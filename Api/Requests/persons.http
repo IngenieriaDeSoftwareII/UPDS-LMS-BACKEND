@@ -1,0 +1,24 @@
+@baseUrl = http://localhost:5024/api
+
+### Crear persona
+POST {{baseUrl}}/persons
+Content-Type: application/json
+
+{
+  "firstName": "José",
+  "lastName": "Mamani",
+  "motherLastName": "Quispe",
+  "dateOfBirth": "1995-04-12",
+  "gender": 0,
+  "nationalId": "7654321",
+  "nationalIdExpedition": "LP",
+  "phoneNumber": "71234567",
+  "address": "Av. Arce #123, La Paz"
+}
+
+###
+
+### Obtener todas las personas
+GET {{baseUrl}}/persons
+
+###
