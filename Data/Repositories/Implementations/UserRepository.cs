@@ -42,6 +42,21 @@ public class UserRepository(UserManager<User> userManager, AppDbContext context)
         return await query.ToListAsync();
     }
 
+    public async Task<User?> FindByEmailAsync(string email)
+    {
+        return await userManager.FindByEmailAsync(email);
+    }
+
+    public async Task<bool> CheckPasswordAsync(User user, string password)
+    {
+        return await userManager.CheckPasswordAsync(user, password);
+    }
+
+    public async Task<bool> IsLockedOutAsync(User user)
+    {
+        return await userManager.IsLockedOutAsync(user);
+    }
+
     public async Task<IList<string>> GetRolesAsync(User user)
     {
         return await userManager.GetRolesAsync(user);
