@@ -6,10 +6,10 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class InscriptionsController(CreateInscription createInscription) : ControllerBase
+public class InscriptionsController(CreateInscriptionUseCase createInscription) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] InscriptionCreateRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateInscriptionDto request)
     {
         var result = await createInscription.ExecuteAsync(request);
 
