@@ -10,6 +10,7 @@ public class InscriptionProfile : Profile
     public InscriptionProfile()
     {
         CreateMap<CreateInscriptionDto, Inscription>();
+        CreateMap<InscriptionByStudentDto, Inscription>();
         CreateMap<Inscription, InscriptionDto>();
     }
 }

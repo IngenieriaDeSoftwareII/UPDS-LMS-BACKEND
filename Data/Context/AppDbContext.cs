@@ -7,6 +7,7 @@ namespace Data.Context;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User>(options)
 {
     public DbSet<Person> People { get; set; }
+
     public DbSet<Inscription> Inscriptions { get; set; }
 
     public DbSet<LessonProgress> LessonProgresses { get; set; }
@@ -17,7 +18,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
 
         modelBuilder.Entity<Inscription>(entity =>
         {
-            entity.ToTable("Inscripciones");
+            entity.ToTable("inscripciones");
+        });
+
+        modelBuilder.Entity<LessonProgress>(entity =>
+        {
+            entity.ToTable("progreso_lecciones");
         });
     }
 }
