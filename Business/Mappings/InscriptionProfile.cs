@@ -3,14 +3,13 @@ using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Data.Entities;
 
-namespace Business.Mappings
+namespace Business.Mappings;
+
+public class InscriptionProfile : Profile
 {
-    public class InscriptionProfile : Profile
+    public InscriptionProfile()
     {
-        public InscriptionProfile()
-        {
-            CreateMap<CreateInscriptionDto, Inscription>();
-            CreateMap<Inscription, InscriptionDto>();
-        }
+        CreateMap<CreateInscriptionDto, Inscription>();
+        CreateMap<Inscription, InscriptionDto>();
     }
 }
