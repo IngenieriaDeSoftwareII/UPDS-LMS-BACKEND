@@ -1,5 +1,5 @@
 using Business.DTOs.Requests;
-using Business.UseCases;
+using Business.UseCases.ImageContent;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -12,7 +12,7 @@ public class ImageContentsController(
     UpdateImageContentUseCase updateImage,
     DeleteImageContentUseCase deleteImage) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("Create")]
     public async Task<IActionResult> Create(CreateImageContentDto dto)
     {
         var result = await createImage.ExecuteAsync(dto);
@@ -23,14 +23,14 @@ public class ImageContentsController(
         return Ok(result.Value);
     }
 
-    [HttpGet]
+    [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
     {
         var result = await listImages.ExecuteAsync();
         return Ok(result);
     }
 
-    [HttpPut("{contentId}")]
+    [HttpPut("Update/{contentId}")]
     public async Task<IActionResult> Update(int contentId, CreateImageContentDto dto)
     {
         var result = await updateImage.ExecuteAsync(contentId, dto);
@@ -41,7 +41,7 @@ public class ImageContentsController(
         return Ok(result.Value);
     }
 
-    [HttpDelete("{contentId}")]
+    [HttpDelete("Delete/{contentId}")]
     public async Task<IActionResult> Delete(int contentId)
     {
         var result = await deleteImage.ExecuteAsync(contentId);

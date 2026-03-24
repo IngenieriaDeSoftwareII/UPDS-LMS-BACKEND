@@ -1,5 +1,5 @@
 using Business.DTOs.Requests;
-using Business.UseCases;
+using Business.UseCases.DocumentContent;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -12,7 +12,7 @@ public class DocumentContentsController(
     UpdateDocumentContentUseCase updateDocument,
     DeleteDocumentContentUseCase deleteDocument) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("Create")]
     public async Task<IActionResult> Create(CreateDocumentContentDto dto)
     {
         var result = await createDocument.ExecuteAsync(dto);
@@ -23,14 +23,14 @@ public class DocumentContentsController(
         return Ok(result.Value);
     }
 
-    [HttpGet]
+    [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
     {
         var result = await listDocuments.ExecuteAsync();
         return Ok(result);
     }
 
-    [HttpPut("{contentId}")]
+    [HttpPut("Update/{contentId}")]
     public async Task<IActionResult> Update(int contentId, CreateDocumentContentDto dto)
     {
         var result = await updateDocument.ExecuteAsync(contentId, dto);
@@ -41,7 +41,7 @@ public class DocumentContentsController(
         return Ok(result.Value);
     }
 
-    [HttpDelete("{contentId}")]
+    [HttpDelete("Delete/{contentId}")]
     public async Task<IActionResult> Delete(int contentId)
     {
         var result = await deleteDocument.ExecuteAsync(contentId);

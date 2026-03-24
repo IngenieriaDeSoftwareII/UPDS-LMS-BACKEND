@@ -1,6 +1,11 @@
 using Azure.Storage.Blobs;
 using Business.Mappings;
 using Business.UseCases;
+using Business.UseCases.Content;
+using Business.UseCases.DocumentContent;
+using Business.UseCases.ImageContent;
+using Business.UseCases.Lesson;
+using Business.UseCases.VideoContent;
 using Data.Context;
 using Data.Repositories.Implementations;
 using Data.Repositories.Interfaces;
@@ -56,16 +61,19 @@ builder.Services.AddScoped<DeleteContentUseCase>();
 
 //Video Content
 builder.Services.AddScoped<CreateVideoContentUseCase>();
+builder.Services.AddScoped<ListVideoContentsUseCase>();
 builder.Services.AddScoped<UpdateVideoContentUseCase>();
 builder.Services.AddScoped<DeleteVideoContentUseCase>();
 
 //Image Content
 builder.Services.AddScoped<CreateImageContentUseCase>();
+builder.Services.AddScoped<ListImageContentsUseCase>();
 builder.Services.AddScoped<UpdateImageContentUseCase>();
 builder.Services.AddScoped<DeleteImageContentUseCase>();
 
 //Document Content
 builder.Services.AddScoped<CreateDocumentContentUseCase>();
+builder.Services.AddScoped<ListDocumentContentsUseCase>();
 builder.Services.AddScoped<UpdateDocumentContentUseCase>();
 builder.Services.AddScoped<DeleteDocumentContentUseCase>();
 
