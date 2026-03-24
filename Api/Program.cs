@@ -64,6 +64,7 @@ builder.Services.AddScoped<ListPersonsUseCase>();
 
 // Users 
 builder.Services.AddScoped<CreateUserUseCase>();
+builder.Services.AddScoped<ListUsersUseCase>();
 
 
 // Validators
@@ -73,7 +74,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<PersonProfile>();
 
 // Mappings
 // --------------------------------------
-builder.Services.AddAutoMapper(cfg => { }, typeof(PersonProfile));
+builder.Services.AddAutoMapper(cfg => { }, typeof(PersonProfile), typeof(UserProfile));
 
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
