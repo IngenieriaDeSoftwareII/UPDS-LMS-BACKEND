@@ -9,6 +9,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<Person> People { get; set; }
     public DbSet<Inscription> Inscriptions { get; set; }
 
+    public DbSet<LessonProgress> LessonProgresses { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

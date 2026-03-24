@@ -29,6 +29,8 @@ builder.Services.AddScoped<IMediaStorageService, AzureMediaStorageService>();
 
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 
+builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>();
+
 
 // UseCases
 // --------------------------------------
