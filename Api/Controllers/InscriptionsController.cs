@@ -7,13 +7,13 @@ namespace Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class InscriptionsController(
-    CreateInscription createInscription,
-    GetMyCourses getMyCourses) : ControllerBase
+    CreateInscriptionUseCase createInscription,
+    ListInscriptionsUseCase listInscriptions) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] InscriptionCreateRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateInscriptionDto dto)
     {
-        var result = await createInscription.ExecuteAsync(request);
+        var result = await createInscription.ExecuteAsync(dto);
         if (!result.IsSuccess) return BadRequest(result.Errors);
         return Ok(result.Value);
     }
@@ -21,7 +21,8 @@ public class InscriptionsController(
     [HttpGet("mis-cursos")]
     public async Task<IActionResult> GetMisCursos([FromQuery] int usuarioId)
     {
-        var result = await getMyCourses.ExecuteAsync(usuarioId);
+        var dto = new InscriptionByStudentDto { UsuarioId = usuarioId };
+        var result = await listInscriptions.ExecuteAsync(dto);
         if (!result.IsSuccess) return BadRequest(result.Errors);
         return Ok(result.Value);
     }

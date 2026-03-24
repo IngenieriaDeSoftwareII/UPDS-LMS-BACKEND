@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace Business.Validators;
 
-public class InscriptionCreateValidator : AbstractValidator<InscriptionCreateRequest>
+public class CreateInscriptionDtoValidator : AbstractValidator<CreateInscriptionDto>
 {
-    public InscriptionCreateValidator()
+    public CreateInscriptionDtoValidator()
     {
         RuleFor(x => x.UsuarioId).GreaterThan(0);
         RuleFor(x => x.CursoId).GreaterThan(0);
