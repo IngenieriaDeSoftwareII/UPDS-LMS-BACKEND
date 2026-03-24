@@ -7,8 +7,7 @@ namespace Data.Context;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User>(options)
 {
     public DbSet<Person> People { get; set; }
-    public DbSet<Inscription> Inscritions { get; set; }
-
+    public DbSet<Inscription> Inscriptions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
