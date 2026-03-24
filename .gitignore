@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Archivo de solución específico
+UPDS-LMS-BACKEND-G2.sin
