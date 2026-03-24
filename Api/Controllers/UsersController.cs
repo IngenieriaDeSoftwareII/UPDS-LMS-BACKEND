@@ -8,11 +8,6 @@ namespace Api.Controllers;
 [Route("api/[controller]")]
 public class UsersController(CreateUserUseCase createUser) : ControllerBase
 {
-    /// <summary>
-    /// HU-01: Crear nuevo usuario (Admin).
-    /// Crea la Person y el User de Identity en una sola operación,
-    /// genera una contraseña por defecto encriptada y asigna el rol.
-    /// </summary>
     [HttpPost]
     public async Task<IActionResult> Create(CreateUserDto dto)
     {

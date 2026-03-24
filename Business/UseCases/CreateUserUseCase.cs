@@ -16,17 +16,14 @@ public class CreateUserUseCase(
 {
     public async Task<Result<UserCreatedDto>> ExecuteAsync(CreateUserDto dto)
     {
-        // 1. Validar el DTO
         var validation = await validator.ValidateAsync(dto);
         if (!validation.IsValid)
             return Result<UserCreatedDto>.Failure(validation.Errors.Select(e => e.ErrorMessage));
 
-        // 2. Verificar que el correo no esté duplicado (HU-01 CS #1)
         var existing = await userManager.FindByEmailAsync(dto.Email);
         if (existing is not null)
             return Result<UserCreatedDto>.Failure(["Este correo ya está registrado"]);
 
-        // 3. Crear Person con datos mínimos (el perfil completo se gestiona en HU-08)
         var person = new Person
         {
             FirstName = dto.FirstName,
@@ -39,7 +36,6 @@ public class CreateUserUseCase(
         };
         var createdPerson = await personRepository.CreateAsync(person);
 
-        // 4. Generar contraseña por defecto y crear el User mediante Identity (encripta automáticamente)
         var tempPassword = GenerateTemporaryPassword();
         var user = new User
         {
@@ -52,7 +48,6 @@ public class CreateUserUseCase(
         if (!identityResult.Succeeded)
             return Result<UserCreatedDto>.Failure(identityResult.Errors.Select(e => e.Description));
 
-        // 5. Asignar rol al usuario
         await userManager.AddToRoleAsync(user, dto.Role);
 
         return Result<UserCreatedDto>.Success(new UserCreatedDto
@@ -65,10 +60,6 @@ public class CreateUserUseCase(
         });
     }
 
-    /// <summary>
-    /// Genera una contraseña temporal que cumple los requisitos de Identity:
-    /// mayúscula, minúscula, dígito y carácter especial.
-    /// </summary>
     private static string GenerateTemporaryPassword()
     {
         var suffix = Random.Shared.Next(100, 999);
