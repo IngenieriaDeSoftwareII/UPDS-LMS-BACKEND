@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260321213854_Identity-Users-Migration")]
-    partial class IdentityUsersMigration
+    [Migration("20260324203824_MigracionLimpia")]
+    partial class MigracionLimpia
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,141 @@ namespace Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Data.Entities.Content", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DocumentContentId")
+                        .HasColumnType("int");
+
+                    b.Property<short>("EntityStatus")
+                        .HasColumnType("smallint");
+
+                    b.Property<int>("LessonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentContentId");
+
+                    b.HasIndex("LessonId");
+
+                    b.ToTable("Contents");
+                });
+
+            modelBuilder.Entity("Data.Entities.DocumentContent", b =>
+                {
+                    b.Property<int>("ContentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Format")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PageCount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SizeKb")
+                        .HasColumnType("int");
+
+                    b.HasKey("ContentId");
+
+                    b.ToTable("DocumentContents");
+                });
+
+            modelBuilder.Entity("Data.Entities.ImageContent", b =>
+                {
+                    b.Property<int>("ContentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AltText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Format")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("HeightPx")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SizeKb")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("WidthPx")
+                        .HasColumnType("int");
+
+                    b.HasKey("ContentId");
+
+                    b.ToTable("ImageContents");
+                });
+
+            modelBuilder.Entity("Data.Entities.Lesson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<short>("EntityStatus")
+                        .HasColumnType("smallint");
+
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Lessons");
+                });
 
             modelBuilder.Entity("Data.Entities.Person", b =>
                 {
@@ -141,6 +276,23 @@ namespace Data.Migrations
                     b.HasIndex("PersonId");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Data.Entities.VideoContent", b =>
+                {
+                    b.Property<int>("ContentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DurationSeconds")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VideoUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ContentId");
+
+                    b.ToTable("VideoContents");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -276,6 +428,45 @@ namespace Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Data.Entities.Content", b =>
+                {
+                    b.HasOne("Data.Entities.DocumentContent", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentContentId");
+
+                    b.HasOne("Data.Entities.Lesson", "Lesson")
+                        .WithMany("Contents")
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+
+                    b.Navigation("Lesson");
+                });
+
+            modelBuilder.Entity("Data.Entities.DocumentContent", b =>
+                {
+                    b.HasOne("Data.Entities.Content", "Content")
+                        .WithOne()
+                        .HasForeignKey("Data.Entities.DocumentContent", "ContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Content");
+                });
+
+            modelBuilder.Entity("Data.Entities.ImageContent", b =>
+                {
+                    b.HasOne("Data.Entities.Content", "Content")
+                        .WithOne("Image")
+                        .HasForeignKey("Data.Entities.ImageContent", "ContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Content");
+                });
+
             modelBuilder.Entity("Data.Entities.User", b =>
                 {
                     b.HasOne("Data.Entities.Person", "Person")
@@ -285,6 +476,17 @@ namespace Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("Data.Entities.VideoContent", b =>
+                {
+                    b.HasOne("Data.Entities.Content", "Content")
+                        .WithOne("Video")
+                        .HasForeignKey("Data.Entities.VideoContent", "ContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Content");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -336,6 +538,18 @@ namespace Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Data.Entities.Content", b =>
+                {
+                    b.Navigation("Image");
+
+                    b.Navigation("Video");
+                });
+
+            modelBuilder.Entity("Data.Entities.Lesson", b =>
+                {
+                    b.Navigation("Contents");
                 });
 
             modelBuilder.Entity("Data.Entities.Person", b =>

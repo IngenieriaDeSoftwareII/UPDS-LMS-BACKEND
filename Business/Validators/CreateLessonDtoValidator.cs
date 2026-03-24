@@ -12,7 +12,7 @@ public class CreateLessonDtoValidator : AbstractValidator<CreateLessonDto>
 
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("El título es requerido.")
-            .MaximumLength(200);
+            .MaximumLength(150);
 
         RuleFor(x => x.Description)
             .MaximumLength(1000)

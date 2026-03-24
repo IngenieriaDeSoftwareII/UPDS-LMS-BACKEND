@@ -1,3 +1,5 @@
+using Data.Enums;
+
 namespace Data.Entities;
 
 public class ImageContent
@@ -6,7 +8,7 @@ public class ImageContent
 
     public string ImageUrl { get; set; } = null!;
 
-    public string Format { get; set; } = null!;
+    public FormatImage Format { get; set; }
 
     public int? WidthPx { get; set; }
 

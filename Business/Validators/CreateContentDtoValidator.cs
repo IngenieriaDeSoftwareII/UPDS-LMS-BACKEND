@@ -1,6 +1,6 @@
 using Business.DTOs.Requests;
 using FluentValidation;
-
+using Data.Enums;
 namespace Business.Validators;
 
 public class CreateContentDtoValidator : AbstractValidator<CreateContentDto>
@@ -11,16 +11,11 @@ public class CreateContentDtoValidator : AbstractValidator<CreateContentDto>
             .GreaterThan(0).WithMessage("El ID de la lección debe ser mayor a 0.");
 
         RuleFor(x => x.Type)
-            .NotEmpty().WithMessage("El tipo de contenido es requerido.")
-            .MaximumLength(50);
-
+            .IsInEnum()
+            .WithMessage("El tipo de contenido no es válido.");
+        
         RuleFor(x => x.Title)
-            .MaximumLength(200)
-            .When(x => x.Title is not null);
-
-        RuleFor(x => x.Url)
-            .MaximumLength(500)
-            .When(x => x.Url is not null);
+            .MaximumLength(150).WithMessage("El título no puede exceder los 150 caracteres.");
 
         RuleFor(x => x.Order)
             .GreaterThanOrEqualTo(0).WithMessage("El orden debe ser mayor o igual a 0.");

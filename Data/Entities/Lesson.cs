@@ -22,4 +22,5 @@ public class Lesson
 
     // Relaciones con contenidos
     public ICollection<Content> Contents { get; set; } = [];
+    //arrelacion con modulo
 }

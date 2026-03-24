@@ -23,22 +23,52 @@ builder.Services.AddSingleton(new BlobServiceClient(
 
 builder.Services.AddScoped<IMediaStorageService, AzureMediaStorageService>();
 
-
 // Repositories
 // --------------------------------------
-
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<IContentRepository, ContentRepository>();
+builder.Services.AddScoped<IVideoContentRepository, VideoContentRepository>();
+builder.Services.AddScoped<IImageContentRepository, ImageContentRepository>();
+builder.Services.AddScoped<IDocumentContentRepository, DocumentContentRepository>();
 
 // UseCases
 // --------------------------------------
-
 // Storage
 builder.Services.AddScoped<UploadImageUseCase>();
 
 // Persons
 builder.Services.AddScoped<CreatePersonUseCase>();
 builder.Services.AddScoped<ListPersonsUseCase>();
+
+//Lessons
+builder.Services.AddScoped<CreateLessonUseCase>();
+builder.Services.AddScoped<ListLessonsUseCase>();
+builder.Services.AddScoped<UpdateLessonUseCase>();
+builder.Services.AddScoped<DeleteLessonUseCase>();
+
+//Content
+builder.Services.AddScoped<CreateContentUseCase>();
+builder.Services.AddScoped<ListContentsUseCase>();
+builder.Services.AddScoped<UpdateContentUseCase>();
+builder.Services.AddScoped<DeleteContentUseCase>();
+
+//Video Content
+builder.Services.AddScoped<CreateVideoContentUseCase>();
+builder.Services.AddScoped<UpdateVideoContentUseCase>();
+builder.Services.AddScoped<DeleteVideoContentUseCase>();
+
+//Image Content
+builder.Services.AddScoped<CreateImageContentUseCase>();
+builder.Services.AddScoped<UpdateImageContentUseCase>();
+builder.Services.AddScoped<DeleteImageContentUseCase>();
+
+//Document Content
+builder.Services.AddScoped<CreateDocumentContentUseCase>();
+builder.Services.AddScoped<UpdateDocumentContentUseCase>();
+builder.Services.AddScoped<DeleteDocumentContentUseCase>();
+
 
 
 // Validators

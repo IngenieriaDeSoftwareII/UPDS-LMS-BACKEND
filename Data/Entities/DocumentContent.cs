@@ -1,3 +1,5 @@
+using Data.Enums;
+
 namespace Data.Entities;
 
 public class DocumentContent
@@ -6,7 +8,7 @@ public class DocumentContent
 
     public string FileUrl { get; set; } = null!;
 
-    public string Format { get; set; } = null!;
+    public FormatDocument Format { get; set; }
 
     public int? SizeKb { get; set; }
 
