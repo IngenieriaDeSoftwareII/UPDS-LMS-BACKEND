@@ -5,13 +5,12 @@ using Data.Entities;
 using Data.Enums;
 using Data.Repositories.Interfaces;
 using FluentValidation;
-using Microsoft.AspNetCore.Identity;
 
 namespace Business.UseCases;
 
 public class CreateUserUseCase(
     IPersonRepository personRepository,
-    UserManager<User> userManager,
+    IUserRepository userRepository,
     IValidator<CreateUserDto> validator)
 {
     public async Task<Result<UserCreatedDto>> ExecuteAsync(CreateUserDto dto)
@@ -20,9 +19,9 @@ public class CreateUserUseCase(
         if (!validation.IsValid)
             return Result<UserCreatedDto>.Failure(validation.Errors.Select(e => e.ErrorMessage));
 
-        var existing = await userManager.FindByEmailAsync(dto.Email);
-        if (existing is not null)
+        if (await userRepository.EmailExistsAsync(dto.Email))
             return Result<UserCreatedDto>.Failure(["Este correo ya está registrado"]);
+
 
         var person = new Person
         {
@@ -36,6 +35,7 @@ public class CreateUserUseCase(
         };
         var createdPerson = await personRepository.CreateAsync(person);
 
+
         var tempPassword = GenerateTemporaryPassword();
         var user = new User
         {
@@ -44,11 +44,12 @@ public class CreateUserUseCase(
             PersonId = createdPerson.Id
         };
 
-        var identityResult = await userManager.CreateAsync(user, tempPassword);
-        if (!identityResult.Succeeded)
-            return Result<UserCreatedDto>.Failure(identityResult.Errors.Select(e => e.Description));
+        var (succeeded, errors) = await userRepository.CreateAsync(user, tempPassword);
+        if (!succeeded)
+            return Result<UserCreatedDto>.Failure(errors);
 
-        await userManager.AddToRoleAsync(user, dto.Role);
+
+        await userRepository.AssignRoleAsync(user, dto.Role);
 
         return Result<UserCreatedDto>.Success(new UserCreatedDto
         {
@@ -59,6 +60,7 @@ public class CreateUserUseCase(
             TemporaryPassword = tempPassword
         });
     }
+
 
     private static string GenerateTemporaryPassword()
     {

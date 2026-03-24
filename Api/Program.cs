@@ -49,6 +49,7 @@ builder.Services.AddScoped<IMediaStorageService, AzureMediaStorageService>();
 // --------------------------------------
 
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
 // UseCases
@@ -61,7 +62,7 @@ builder.Services.AddScoped<UploadImageUseCase>();
 builder.Services.AddScoped<CreatePersonUseCase>();
 builder.Services.AddScoped<ListPersonsUseCase>();
 
-// Users
+// Users 
 builder.Services.AddScoped<CreateUserUseCase>();
 
 
