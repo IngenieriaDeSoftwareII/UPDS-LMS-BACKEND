@@ -1,6 +1,6 @@
 namespace Data.Enums;
 
-public enum InscriptionEstado
+public enum InscriptionEstate
 {
     Activo,
     Progreso,
