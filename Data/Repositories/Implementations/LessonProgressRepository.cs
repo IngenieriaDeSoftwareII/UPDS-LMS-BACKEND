@@ -20,8 +20,8 @@ namespace Data.Repositories.Implementations
         {
             return await context.LessonProgresses
                 .Include(p => p.Lesson)
-                    .ThenInclude(l => l.Module)
-                .Where(p => p.usuario_id == usuario_id && p.Lesson.Module.curso_id == curso_id)
+                    .ThenInclude(l => l.Modulos)
+                .Where(p => p.usuario_id == usuario_id && p.Lesson.Modulos.CursoId == curso_id)
                 .ToListAsync();
         }
 

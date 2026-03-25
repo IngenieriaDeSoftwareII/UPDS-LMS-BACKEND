@@ -52,5 +52,7 @@ public class Course
     public DateTime? DeletedAt { get; set; }
 
     public ICollection<Inscription> Inscripciones { get; set; } = [];
+
+    public ICollection<Module> Modulos { get; set; } = [];
 }
 
