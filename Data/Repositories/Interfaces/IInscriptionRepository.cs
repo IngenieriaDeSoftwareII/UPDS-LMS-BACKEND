@@ -1,4 +1,4 @@
-﻿using Data.Entities;
+using Data.Entities;
 
 namespace Data.Repositories.Interfaces
 {
@@ -7,6 +7,7 @@ namespace Data.Repositories.Interfaces
         Task<Inscription?> GetByUserAndCourseAsync(int usuarioId, int cursoId);
         Task<IEnumerable<Inscription>> GetByUserAsync(int usuarioId);
         Task<Inscription> CreateAsync(Inscription inscripcion);
-        Task<int> CountByCourseAsync(int cursoId);
+        Task<Inscription> UpdateAsync(Inscription inscripcion);
+        Task<int> CountActiveInscriptionsByCourseAsync(int cursoId);
     }
 }

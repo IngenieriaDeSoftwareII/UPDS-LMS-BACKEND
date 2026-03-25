@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Data.Enums;
 
 namespace Data.Entities
 {
-    [Table("inscripciones")] 
+    [Table("inscripciones")]
     public class Inscription
     {
         [Key]
@@ -21,7 +22,7 @@ namespace Data.Entities
 
         [Column("estado")]
         [StringLength(50)]
-        public string Estado { get; set; } = "activo";
+        public InscriptionEstado Estado { get; set; } = InscriptionEstado.Activo;
 
         [Column("entity_status")]
         public short EntityStatus { get; set; } = 1;
@@ -35,7 +36,6 @@ namespace Data.Entities
         [Column("deleted_at")]
         public DateTime? DeletedAt { get; set; }
 
-        
         [ForeignKey("UsuarioId")]
         public virtual AspNetUser Usuario { get; set; }
 
