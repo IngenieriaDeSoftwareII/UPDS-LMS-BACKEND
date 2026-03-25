@@ -42,7 +42,7 @@ namespace Data.Repositories.Implementations
         {
             return await dbContext.Inscriptions
                 .Where(i => i.UsuarioId == usuarioId && i.Estado != InscriptionEstate.Cancelado)
-                .Include(i => i.Curso)
+                .Include(i => i.Cursos)
                 .ToListAsync();
         }
     }
