@@ -2,7 +2,7 @@ using AutoMapper;
 using Business.DTOs.Responses;
 using Data.Repositories.Interfaces;
 
-namespace Business.UseCases;
+namespace Business.UseCases.Lesson;
 
 public class ListLessonsUseCase(ILessonRepository repository, IMapper mapper)
 {

@@ -2,7 +2,7 @@ using AutoMapper;
 using Business.DTOs.Responses;
 using Data.Repositories.Interfaces;
 
-namespace Business.UseCases;
+namespace Business.UseCases.DocumentContent;
 
 public class ListDocumentContentsUseCase(IDocumentContentRepository repository, IMapper mapper)
 {

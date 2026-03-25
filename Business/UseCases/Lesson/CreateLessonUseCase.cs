@@ -6,7 +6,7 @@ using Data.Entities;
 using Data.Repositories.Interfaces;
 using FluentValidation;
 
-namespace Business.UseCases;
+namespace Business.UseCases.Lesson;
 
 public class CreateLessonUseCase(
     ILessonRepository repository,
@@ -19,7 +19,7 @@ public class CreateLessonUseCase(
         if (!validation.IsValid)
             return Result<LessonDto>.Failure(validation.Errors.Select(e => e.ErrorMessage));
 
-        var lesson = mapper.Map<Lesson>(dto);
+        var lesson = mapper.Map<Data.Entities.Lesson>(dto);
         var created = await repository.CreateAsync(lesson);
 
         return Result<LessonDto>.Success(mapper.Map<LessonDto>(created));

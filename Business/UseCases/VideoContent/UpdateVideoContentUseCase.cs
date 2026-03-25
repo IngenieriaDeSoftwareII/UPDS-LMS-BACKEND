@@ -6,7 +6,7 @@ using Data.Entities;
 using Data.Repositories.Interfaces;
 using FluentValidation;
 
-namespace Business.UseCases;
+namespace Business.UseCases.VideoContent;
 
 public class UpdateVideoContentUseCase(
     IVideoContentRepository repository,

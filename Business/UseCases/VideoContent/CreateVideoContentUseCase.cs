@@ -6,7 +6,7 @@ using Data.Entities;
 using Data.Repositories.Interfaces;
 using FluentValidation;
 
-namespace Business.UseCases;
+namespace Business.UseCases.VideoContent;
 
 public class CreateVideoContentUseCase(
     IVideoContentRepository repository,
@@ -19,7 +19,7 @@ public class CreateVideoContentUseCase(
         if (!validation.IsValid)
             return Result<VideoContentDto>.Failure(validation.Errors.Select(e => e.ErrorMessage));
 
-        var entity = mapper.Map<VideoContent>(dto);
+        var entity = mapper.Map<Data.Entities.VideoContent>(dto);
         var created = await repository.CreateAsync(entity);
 
         return Result<VideoContentDto>.Success(mapper.Map<VideoContentDto>(created));

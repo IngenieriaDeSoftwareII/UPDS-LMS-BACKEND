@@ -6,7 +6,7 @@ using Data.Entities;
 using Data.Repositories.Interfaces;
 using FluentValidation;
 
-namespace Business.UseCases;
+namespace Business.UseCases.DocumentContent;
 
 public class CreateDocumentContentUseCase(
     IDocumentContentRepository repository,
@@ -19,7 +19,7 @@ public class CreateDocumentContentUseCase(
         if (!validation.IsValid)
             return Result<DocumentContentDto>.Failure(validation.Errors.Select(e => e.ErrorMessage));
 
-        var entity = mapper.Map<DocumentContent>(dto);
+        var entity = mapper.Map<Data.Entities.DocumentContent>(dto);
         var created = await repository.CreateAsync(entity);
 
         return Result<DocumentContentDto>.Success(mapper.Map<DocumentContentDto>(created));

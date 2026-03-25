@@ -29,7 +29,7 @@ public class UploadDocumentContentUseCase
         var blobName = await _storage.UploadAsync(fileStream, fileName, Container);
 
         // Crear entidad Content base
-        var content = new Content
+        var content = new Data.Entities.Content
         {
             LessonId = lessonId,
             Type = TypeContent.documento,
@@ -44,7 +44,7 @@ public class UploadDocumentContentUseCase
         await _db.SaveChangesAsync(); // Guarda y genera Content.Id
 
         // Crear entidad DocumentContent (1:1 con Content)
-        var documentContent = new DocumentContent
+        var documentContent = new Data.Entities.DocumentContent
         {
             ContentId = content.Id,
             FileUrl = blobName, // o construir URL completa si lo necesitas

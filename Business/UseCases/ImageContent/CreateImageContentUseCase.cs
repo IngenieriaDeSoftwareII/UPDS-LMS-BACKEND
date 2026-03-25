@@ -6,7 +6,7 @@ using Data.Entities;
 using Data.Repositories.Interfaces;
 using FluentValidation;
 
-namespace Business.UseCases;
+namespace Business.UseCases.ImageContent;
 
 public class CreateImageContentUseCase(
     IImageContentRepository repository,
@@ -19,7 +19,7 @@ public class CreateImageContentUseCase(
         if (!validation.IsValid)
             return Result<ImageContentDto>.Failure(validation.Errors.Select(e => e.ErrorMessage));
 
-        var entity = mapper.Map<ImageContent>(dto);
+        var entity = mapper.Map<Data.Entities.ImageContent>(dto);
         var created = await repository.CreateAsync(entity);
 
         return Result<ImageContentDto>.Success(mapper.Map<ImageContentDto>(created));

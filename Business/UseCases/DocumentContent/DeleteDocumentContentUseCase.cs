@@ -1,15 +1,15 @@
 using Business.Results;
 using Data.Repositories.Interfaces;
 
-namespace Business.UseCases;
+namespace Business.UseCases.DocumentContent;
 
-public class DeleteVideoContentUseCase(IVideoContentRepository repository)
+public class DeleteDocumentContentUseCase(IDocumentContentRepository repository)
 {
     public async Task<Result<bool>> ExecuteAsync(int contentId)
     {
         var existing = await repository.GetByContentIdAsync(contentId);
         if (existing is null)
-            return Result<bool>.Failure(["VideoContent no encontrado"]);
+            return Result<bool>.Failure(["DocumentContent no encontrado"]);
 
         await repository.DeleteAsync(contentId);
 
