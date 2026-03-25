@@ -42,3 +42,5 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
         });
     }
 }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+}
