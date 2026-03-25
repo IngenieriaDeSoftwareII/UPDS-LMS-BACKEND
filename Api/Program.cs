@@ -46,6 +46,7 @@ builder.Services.AddScoped<ListPersonsUseCase>();
 //Inscriptions
 builder.Services.AddScoped<CreateInscriptionUseCase>();
 builder.Services.AddScoped<ListInscriptionsUseCase>();
+builder.Services.AddScoped<CancelInscriptionUseCase>();
 
 
 // Validators

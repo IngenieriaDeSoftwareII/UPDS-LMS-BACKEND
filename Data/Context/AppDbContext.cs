@@ -1,4 +1,5 @@
-﻿using Data.Entities;
+using Data.Entities;
+using Data.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
         modelBuilder.Entity<Inscription>(entity =>
         {
             entity.ToTable("inscripciones");
+            entity.Property(e => e.Estado)
+                .HasMaxLength(50)
+                .HasConversion(
+                    v => v.ToString().ToLowerInvariant(),
+                    v => string.IsNullOrEmpty(v)
+                        ? InscriptionEstado.Activo
+                        : Enum.Parse<InscriptionEstado>(v, true));
         });
 
         modelBuilder.Entity<LessonProgress>(entity =>
