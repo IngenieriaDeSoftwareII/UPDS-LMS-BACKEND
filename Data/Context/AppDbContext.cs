@@ -13,6 +13,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
 
     public DbSet<LessonProgress> LessonProgresses { get; set; }
 
+    public DbSet<Course> Courses { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -32,6 +34,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
         modelBuilder.Entity<LessonProgress>(entity =>
         {
             entity.ToTable("progreso_lecciones");
+        });
+
+        modelBuilder.Entity<Course>(entity =>
+        {
+            entity.ToTable("cursos");
         });
     }
 }

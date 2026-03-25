@@ -10,7 +10,7 @@ namespace Business.UseCases;
 
 public class CancelInscriptionUseCase(
     IInscriptionRepository repository,
-    ICursoRepository cursoRepository,
+    ICourseRepository courseRepository,
     IMapper mapper,
     IValidator<CancelInscriptionDto> validator)
 {
@@ -42,7 +42,7 @@ public class CancelInscriptionUseCase(
         existing.Estado = InscriptionEstate.Cancelado;
         var saved = await repository.UpdateAsync(existing);
 
-        var curso = await cursoRepository.GetByIdAsync(dto.CursoId);
+        var curso = await courseRepository.GetByIdAsync(dto.CursoId);
         var resultDto = mapper.Map<InscriptionDto>(saved);
         resultDto.Curso = curso is null
             ? new CourseDto { Id = dto.CursoId }

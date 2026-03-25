@@ -11,7 +11,7 @@ namespace Business.UseCases
 {
     public class CreateInscriptionUseCase(
         IInscriptionRepository repository,
-        ICursoRepository cursoRepository,
+        ICourseRepository courseRepository,
         IMapper mapper,
         IValidator<CreateInscriptionDto> validator)
     {
@@ -21,7 +21,7 @@ namespace Business.UseCases
             if (!validation.IsValid)
                 return Result<InscriptionDto>.Failure(validation.Errors.Select(e => e.ErrorMessage));
 
-            var curso = await cursoRepository.GetByIdAsync(dto.CursoId);
+            var curso = await courseRepository.GetByIdAsync(dto.CursoId);
             if (curso is null)
                 return Result<InscriptionDto>.Failure(["El curso no existe."]);
 
