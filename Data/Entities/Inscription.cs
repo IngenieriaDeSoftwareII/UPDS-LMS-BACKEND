@@ -40,6 +40,6 @@ namespace Data.Entities
         public virtual AspNetUser Usuario { get; set; }
 
         [ForeignKey("CursoId")]
-        public virtual Curso Curso { get; set; }
+        public virtual Course Curso { get; set; }
     }
 }
