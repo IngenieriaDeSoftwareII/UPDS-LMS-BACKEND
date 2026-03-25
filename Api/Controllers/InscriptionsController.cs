@@ -22,7 +22,7 @@ public class InscriptionsController(
         return Ok(result.Value);
     }
 
-    [HttpGet("mis-cursos")]
+    [HttpGet("courses")]
     public async Task<IActionResult> GetMyCourses(int usuarioId)
     {
         var dto = new InscriptionByStudentDto { UsuarioId = usuarioId };
@@ -35,7 +35,7 @@ public class InscriptionsController(
         return Ok(result.Value);
     }
 
-    [HttpPost("cancelar")]
+    [HttpPatch("cancel")]
     public async Task<IActionResult> Cancel(CancelInscriptionDto dto)
     {
         var result = await cancelInscription.ExecuteAsync(dto);

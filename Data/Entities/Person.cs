@@ -26,7 +26,7 @@ public class Person
 
     public string? ProfilePictureUrl { get; set; }
 
-    public ICollection<User> Users { get; set; } = [];
+    public User? User { get; set; }
 
     public ICollection<Inscription> Inscripciones { get; set; } = [];
 }

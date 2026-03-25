@@ -13,7 +13,7 @@ namespace Data.Repositories.Implementations
         public async Task<LessonProgress?> GetByUserAndLessonAsync(int usuario_id, int leccion_id)
         {
             return await context.LessonProgresses
-                .FirstOrDefaultAsync(p => p.usuario_id == usuario_id && p.leccion_id == leccion_id);
+                .FirstOrDefaultAsync(p => p.UsuarioId == usuario_id && p.LeccionId == leccion_id);
         }
 
         public async Task<IEnumerable<LessonProgress>> GetByUserAndCourseAsync(int usuario_id, int curso_id)
@@ -21,7 +21,7 @@ namespace Data.Repositories.Implementations
             return await context.LessonProgresses
                 .Include(p => p.Lesson)
                     .ThenInclude(l => l.Modulos)
-                .Where(p => p.usuario_id == usuario_id && p.Lesson.Modulos.CursoId == curso_id)
+                .Where(p => p.UsuarioId == usuario_id && p.Lesson.Modulos.CursoId == curso_id)
                 .ToListAsync();
         }
 

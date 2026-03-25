@@ -23,7 +23,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasOne(u => u.Person)
-                  .WithOne()
+                  .WithOne(p => p.User)
                   .HasForeignKey<User>(u => u.PersonId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
@@ -72,7 +72,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             entity.Property(e => e.Estado)
                   .HasMaxLength(50)
                   .HasConversion(
-                      v => v.ToString().ToLowerInvariant(),
+                      v => v.ToString(),
                       v => string.IsNullOrEmpty(v)
                           ? InscriptionEstate.Activo
                           : Enum.Parse<InscriptionEstate>(v, true));

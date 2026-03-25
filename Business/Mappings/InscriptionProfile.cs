@@ -12,6 +12,8 @@ public class InscriptionProfile : Profile
         CreateMap<InscriptionByStudentDto, Inscription>();
         CreateMap<Inscription, InscriptionDto>()
             .ForMember(d => d.Estado,
-                o => o.MapFrom(s => s.Estado.ToString().ToLowerInvariant()));
+                o => o.MapFrom(s => s.Estado.ToString()))
+            .ForMember(d => d.Curso,
+                o => o.MapFrom(s => s.Cursos));
     }
 }

@@ -117,7 +117,12 @@ builder.Services.AddValidatorsFromAssemblyContaining<PersonProfile>();
 
 // Mappings
 // --------------------------------------
-builder.Services.AddAutoMapper(cfg => { }, typeof(PersonProfile), typeof(UserProfile));
+builder.Services.AddAutoMapper(
+    cfg => { },
+    typeof(PersonProfile),
+    typeof(UserProfile),
+    typeof(InscriptionProfile),
+    typeof(CourseProfile));
 
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
