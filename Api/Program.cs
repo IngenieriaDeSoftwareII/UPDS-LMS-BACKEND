@@ -82,6 +82,9 @@ builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
+builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>();
+builder.Services.AddScoped<IInscriptionRepository, InscriptionRepository>();
+
 
 // UseCases
 // --------------------------------------
@@ -93,6 +96,10 @@ builder.Services.AddScoped<UploadImageUseCase>();
 builder.Services.AddScoped<CreatePersonUseCase>();
 builder.Services.AddScoped<ListPersonsUseCase>();
 
+//Inscriptions
+builder.Services.AddScoped<CreateInscriptionUseCase>();
+builder.Services.AddScoped<ListInscriptionsUseCase>();
+builder.Services.AddScoped<CancelInscriptionUseCase>();
 // Users
 builder.Services.AddScoped<CreateUserUseCase>();
 builder.Services.AddScoped<ListUsersUseCase>();
