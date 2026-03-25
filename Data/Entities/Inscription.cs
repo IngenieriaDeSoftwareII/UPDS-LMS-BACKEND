@@ -22,7 +22,7 @@ namespace Data.Entities
 
         [Column("estado")]
         [StringLength(50)]
-        public InscriptionEstado Estado { get; set; } = InscriptionEstado.Activo;
+        public InscriptionEstate Estado { get; set; } = InscriptionEstate.Activo;
 
         [Column("entity_status")]
         public short EntityStatus { get; set; } = 1;

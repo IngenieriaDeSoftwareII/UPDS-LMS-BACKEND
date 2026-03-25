@@ -25,8 +25,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
                 .HasConversion(
                     v => v.ToString().ToLowerInvariant(),
                     v => string.IsNullOrEmpty(v)
-                        ? InscriptionEstado.Activo
-                        : Enum.Parse<InscriptionEstado>(v, true));
+                        ? InscriptionEstate.Activo
+                        : Enum.Parse<InscriptionEstate>(v, true));
         });
 
         modelBuilder.Entity<LessonProgress>(entity =>

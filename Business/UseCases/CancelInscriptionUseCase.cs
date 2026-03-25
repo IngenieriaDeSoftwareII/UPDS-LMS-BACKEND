@@ -27,19 +27,19 @@ public class CancelInscriptionUseCase(
                 ["No hay una inscripción a este curso para el usuario indicado."]);
         }
 
-        if (existing.Estado == InscriptionEstado.Cancelado)
+        if (existing.Estado == InscriptionEstate.Cancelado)
         {
             return Result<InscriptionDto>.Failure(
                 ["La inscripción ya está cancelada."]);
         }
 
-        if (existing.Estado == InscriptionEstado.Terminado)
+        if (existing.Estado == InscriptionEstate.Terminado)
         {
             return Result<InscriptionDto>.Failure(
                 ["No se puede cancelar una inscripción ya finalizada."]);
         }
 
-        existing.Estado = InscriptionEstado.Cancelado;
+        existing.Estado = InscriptionEstate.Cancelado;
         var saved = await repository.UpdateAsync(existing);
 
         var curso = await cursoRepository.GetByIdAsync(dto.CursoId);

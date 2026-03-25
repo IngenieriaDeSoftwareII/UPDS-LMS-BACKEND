@@ -13,7 +13,7 @@ namespace Data.Repositories.Implementations
         {
             return await dbContext.Inscriptions
                 .Where(i => i.CursoId == cursoId
-                    && (i.Estado == InscriptionEstado.Activo || i.Estado == InscriptionEstado.Progreso))
+                    && (i.Estado == InscriptionEstate.Activo || i.Estado == InscriptionEstate.Progreso))
                 .CountAsync();
         }
 
@@ -41,7 +41,7 @@ namespace Data.Repositories.Implementations
         public async Task<IEnumerable<Inscription>> GetByUserAsync(int usuarioId)
         {
             return await dbContext.Inscriptions
-                .Where(i => i.UsuarioId == usuarioId && i.Estado != InscriptionEstado.Cancelado)
+                .Where(i => i.UsuarioId == usuarioId && i.Estado != InscriptionEstate.Cancelado)
                 .Include(i => i.Curso)
                 .ToListAsync();
         }

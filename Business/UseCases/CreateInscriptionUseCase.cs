@@ -37,13 +37,13 @@ namespace Business.UseCases
                 dto.UsuarioId,
                 dto.CursoId);
 
-            if (existing is not null && existing.Estado != InscriptionEstado.Cancelado)
+            if (existing is not null && existing.Estado != InscriptionEstate.Cancelado)
                 return Result<InscriptionDto>.Failure(["El usuario ya está inscrito en este curso."]);
 
             Inscription saved;
             if (existing is not null)
             {
-                existing.Estado = InscriptionEstado.Activo;
+                existing.Estado = InscriptionEstate.Activo;
                 existing.DeletedAt = null;
                 saved = await repository.UpdateAsync(existing);
             }
