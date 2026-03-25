@@ -9,13 +9,23 @@ public class ContentProfile : Profile
 {
     public ContentProfile()
     {
+        // Content
         CreateMap<CreateContentDto, Content>();
         CreateMap<Content, ContentDto>();
-        CreateMap<CreateDocumentContentDto, DocumentContent>();
+
+        // Document
+        CreateMap<CreateDocumentContentDto, DocumentContent>()
+            .ForMember(dest => dest.Content, opt => opt.Ignore());
         CreateMap<DocumentContent, DocumentContentDto>();
-        CreateMap<CreateImageContentDto, ImageContent>();
+
+        // Image
+        CreateMap<CreateImageContentDto, ImageContent>()
+            .ForMember(dest => dest.Content, opt => opt.Ignore()); 
         CreateMap<ImageContent, ImageContentDto>();
-        CreateMap<CreateVideoContentDto, VideoContent>();
+
+        // Video
+        CreateMap<CreateVideoContentDto, VideoContent>()
+            .ForMember(dest => dest.Content, opt => opt.Ignore()); 
         CreateMap<VideoContent, VideoContentDto>();
     }
 }

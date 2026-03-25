@@ -13,7 +13,7 @@ public class ContentsController(
     DeleteContentUseCase deleteContent) : ControllerBase
 {
     [HttpPost("Create")]
-    public async Task<IActionResult> Create(CreateContentDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateContentDto dto)
     {
         var result = await createContent.ExecuteAsync(dto);
 
@@ -23,6 +23,8 @@ public class ContentsController(
         return Ok(result.Value);
     }
 
+
+
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
     {
@@ -31,7 +33,7 @@ public class ContentsController(
     }
 
     [HttpPut("Update/{id}")]
-    public async Task<IActionResult> Update(int id, CreateContentDto dto)
+    public async Task<IActionResult> Update(int id, [FromBody] CreateContentDto dto)
     {
         var result = await updateContent.ExecuteAsync(id, dto);
 

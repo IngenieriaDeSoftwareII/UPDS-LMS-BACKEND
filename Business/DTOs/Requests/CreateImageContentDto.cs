@@ -2,6 +2,7 @@ namespace Business.DTOs.Requests;
 
 public class CreateImageContentDto
 {
+    public int ContentId { get; set; }
     public string ImageUrl { get; set; } = null!;
     public string Format { get; set; } = null!;
     public int? WidthPx { get; set; }
