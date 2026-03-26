@@ -180,8 +180,8 @@ builder.Services.AddOpenApi(options =>
 
 var app = builder.Build();
 
-// Seed de roles al iniciar la aplicación
-await SeedRolesAsync(app.Services);
+// Seed de roles y admin inicial
+await Api.Extensions.DbSeeder.SeedRolesAndAdminAsync(app.Services);
 
 if (app.Environment.IsDevelopment())
 {
@@ -202,18 +202,7 @@ app.Run();
 
 
 
-static async Task SeedRolesAsync(IServiceProvider services)
-{
-    using var scope = services.CreateScope();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-    foreach (var role in UserRoles.All)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-            await roleManager.CreateAsync(new IdentityRole(role));
-    }
-}
-
+// Deleted Local Seed Method
 internal sealed class BearerSecuritySchemeTransformer(
     Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider authenticationSchemeProvider)
     : Microsoft.AspNetCore.OpenApi.IOpenApiDocumentTransformer
