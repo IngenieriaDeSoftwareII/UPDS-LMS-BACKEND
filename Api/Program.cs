@@ -78,6 +78,7 @@ builder.Services.AddScoped<ListDocumentContentsUseCase>();
 builder.Services.AddScoped<UpdateDocumentContentUseCase>();
 builder.Services.AddScoped<DeleteDocumentContentUseCase>();
 builder.Services.AddScoped<UploadDocumentContentUseCase>();
+builder.Services.AddScoped<GetDocumentSasUrlUseCase>();
 
 
 
@@ -107,7 +108,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
+//Aumente esto PARA VER ARCHIVOS
+app.UseStaticFiles(); 
 app.UseHttpsRedirection();
 
 app.UseCors();
