@@ -23,4 +23,10 @@ public class PersonRepository(AppDbContext context) : IPersonRepository
     {
         return await context.People.ToListAsync();
     }
+
+    public async Task UpdateAsync(Person person)
+    {
+        context.People.Update(person);
+        await context.SaveChangesAsync();
+    }
 }

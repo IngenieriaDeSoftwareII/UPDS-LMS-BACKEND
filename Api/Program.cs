@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Azure.Storage.Blobs;
 using Business.Mappings;
 using Business.UseCases;
@@ -65,6 +66,34 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
         ClockSkew = TimeSpan.Zero
     };
+
+    options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+    {
+        OnChallenge = context =>
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+
+            var isExpired = context.AuthenticateFailure is Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException;
+            var message = isExpired 
+                ? "Tu sesión ha expirado por inactividad tras 15 minutos" 
+                : "Acceso denegado: no tienes permisos";
+
+            var json = System.Text.Json.JsonSerializer.Serialize(new { errors = new[] { message } });
+            return context.Response.WriteAsync(json);
+        },
+        OnForbidden = context =>
+        {
+            context.Response.StatusCode = 403;
+            context.Response.ContentType = "application/json";
+            var json = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                errors = new[] { "Acceso denegado: no tienes permisos" }
+            });
+            return context.Response.WriteAsync(json);
+        }
+    };
 });
 
 
@@ -96,6 +125,7 @@ builder.Services.AddScoped<UploadImageUseCase>();
 // Persons
 builder.Services.AddScoped<CreatePersonUseCase>();
 builder.Services.AddScoped<ListPersonsUseCase>();
+builder.Services.AddScoped<UpdatePersonUseCase>();
 
 //Inscriptions
 builder.Services.AddScoped<CreateInscriptionUseCase>();
@@ -104,11 +134,13 @@ builder.Services.AddScoped<CancelInscriptionUseCase>();
 // Users
 builder.Services.AddScoped<CreateUserUseCase>();
 builder.Services.AddScoped<ListUsersUseCase>();
+builder.Services.AddScoped<UpdateUserUseCase>();
 builder.Services.AddScoped<ResetUserPasswordUseCase>();
 
 // Auth
 builder.Services.AddScoped<LoginUseCase>();
 builder.Services.AddScoped<RefreshTokenUseCase>();
+builder.Services.AddScoped<LogoutUseCase>();
 
 
 // Validators
@@ -133,7 +165,10 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
 
 builder.Services.AddControllers();
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 
 var app = builder.Build();
 
@@ -168,5 +203,32 @@ static async Task SeedRolesAsync(IServiceProvider services)
     {
         if (!await roleManager.RoleExistsAsync(role))
             await roleManager.CreateAsync(new IdentityRole(role));
+    }
+}
+
+internal sealed class BearerSecuritySchemeTransformer(
+    Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider authenticationSchemeProvider)
+    : Microsoft.AspNetCore.OpenApi.IOpenApiDocumentTransformer
+{
+    public async Task TransformAsync(
+        Microsoft.OpenApi.OpenApiDocument document,
+        Microsoft.AspNetCore.OpenApi.OpenApiDocumentTransformerContext context,
+        CancellationToken cancellationToken)
+    {
+        var authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync();
+        if (authenticationSchemes.Any(authScheme => authScheme.Name == "Bearer"))
+        {
+            document.Components ??= new Microsoft.OpenApi.OpenApiComponents();
+            document.Components.SecuritySchemes = new Dictionary<string, Microsoft.OpenApi.IOpenApiSecurityScheme>
+            {
+                ["Bearer"] = new Microsoft.OpenApi.OpenApiSecurityScheme
+                {
+                    Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    In = Microsoft.OpenApi.ParameterLocation.Header,
+                    BearerFormat = "Json Web Token"
+                }
+            };
+        }
     }
 }
