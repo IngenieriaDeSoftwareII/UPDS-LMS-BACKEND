@@ -12,6 +12,7 @@ public class UsersController(
     CreateUserUseCase createUser,
     ListUsersUseCase listUsers,
     UpdateUserUseCase updateUser,
+    ChangeUserStatusUseCase changeStatus,
     ResetUserPasswordUseCase resetPassword) : ControllerBase
 {
     [HttpPost]
@@ -63,6 +64,21 @@ public class UsersController(
         {
             message = "Contraseña restablecida exitosamente",
             data = result.Value
+        });
+    }
+
+    [HttpPatch("{id}/status")]
+    public async Task<IActionResult> ChangeStatus(string id, [FromBody] ChangeUserStatusDto dto)
+    {
+        var result = await changeStatus.ExecuteAsync(id, dto);
+
+        if (!result.IsSuccess)
+            return BadRequest(new { errors = result.Errors });
+
+        return Ok(new
+        {
+            message = dto.IsActive ? "Cuenta de usuario habilitada" : "Cuenta de usuario deshabilitada",
+            data = new { id, dto.IsActive, dto.LockedUntil }
         });
     }
 }

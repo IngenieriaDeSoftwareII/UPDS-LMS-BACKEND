@@ -91,4 +91,19 @@ public class UserRepository(UserManager<User> userManager, AppDbContext context)
     {
         await userManager.RemoveFromRolesAsync(user, roles);
     }
+
+    public async Task<(bool Succeeded, IEnumerable<string> Errors)> SetLockoutEndDateAsync(User user, DateTimeOffset? lockoutEnd)
+    {
+        if (!await userManager.GetLockoutEnabledAsync(user))
+            await userManager.SetLockoutEnabledAsync(user, true);
+
+        var result = await userManager.SetLockoutEndDateAsync(user, lockoutEnd);
+        return (result.Succeeded, result.Errors.Select(e => e.Description));
+    }
+
+    public async Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePasswordAsync(User user, string currentPassword, string newPassword)
+    {
+        var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        return (result.Succeeded, result.Errors.Select(e => e.Description));
+    }
 }

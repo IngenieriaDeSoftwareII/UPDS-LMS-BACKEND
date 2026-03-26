@@ -11,7 +11,8 @@ namespace Api.Controllers;
 public class AuthController(
     LoginUseCase login,
     RefreshTokenUseCase refreshToken,
-    LogoutUseCase logout) : ControllerBase
+    LogoutUseCase logout,
+    ChangePasswordUseCase changePassword) : ControllerBase
 {
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto dto)
@@ -44,5 +45,20 @@ public class AuthController(
             return BadRequest(new { errors = result.Errors });
 
         return Ok(new { message = result.Value });
+    }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var result = await changePassword.ExecuteAsync(userId, dto);
+        if (!result.IsSuccess)
+            return BadRequest(new { errors = result.Errors });
+
+        return Ok(new { message = "Contraseña actualizada exitosamente" });
     }
 }

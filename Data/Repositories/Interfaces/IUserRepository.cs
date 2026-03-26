@@ -17,4 +17,6 @@ public interface IUserRepository
     Task<(bool Succeeded, IEnumerable<string> Errors)> UpdateAsync(User user);
     Task RemoveRolesAsync(User user, IList<string> roles);
     Task<(bool Succeeded, IEnumerable<string> Errors)> ResetPasswordAsync(User user, string newPassword);
+    Task<(bool Succeeded, IEnumerable<string> Errors)> SetLockoutEndDateAsync(User user, DateTimeOffset? lockoutEnd);
+    Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePasswordAsync(User user, string currentPassword, string newPassword);
 }
