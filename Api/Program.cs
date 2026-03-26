@@ -38,6 +38,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = true;
 
     options.User.RequireUniqueEmail = true;
+
+    options.Lockout.AllowedForNewUsers = true;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
@@ -135,12 +137,18 @@ builder.Services.AddScoped<CancelInscriptionUseCase>();
 builder.Services.AddScoped<CreateUserUseCase>();
 builder.Services.AddScoped<ListUsersUseCase>();
 builder.Services.AddScoped<UpdateUserUseCase>();
+builder.Services.AddScoped<ChangeUserStatusUseCase>();
 builder.Services.AddScoped<ResetUserPasswordUseCase>();
 
 // Auth
 builder.Services.AddScoped<LoginUseCase>();
 builder.Services.AddScoped<RefreshTokenUseCase>();
 builder.Services.AddScoped<LogoutUseCase>();
+builder.Services.AddScoped<ChangePasswordUseCase>();
+
+// Profile
+builder.Services.AddScoped<GetMyProfileUseCase>();
+builder.Services.AddScoped<UpdateMyProfileUseCase>();
 
 
 // Validators
