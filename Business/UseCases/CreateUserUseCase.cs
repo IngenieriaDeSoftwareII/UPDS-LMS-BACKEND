@@ -2,7 +2,6 @@ using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Business.Results;
 using Data.Entities;
-using Data.Enums;
 using Data.Repositories.Interfaces;
 using FluentValidation;
 
@@ -22,18 +21,9 @@ public class CreateUserUseCase(
         if (await userRepository.EmailExistsAsync(dto.Email))
             return Result<UserCreatedDto>.Failure(["Este correo ya está registrado"]);
 
-
-        var person = new Person
-        {
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            MotherLastName = string.Empty,
-            DateOfBirth = DateOnly.MinValue,
-            Gender = Gender.Other,
-            NationalId = string.Empty,
-            NationalIdExpedition = string.Empty
-        };
-        var createdPerson = await personRepository.CreateAsync(person);
+        var person = await personRepository.GetByIdAsync(dto.PersonId);
+        if (person is null)
+            return Result<UserCreatedDto>.Failure(["La persona especificada no existe"]);
 
 
         var tempPassword = GenerateTemporaryPassword();
@@ -41,7 +31,7 @@ public class CreateUserUseCase(
         {
             UserName = dto.Email,
             Email = dto.Email,
-            PersonId = createdPerson.Id
+            PersonId = person.Id
         };
 
         var (succeeded, errors) = await userRepository.CreateAsync(user, tempPassword);
@@ -54,7 +44,7 @@ public class CreateUserUseCase(
         return Result<UserCreatedDto>.Success(new UserCreatedDto
         {
             Id = user.Id,
-            FullName = $"{dto.FirstName} {dto.LastName}",
+            FullName = $"{person.FirstName} {person.LastName}",
             Email = dto.Email,
             Role = dto.Role,
             TemporaryPassword = tempPassword
@@ -67,4 +57,4 @@ public class CreateUserUseCase(
         var suffix = Random.Shared.Next(100, 999);
         return $"Upds@{DateTime.UtcNow.Year}!{suffix}";
     }
-}
+}

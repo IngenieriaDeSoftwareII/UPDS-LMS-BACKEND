@@ -23,8 +23,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasOne(u => u.Person)
-                  .WithOne(p => p.User)
-                  .HasForeignKey<User>(u => u.PersonId)
+                  .WithMany(p => p.Users)
+                  .HasForeignKey(u => u.PersonId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
