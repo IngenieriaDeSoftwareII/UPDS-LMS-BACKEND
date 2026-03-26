@@ -19,8 +19,5 @@ public class CreateContentDtoValidator : AbstractValidator<CreateContentDto>
 
         RuleFor(x => x.Order)
             .GreaterThanOrEqualTo(0).WithMessage("El orden debe ser mayor o igual a 0.");
-
-        RuleFor(x => x.Duration)
-            .GreaterThanOrEqualTo(0).WithMessage("La duración debe ser mayor o igual a 0.");
     }
 }

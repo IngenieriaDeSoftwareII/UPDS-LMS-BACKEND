@@ -7,8 +7,8 @@ public class CreateLessonDtoValidator : AbstractValidator<CreateLessonDto>
 {
     public CreateLessonDtoValidator()
     {
-        RuleFor(x => x.ModuleId)
-            .GreaterThan(0).WithMessage("El ID del módulo debe ser mayor a 0.");
+        RuleFor(x => x.CourseId)
+            .GreaterThan(0).WithMessage("El ID del curso debe ser mayor a 0.");
 
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("El título es requerido.")

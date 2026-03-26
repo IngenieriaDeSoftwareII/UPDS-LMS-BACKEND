@@ -1,9 +1,12 @@
 using Data.Enums;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
 public class ImageContent
 {
+    [Key, ForeignKey("Content")]
     public int ContentId { get; set; }
 
     public string ImageUrl { get; set; } = null!;
@@ -20,4 +23,5 @@ public class ImageContent
 
     // relacion con contenido
     public Content Content { get; set; } = null!;
+
 }

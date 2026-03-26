@@ -1,6 +1,6 @@
 using Data.Services.Interfaces;
 
-namespace Business.UseCases;
+namespace Business.UseCases.UpdateDocumentContent;
 
 public class UploadImageUseCase(IMediaStorageService storage)
 {

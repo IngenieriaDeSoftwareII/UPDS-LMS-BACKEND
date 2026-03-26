@@ -1,10 +1,10 @@
 using Business.DTOs.Requests;
+using Business.DTOs.Responses;
 using Data.Context;
 using Data.Entities;
 using Data.Enums;
 using Data.Services.Interfaces;
-
-namespace Business.UseCases;
+namespace Business.UseCases.UpdateDocumentContent;
 
 public class UploadDocumentContentUseCase
 {
@@ -18,22 +18,22 @@ public class UploadDocumentContentUseCase
         _storage = storage;
     }
 
-    public async Task<object> ExecuteAsync(Stream fileStream, string fileName, int lessonId, string title, string format, int? sizeKb = null, int? pageCount = null)
+    public async Task<UploadDocumentContentResponseDto> ExecuteAsync(UploadDocumentContentRequestDto dto)
     {
         // Validar extensión permitida
-        var ext = Path.GetExtension(fileName).ToLower();
+        var ext = Path.GetExtension(dto.FileName).ToLower();
         if (!new[] { ".pdf", ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt", ".zip", ".rar" }.Contains(ext))
             throw new InvalidOperationException($"Tipo de archivo no permitido: {ext}");
 
         // Subir archivo a Azure Blob Storage
-        var blobName = await _storage.UploadAsync(fileStream, fileName, Container);
+        var blobName = await _storage.UploadAsync(dto.FileStream, dto.FileName, Container);
 
         // Crear entidad Content base
         var content = new Data.Entities.Content
         {
-            LessonId = lessonId,
+            LessonId = dto.LessonId,
             Type = TypeContent.documento,
-            Title = title,
+            Title = dto.Title,
             Order = 1,
             EntityStatus = 1,
             CreatedAt = DateTime.UtcNow,
@@ -47,25 +47,25 @@ public class UploadDocumentContentUseCase
         var documentContent = new Data.Entities.DocumentContent
         {
             ContentId = content.Id,
-            FileUrl = blobName, // o construir URL completa si lo necesitas
-            Format = Enum.Parse<FormatDocument>(format, true),
-            SizeKb = sizeKb,
-            PageCount = pageCount
+            FileUrl = blobName,
+            Format = Enum.Parse<FormatDocument>(dto.Format, true),
+            SizeKb = dto.SizeKb,
+            PageCount = dto.PageCount
         };
 
         _db.DocumentContents.Add(documentContent);
         await _db.SaveChangesAsync(); // Guarda DocumentContent
 
-        // 5️⃣ Retornar respuesta
-        return new
+        // Retornar respuesta
+        return new UploadDocumentContentResponseDto
         {
-            contentId = content.Id,
-            documentId = documentContent.ContentId,
-            fileName = fileName,
-            fileUrl = blobName,
-            title = content.Title,
-            lessonId = lessonId,
-            createdAt = content.CreatedAt
+            ContentId = content.Id,
+            DocumentId = documentContent.ContentId,
+            FileName = dto.FileName,
+            FileUrl = blobName,
+            Title = content.Title,
+            LessonId = dto.LessonId,
+            CreatedAt = content.CreatedAt
         };
     }
 }

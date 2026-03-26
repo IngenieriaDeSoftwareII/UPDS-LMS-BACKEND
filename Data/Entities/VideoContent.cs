@@ -1,7 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Data.Entities;
 
 public class VideoContent
 {
+    [Key, ForeignKey("Content")]
     public int ContentId { get; set; }
 
     public string VideoUrl { get; set; } = null!;
