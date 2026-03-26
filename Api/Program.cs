@@ -6,6 +6,7 @@ using Business.UseCases.DocumentContent;
 using Business.UseCases.ImageContent;
 using Business.UseCases.Lesson;
 using Business.UseCases.VideoContent;
+using Business.UseCases.UpdateDocumentContent;
 using Data.Context;
 using Data.Repositories.Implementations;
 using Data.Repositories.Interfaces;
@@ -76,6 +77,7 @@ builder.Services.AddScoped<CreateDocumentContentUseCase>();
 builder.Services.AddScoped<ListDocumentContentsUseCase>();
 builder.Services.AddScoped<UpdateDocumentContentUseCase>();
 builder.Services.AddScoped<DeleteDocumentContentUseCase>();
+builder.Services.AddScoped<UploadDocumentContentUseCase>();
 
 
 
@@ -91,9 +93,9 @@ builder.Services.AddAutoMapper(cfg => { }, typeof(PersonProfile));
 
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
-    policy.WithOrigins("http://localhost:5173")
-          .AllowAnyHeader()
-          .AllowAnyMethod()));
+    policy.AllowAnyOrigin()//permitir cualquier origen para las peticiones
+           .AllowAnyMethod()
+           .AllowAnyHeader()));
 
 builder.Services.AddControllers();
 
