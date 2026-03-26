@@ -118,7 +118,7 @@ public class DocumentContentsController : ControllerBase
         {
             var containerName = "documents";
 
-            // 🔥 IMPORTANTE: aquí estás usando blobName
+            // aquí se esta usando blobName
             var blobName = document.FileUrl;
 
             var sasUri = await _getDocumentSas.ExecuteAsync(

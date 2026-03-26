@@ -20,23 +20,21 @@ public class UploadDocumentContentUseCase
 
     public async Task<UploadDocumentContentResponseDto> ExecuteAsync(UploadDocumentContentRequestDto dto)
     {
-        // ✅ Validar extensión
+        // Validar extensión
         var ext = Path.GetExtension(dto.FileName).ToLower();
         if (!new[] { ".pdf", ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt", ".zip", ".rar" }.Contains(ext))
             throw new InvalidOperationException($"Tipo de archivo no permitido: {ext}");
 
-        // ✅ Subir archivo → devuelve blobName
+        // Subir archivo → devuelve blobName
         var blobName = await _storage.UploadAsync(dto.FileStream, dto.FileName, Container);
 
-        // ❌ NO generar SAS aquí
-
-        // ✅ Crear Content
+        // Crear Content
         var content = new Data.Entities.Content
         {
             LessonId = dto.LessonId,
             Type = TypeContent.documento,
             Title = dto.Title,
-            Order = 1,
+            Order = dto.Order,
             EntityStatus = 1,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -45,11 +43,11 @@ public class UploadDocumentContentUseCase
         _db.Contents.Add(content);
         await _db.SaveChangesAsync();
 
-        // ✅ Guardar SOLO blobName
+        // Guardar SOLO blobName
         var documentContent = new Data.Entities.DocumentContent
         {
             ContentId = content.Id,
-            FileUrl = blobName, // 🔥 CLAVE
+            FileUrl = blobName,
             Format = Enum.Parse<FormatDocument>(dto.Format, true),
             SizeKb = dto.SizeKb,
             PageCount = dto.PageCount
@@ -58,7 +56,7 @@ public class UploadDocumentContentUseCase
         _db.DocumentContents.Add(documentContent);
         await _db.SaveChangesAsync();
 
-        // ✅ Respuesta
+        // Respuesta
         return new UploadDocumentContentResponseDto
         {
             ContentId = content.Id,
