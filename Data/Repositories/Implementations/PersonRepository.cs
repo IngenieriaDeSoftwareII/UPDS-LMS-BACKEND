@@ -14,6 +14,11 @@ public class PersonRepository(AppDbContext context) : IPersonRepository
         return person;
     }
 
+    public async Task<Person?> GetByIdAsync(int id)
+    {
+        return await context.People.FindAsync(id);
+    }
+
     public async Task<IEnumerable<Person>> GetAllAsync()
     {
         return await context.People.ToListAsync();

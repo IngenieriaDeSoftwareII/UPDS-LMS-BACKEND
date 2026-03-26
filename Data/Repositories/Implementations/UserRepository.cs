@@ -61,4 +61,16 @@ public class UserRepository(UserManager<User> userManager, AppDbContext context)
     {
         return await userManager.GetRolesAsync(user);
     }
+
+    public async Task<User?> FindByIdAsync(string id)
+    {
+        return await userManager.FindByIdAsync(id);
+    }
+
+    public async Task<(bool Succeeded, IEnumerable<string> Errors)> ResetPasswordAsync(User user, string newPassword)
+    {
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await userManager.ResetPasswordAsync(user, token, newPassword);
+        return (result.Succeeded, result.Errors.Select(e => e.Description));
+    }
 }

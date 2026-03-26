@@ -6,10 +6,13 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(CreateUserUseCase createUser, ListUsersUseCase listUsers) : ControllerBase
+public class UsersController(
+    CreateUserUseCase createUser,
+    ListUsersUseCase listUsers,
+    ResetUserPasswordUseCase resetPassword) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create(CreateUserDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateUserDto dto)
     {
         var result = await createUser.ExecuteAsync(dto);
 
@@ -28,5 +31,20 @@ public class UsersController(CreateUserUseCase createUser, ListUsersUseCase list
     {
         var users = await listUsers.ExecuteAsync(search);
         return Ok(users);
+    }
+
+    [HttpPost("{id}/reset-password")]
+    public async Task<IActionResult> ResetPassword(string id)
+    {
+        var result = await resetPassword.ExecuteAsync(id);
+
+        if (!result.IsSuccess)
+            return BadRequest(new { errors = result.Errors });
+
+        return Ok(new
+        {
+            message = "Contraseña restablecida exitosamente",
+            data = result.Value
+        });
     }
 }

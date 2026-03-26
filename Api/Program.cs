@@ -96,6 +96,7 @@ builder.Services.AddScoped<ListPersonsUseCase>();
 // Users
 builder.Services.AddScoped<CreateUserUseCase>();
 builder.Services.AddScoped<ListUsersUseCase>();
+builder.Services.AddScoped<ResetUserPasswordUseCase>();
 
 // Auth
 builder.Services.AddScoped<LoginUseCase>();

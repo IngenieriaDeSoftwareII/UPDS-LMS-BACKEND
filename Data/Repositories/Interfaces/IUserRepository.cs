@@ -12,4 +12,6 @@ public interface IUserRepository
     Task<User?> FindByEmailAsync(string email);
     Task<bool> CheckPasswordAsync(User user, string password);
     Task<bool> IsLockedOutAsync(User user);
+    Task<User?> FindByIdAsync(string id);
+    Task<(bool Succeeded, IEnumerable<string> Errors)> ResetPasswordAsync(User user, string newPassword);
 }

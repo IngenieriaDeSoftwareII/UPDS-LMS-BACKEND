@@ -9,7 +9,7 @@ namespace Api.Controllers;
 public class PersonsController(CreatePersonUseCase createPerson, ListPersonsUseCase listPersons) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create(CreatePersonDto dto)
+    public async Task<IActionResult> Create([FromBody] CreatePersonDto dto)
     {
         var result = await createPerson.ExecuteAsync(dto);
 
