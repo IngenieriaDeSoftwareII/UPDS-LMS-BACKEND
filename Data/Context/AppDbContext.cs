@@ -1,4 +1,6 @@
-﻿using Data.Entities;
+using Data.Entities;
+using Data.Enums;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +9,11 @@ namespace Data.Context;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User>(options)
 {
     public DbSet<Person> People { get; set; }
+    public DbSet<Inscription> Inscriptions { get; set; }
+    public DbSet<LessonProgress> LessonProgresses { get; set; }
+    public DbSet<Course> Courses { get; set; }
+    public DbSet<Module> Modules { get; set; }
+    public DbSet<Lesson> Lessons { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
