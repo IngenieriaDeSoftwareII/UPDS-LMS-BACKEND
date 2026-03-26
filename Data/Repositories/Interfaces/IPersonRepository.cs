@@ -7,4 +7,5 @@ public interface IPersonRepository
     Task<Person> CreateAsync(Person person);
     Task<Person?> GetByIdAsync(int id);
     Task<IEnumerable<Person>> GetAllAsync();
+    Task UpdateAsync(Person person);
 }

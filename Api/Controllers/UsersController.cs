@@ -1,14 +1,17 @@
 using Business.DTOs.Requests;
 using Business.UseCases;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class UsersController(
     CreateUserUseCase createUser,
     ListUsersUseCase listUsers,
+    UpdateUserUseCase updateUser,
     ResetUserPasswordUseCase resetPassword) : ControllerBase
 {
     [HttpPost]
@@ -31,6 +34,21 @@ public class UsersController(
     {
         var users = await listUsers.ExecuteAsync(search);
         return Ok(users);
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> Update(string id, [FromBody] UpdateUserDto dto)
+    {
+        var result = await updateUser.ExecuteAsync(id, dto);
+
+        if (!result.IsSuccess)
+            return BadRequest(new { errors = result.Errors });
+
+        return Ok(new
+        {
+            message = "Datos actualizados correctamente",
+            data = result.Value
+        });
     }
 
     [HttpPost("{id}/reset-password")]
