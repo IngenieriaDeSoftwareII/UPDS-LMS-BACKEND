@@ -32,6 +32,7 @@ public class UpdatePersonUseCase(
         if (dto.NationalIdExpedition != null) person.NationalIdExpedition = dto.NationalIdExpedition;
         if (dto.PhoneNumber != null) person.PhoneNumber = dto.PhoneNumber;
         if (dto.Address != null) person.Address = dto.Address;
+        if (dto.ProfilePictureUrl != null) person.ProfilePictureUrl = dto.ProfilePictureUrl;
 
         await repository.UpdateAsync(person);
 

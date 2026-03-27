@@ -6,9 +6,11 @@ namespace Business.UseCases;
 
 public class ListPersonsUseCase(IPersonRepository repository, IMapper mapper)
 {
-    public async Task<IEnumerable<PersonDto>> ExecuteAsync()
+    public async Task<IEnumerable<PersonDto>> ExecuteAsync(bool includeInactive = false)
     {
-        var persons = await repository.GetAllAsync();
+        var persons = includeInactive
+            ? await repository.GetAllIncludingInactiveAsync()
+            : await repository.GetAllAsync();
         return mapper.Map<IEnumerable<PersonDto>>(persons);
     }
 }

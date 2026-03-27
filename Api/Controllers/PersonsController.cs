@@ -22,13 +22,20 @@ public class PersonsController(
         if (!result.IsSuccess)
             return BadRequest(new { errors = result.Errors });
 
-        return CreatedAtAction(nameof(GetAll), new { id = result.Value!.Id }, result.Value);
+        return CreatedAtAction(nameof(GetActive), new { id = result.Value!.Id }, result.Value);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetActive()
     {
         var result = await listPersons.ExecuteAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAll()
+    {
+        var result = await listPersons.ExecuteAsync(includeInactive: true);
         return Ok(result);
     }
     [HttpPatch("{id}")]

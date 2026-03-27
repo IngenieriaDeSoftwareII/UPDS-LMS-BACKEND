@@ -172,7 +172,6 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
           .AllowAnyHeader()
           .AllowAnyMethod()));
 
-builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi(options =>
@@ -197,8 +196,6 @@ app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseMiddleware<Api.Middleware.UserActivityMiddleware>();
 
 app.MapControllers();
 

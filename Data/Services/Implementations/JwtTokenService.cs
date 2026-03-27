@@ -18,8 +18,8 @@ public class JwtTokenService(IConfiguration configuration) : IJwtTokenService
 
     public int AccessTokenExpirationMinutes => _accessTokenMinutes;
 
-    public int RefreshTokenExpirationDays =>
-        int.Parse(configuration["Jwt:RefreshTokenExpirationDays"]!);
+    public int RefreshTokenExpirationMinutes =>
+        int.Parse(configuration["Jwt:RefreshTokenExpirationMinutes"]!);
 
     public string GenerateAccessToken(User user, IList<string> roles)
     {
