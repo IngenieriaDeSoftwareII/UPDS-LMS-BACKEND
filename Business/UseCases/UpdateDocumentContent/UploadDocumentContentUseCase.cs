@@ -33,7 +33,6 @@ public class UploadDocumentContentUseCase
         {
             LessonId = dto.LessonId,
             Type = TypeContent.documento,
-            Title = dto.Title,
             Order = dto.Order,
             EntityStatus = 1,
             CreatedAt = DateTime.UtcNow,
@@ -63,7 +62,6 @@ public class UploadDocumentContentUseCase
             DocumentId = documentContent.ContentId,
             FileName = dto.FileName,
             FileUrl = blobName,
-            Title = content.Title,
             LessonId = dto.LessonId,
             CreatedAt = content.CreatedAt
         };

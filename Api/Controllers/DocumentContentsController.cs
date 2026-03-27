@@ -84,9 +84,8 @@ public class DocumentContentsController : ControllerBase
             FileStream = stream,
             FileName = dto.File.FileName,
             LessonId = dto.LessonId,
-            Title = dto.Title ?? Path.GetFileNameWithoutExtension(dto.File.FileName),
             Format = dto.Format ?? Path.GetExtension(dto.File.FileName).TrimStart('.'),
-            SizeKb = dto.SizeKb,
+            SizeKb = (int)(dto.File.Length / 1024),
             PageCount = dto.PageCount
         };
 

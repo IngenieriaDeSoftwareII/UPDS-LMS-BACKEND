@@ -7,4 +7,7 @@ public class DocumentContentDto
     public string Format { get; set; } = null!;
     public int? SizeKb { get; set; }
     public int? PageCount { get; set; }
+
+     // RELACIÓN con content
+    public ContentDto Content { get; set; } = null!;
 }

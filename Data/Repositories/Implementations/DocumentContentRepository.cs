@@ -32,7 +32,9 @@ public class DocumentContentRepository : IDocumentContentRepository
 
     public async Task<IEnumerable<DocumentContent>> GetAllAsync()
     {
-        return await _context.DocumentContents.ToListAsync();
+        return await _context.DocumentContents
+            .Include(dc => dc.Content)
+            .ToListAsync();
     }
 
     public async Task<DocumentContent?> GetByContentIdAsync(int contentId)

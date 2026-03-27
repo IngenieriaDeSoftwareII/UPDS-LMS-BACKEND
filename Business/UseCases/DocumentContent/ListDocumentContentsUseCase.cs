@@ -24,10 +24,23 @@ public class ListDocumentContentsUseCase
         var result = documents.Select(doc => new DocumentContentDto
         {
             ContentId = doc.ContentId,
-            FileUrl = doc.FileUrl, 
+            FileUrl = doc.FileUrl,
             Format = doc.Format.ToString(),
             SizeKb = doc.SizeKb,
-            PageCount = doc.PageCount
+            PageCount = doc.PageCount,
+
+            Content = new ContentDto
+            {
+                Id = doc.Content.Id,
+                LessonId = doc.Content.LessonId,
+                Type = doc.Content.Type.ToString(),
+                Title = doc.Content.Title,
+                Order = doc.Content.Order,
+                EntityStatus = doc.Content.EntityStatus,
+                CreatedAt = doc.Content.CreatedAt,
+                UpdatedAt = doc.Content.UpdatedAt,
+                DeletedAt = doc.Content.DeletedAt
+            }
         });
 
         return result;
