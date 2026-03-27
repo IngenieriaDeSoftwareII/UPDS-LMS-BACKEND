@@ -15,6 +15,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<Module> Modules { get; set; }
     public DbSet<Lesson> Lessons { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Evaluation> Evaluations { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<AnswerOption> AnswerOptions { get; set; }
+    public DbSet<EvaluationAttempt> EvaluationAttempts { get; set; }
+    public DbSet<EvaluationAnswer> EvaluationAnswers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -64,6 +69,73 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
         modelBuilder.Entity<Lesson>(entity =>
         {
             entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
+        });
+
+        modelBuilder.Entity<Evaluation>(entity =>
+        {
+            entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
+            entity.Property(e => e.IntentosPermitidos).HasDefaultValue(1);
+
+            entity.HasOne(e => e.Cursos)
+                  .WithMany()
+                  .HasForeignKey(e => e.CursoId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(e => e.Preguntas)
+                  .WithOne(p => p.Evaluaciones)
+                  .HasForeignKey(p => p.EvaluacionId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(e => e.Intentos)
+                  .WithOne(i => i.Evaluaciones)
+                  .HasForeignKey(i => i.EvaluacionId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Question>(entity =>
+        {
+            entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
+            entity.Property(e => e.Puntos).HasDefaultValue(1);
+            entity.Property(e => e.Orden).HasDefaultValue(1);
+
+            entity.HasMany(e => e.OpcionesRespuesta)
+                  .WithOne(o => o.Preguntas)
+                  .HasForeignKey(o => o.PreguntaId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<AnswerOption>(entity =>
+        {
+            entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
+            entity.Property(e => e.Orden).HasDefaultValue(1);
+            entity.Property(e => e.EsCorrecta).HasDefaultValue(false);
+        });
+
+        modelBuilder.Entity<EvaluationAttempt>(entity =>
+        {
+            entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
+            entity.Property(e => e.NumeroIntento).HasDefaultValue(1);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+            entity.HasMany(e => e.Respuestas)
+                  .WithOne(r => r.Intentos)
+                  .HasForeignKey(r => r.IntentoId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<EvaluationAnswer>(entity =>
+        {
+            entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
+
+            entity.HasOne(e => e.Preguntas)
+                  .WithMany(p => p.Respuestas)
+                  .HasForeignKey(e => e.PreguntaId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.OpcionesRespuesta)
+                  .WithMany(o => o.RespuestasSeleccionadas)
+                  .HasForeignKey(e => e.OpcionRespuestaId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Inscription>(entity =>
