@@ -33,6 +33,7 @@ public class UploadDocumentContentUseCase
         {
             LessonId = dto.LessonId,
             Type = TypeContent.documento,
+             Title = dto.Title,
             Order = dto.Order,
             EntityStatus = 1,
             CreatedAt = DateTime.UtcNow,
