@@ -43,7 +43,7 @@ public class LoginUseCase(
         {
             Token = rawRefreshToken,
             UserId = user.Id,
-            ExpiresAt = DateTime.UtcNow.AddDays(jwtTokenService.RefreshTokenExpirationDays)
+            ExpiresAt = DateTime.UtcNow.AddMinutes(jwtTokenService.RefreshTokenExpirationMinutes)
         });
 
         var role = roles.FirstOrDefault() ?? string.Empty;
@@ -52,6 +52,7 @@ public class LoginUseCase(
         {
             AccessToken = accessToken,
             RefreshToken = rawRefreshToken,
+            SessionTTL = jwtTokenService.RefreshTokenExpirationMinutes * 60 * 1000,
             Role = role,
             RedirectTo = GetDashboard(role)
         });

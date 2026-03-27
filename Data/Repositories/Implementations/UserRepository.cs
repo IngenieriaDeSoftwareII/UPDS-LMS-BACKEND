@@ -106,4 +106,10 @@ public class UserRepository(UserManager<User> userManager, AppDbContext context)
         var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
         return (result.Succeeded, result.Errors.Select(e => e.Description));
     }
+
+    public async Task<bool> HasActiveUsersAsync(int personId)
+    {
+        return await context.Users
+            .AnyAsync(u => u.PersonId == personId && (u.LockoutEnd == null || u.LockoutEnd <= DateTimeOffset.UtcNow));
+    }
 }
