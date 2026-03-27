@@ -16,12 +16,17 @@ public class CategoriaRepository(AppDbContext context) : ICategoriaRepository
 
     public async Task<IEnumerable<Categoria>> GetAllAsync()
     {
-        return await context.Categorias.Where(c => c.EntityStatus == 1).ToListAsync();
+        return await context.Categorias
+            .Include(c => c.Cursos.Where(curso => curso.EntityStatus == 1))
+            .Where(c => c.EntityStatus == 1)
+            .ToListAsync();
     }
 
     public async Task<Categoria?> GetByIdAsync(int id)
     {
-        return await context.Categorias.FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
+        return await context.Categorias
+            .Include(c => c.Cursos.Where(curso => curso.EntityStatus == 1))
+            .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
     }
 
     public async Task UpdateAsync(Categoria categoria)

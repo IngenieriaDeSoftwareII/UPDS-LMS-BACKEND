@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Business.DTOs.Responses;
 
 public class DocenteDto
@@ -7,4 +9,6 @@ public class DocenteDto
     public string? Especialidad { get; set; }
     public string? Biografia { get; set; }
     public int TotalCursos { get; set; }
+    
+    public IEnumerable<CursoDto> Cursos { get; set; } = new List<CursoDto>();
 }

@@ -12,6 +12,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     // LMS Entities
+    public DbSet<Catalogo> Catalogos { get; set; }
     public DbSet<Docente> Docentes { get; set; }
     public DbSet<Categoria> Categorias { get; set; }
     public DbSet<Curso> Cursos { get; set; }

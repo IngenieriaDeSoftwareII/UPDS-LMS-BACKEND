@@ -13,5 +13,8 @@ public class Categoria
     public string? Descripcion { get; set; }
     public short EntityStatus { get; set; } = 1;
 
+    public int? CatalogoId { get; set; }
+    public Catalogo? Catalogo { get; set; }
+
     public ICollection<Curso> Cursos { get; set; } = new List<Curso>();
 }

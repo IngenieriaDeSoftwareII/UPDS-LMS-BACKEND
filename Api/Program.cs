@@ -78,8 +78,9 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<ICursoRepository, CursoRepository>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<ICatalogoRepository, CatalogoRepository>();
 builder.Services.AddScoped<IDocenteRepository, DocenteRepository>();
 
 
@@ -103,6 +104,11 @@ builder.Services.AddScoped<Business.UseCases.Categorias.ListCategoriasUseCase>()
 builder.Services.AddScoped<Business.UseCases.Categorias.GetCategoriaByIdUseCase>();
 builder.Services.AddScoped<Business.UseCases.Categorias.UpdateCategoriaUseCase>();
 builder.Services.AddScoped<Business.UseCases.Categorias.DeleteCategoriaUseCase>();
+
+// Catalogos
+builder.Services.AddScoped<Business.UseCases.Catalogos.CreateCatalogoUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalogos.ListCatalogosUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalogos.GetCatalogoByIdUseCase>();
 
 // Cursos
 builder.Services.AddScoped<Business.UseCases.Cursos.CreateCursoUseCase>();
