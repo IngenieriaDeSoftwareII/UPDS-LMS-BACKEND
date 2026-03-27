@@ -29,4 +29,6 @@ public class Person
     public ICollection<User> Users { get; set; } = [];
 
     public ICollection<Inscription> Inscripciones { get; set; } = [];
+
+    public bool IsActive { get; set; } = true;
 }

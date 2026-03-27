@@ -16,9 +16,12 @@ public class ChangeUserStatusUseCase(
         if (!validation.IsValid)
             return Result<bool>.Failure(validation.Errors.Select(e => e.ErrorMessage));
 
-        var user = await userRepository.FindByIdAsync(userId);
+        var user = await userRepository.FindByIdWithPersonAsync(userId);
         if (user is null)
             return Result<bool>.Failure(["El usuario no existe"]);
+
+        if (dto.IsActive && !user.Person.IsActive)
+            return Result<bool>.Failure(["No se puede habilitar la cuenta de usuario porque la persona asociada se encuentra desactivada."]);
 
         var roles = await userRepository.GetRolesAsync(user);
         if (!dto.IsActive && roles.Contains(UserRoles.Admin))

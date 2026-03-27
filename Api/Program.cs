@@ -128,6 +128,7 @@ builder.Services.AddScoped<UploadImageUseCase>();
 builder.Services.AddScoped<CreatePersonUseCase>();
 builder.Services.AddScoped<ListPersonsUseCase>();
 builder.Services.AddScoped<UpdatePersonUseCase>();
+builder.Services.AddScoped<ChangePersonStatusUseCase>();
 
 //Inscriptions
 builder.Services.AddScoped<CreateInscriptionUseCase>();

@@ -11,7 +11,8 @@ namespace Api.Controllers;
 public class PersonsController(
     CreatePersonUseCase createPerson, 
     ListPersonsUseCase listPersons,
-    UpdatePersonUseCase updatePerson) : ControllerBase
+    UpdatePersonUseCase updatePerson,
+    ChangePersonStatusUseCase changePersonStatus) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreatePersonDto dto)
@@ -39,5 +40,18 @@ public class PersonsController(
             return BadRequest(new { errors = result.Errors });
 
         return Ok(new { message = "Datos de persona actualizados correctamente", data = result.Value });
+    }
+
+    [HttpPatch("{id}/status")]
+    public async Task<IActionResult> ChangeStatus(int id, [FromBody] ChangePersonStatusDto dto)
+    {
+        var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var result = await changePersonStatus.ExecuteAsync(id, dto, currentUserId);
+
+        if (!result.IsSuccess)
+            return BadRequest(new { errors = result.Errors });
+
+        var message = dto.IsActive ? "Persona reactivada correctamente" : "Persona desactivada correctamente";
+        return Ok(new { message });
     }
 }

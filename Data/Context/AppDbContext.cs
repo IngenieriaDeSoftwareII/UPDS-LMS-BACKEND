@@ -49,6 +49,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
                   .WithOne(i => i.Usuarios)
                   .HasForeignKey(i => i.UsuarioId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
         });
 
         modelBuilder.Entity<Module>(entity =>

@@ -25,6 +25,9 @@ public class CreateUserUseCase(
         if (person is null)
             return Result<UserCreatedDto>.Failure(["La persona especificada no existe"]);
 
+        if (!person.IsActive)
+            return Result<UserCreatedDto>.Failure(["La persona seleccionada ha sido desactivada y no se le puede crear un usuario"]);
+
 
         var tempPassword = GenerateTemporaryPassword();
         var user = new User

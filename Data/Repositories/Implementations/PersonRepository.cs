@@ -21,7 +21,7 @@ public class PersonRepository(AppDbContext context) : IPersonRepository
 
     public async Task<IEnumerable<Person>> GetAllAsync()
     {
-        return await context.People.ToListAsync();
+        return await context.People.Where(p => p.IsActive).ToListAsync();
     }
 
     public async Task UpdateAsync(Person person)
