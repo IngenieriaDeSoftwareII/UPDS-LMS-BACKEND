@@ -22,13 +22,16 @@ public class DocumentContentRepository : IDocumentContentRepository
 
     public async Task DeleteAsync(int contentId)
     {
-        var documentContent = await _context.DocumentContents.FindAsync(contentId);
-        if (documentContent != null)
+        var entity = await _context.DocumentContents
+            .FirstOrDefaultAsync(dc => dc.ContentId == contentId);
+
+        if (entity != null)
         {
-            _context.DocumentContents.Remove(documentContent);
+            _context.DocumentContents.Remove(entity);
             await _context.SaveChangesAsync();
         }
     }
+    
 
     public async Task<IEnumerable<DocumentContent>> GetAllAsync()
     {

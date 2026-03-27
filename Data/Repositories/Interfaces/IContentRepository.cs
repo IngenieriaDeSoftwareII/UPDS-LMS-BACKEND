@@ -14,5 +14,5 @@ public interface IContentRepository
 
     Task<Content>UpdateAsync(Content content);
 
-    Task DeleteAsync(int id);
+    Task DeleteAsync(int contentId);
 }
