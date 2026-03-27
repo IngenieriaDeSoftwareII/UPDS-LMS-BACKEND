@@ -52,6 +52,7 @@ public class LoginUseCase(
         {
             AccessToken = accessToken,
             RefreshToken = rawRefreshToken,
+            ExpiresIn = jwtTokenService.AccessTokenExpirationMinutes * 60,
             Role = role,
             RedirectTo = GetDashboard(role)
         });

@@ -16,6 +16,8 @@ public class JwtTokenService(IConfiguration configuration) : IJwtTokenService
     private readonly string _audience = configuration["Jwt:Audience"]!;
     private readonly int _accessTokenMinutes = int.Parse(configuration["Jwt:AccessTokenExpirationMinutes"]!);
 
+    public int AccessTokenExpirationMinutes => _accessTokenMinutes;
+
     public int RefreshTokenExpirationDays =>
         int.Parse(configuration["Jwt:RefreshTokenExpirationDays"]!);
 
