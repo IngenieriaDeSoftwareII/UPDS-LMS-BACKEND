@@ -78,8 +78,8 @@ builder.Services.AddAuthentication(options =>
             context.Response.ContentType = "application/json";
 
             var isExpired = context.AuthenticateFailure is Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException;
-            var message = isExpired 
-                ? "Tu sesión ha expirado por inactividad tras 15 minutos" 
+            var message = isExpired
+                ? "Tu sesión ha expirado por inactividad tras 15 minutos"
                 : "Acceso denegado: no tienes permisos";
 
             var json = System.Text.Json.JsonSerializer.Serialize(new { errors = new[] { message } });
@@ -116,6 +116,7 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>();
 builder.Services.AddScoped<IInscriptionRepository, InscriptionRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IEvaluationRepository, EvaluationRepository>();
 
 
 // UseCases
@@ -133,6 +134,13 @@ builder.Services.AddScoped<UpdatePersonUseCase>();
 builder.Services.AddScoped<CreateInscriptionUseCase>();
 builder.Services.AddScoped<ListInscriptionsUseCase>();
 builder.Services.AddScoped<CancelInscriptionUseCase>();
+// Evaluations
+builder.Services.AddScoped<CreateEvaluationUseCase>();
+builder.Services.AddScoped<AddEvaluationQuestionUseCase>();
+builder.Services.AddScoped<SubmitEvaluationUseCase>();
+builder.Services.AddScoped<ListMyEvaluationGradesUseCase>();
+builder.Services.AddScoped<ListEvaluationGradesForTeacherUseCase>();
+builder.Services.AddScoped<GetEvaluationToTakeUseCase>();
 // Users
 builder.Services.AddScoped<CreateUserUseCase>();
 builder.Services.AddScoped<ListUsersUseCase>();
@@ -163,7 +171,8 @@ builder.Services.AddAutoMapper(
     typeof(PersonProfile),
     typeof(UserProfile),
     typeof(InscriptionProfile),
-    typeof(CourseProfile));
+    typeof(CourseProfile),
+    typeof(EvaluationProfile));
 
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
