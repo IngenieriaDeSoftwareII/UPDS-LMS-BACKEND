@@ -218,7 +218,7 @@ builder.Services.AddAutoMapper(
 
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
-    policy.WithOrigins("http://localhost:5137")
+    policy.WithOrigins("http://localhost:5173")
            .AllowAnyMethod()
            .AllowAnyHeader()));
 
