@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20260323202204_AgregarLMS.cs" />
+    <Compile Remove="Migrations\20260323202204_AgregarLMS.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Migrations\" />
   </ItemGroup>
 

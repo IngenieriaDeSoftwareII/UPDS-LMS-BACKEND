@@ -130,7 +130,7 @@ builder.Services.AddAutoMapper(cfg => { }, typeof(PersonProfile), typeof(UserPro
 
 // HTTP Pipeline & Middleware
 // --------------------------------------
-builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
+builder.Services.AddCors(options => options.AddPolicy("AllowFrontend", policy =>
     policy.WithOrigins("http://localhost:5173")
           .AllowAnyHeader()
           .AllowAnyMethod()));
@@ -149,8 +149,10 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-app.UseHttpsRedirection();
-app.UseCors();
+// COMENTADO PARA EVITAR ERROR 307 (Temporary Redirect) Y PROBLEMAS DE CORS EN DESARROLLO LOCAL
+// app.UseHttpsRedirection();
+
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
