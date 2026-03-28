@@ -1,0 +1,12 @@
+@baseUrl = http://localhost:5024/api
+
+### Iniciar sesión
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "IngenieriaAdmin@upds.edu.bo",
+  "password": "IngenieriaPassword@2026"
+}
+
+###

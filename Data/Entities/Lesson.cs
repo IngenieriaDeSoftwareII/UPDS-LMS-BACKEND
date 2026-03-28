@@ -21,9 +21,8 @@ public class Lesson
     [Column("descripcion")]
     public string? Descripcion { get; set; }
 
-    [Required]
     [Column("orden")]
-    public int Orden { get; set; }
+    public int? Orden { get; set; }
 
     [Column("entity_status")]
     public short EntityStatus { get; set; } = 1;

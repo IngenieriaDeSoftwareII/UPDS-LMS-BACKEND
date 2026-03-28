@@ -1,22 +1,34 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "http": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": false,
+      "launchBrowser": true,
+      "launchUrl": "scalar/v1",
       "applicationUrl": "http://localhost:5024",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Jwt__Secret": "upds-lms-super-secret-key-2026-dev-only!!",
+        "Jwt__Issuer": "upds-lms-api",
+        "Jwt__Audience": "upds-lms-client",
+        "Jwt__AccessTokenExpirationMinutes": "10",
+        "Jwt__RefreshTokenExpirationMinutes": "15"
       }
     },
     "https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": false,
+      "launchBrowser": true,
+      "launchUrl": "scalar/v1",
       "applicationUrl": "https://localhost:7292;http://localhost:5024",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Jwt__Secret": "upds-lms-super-secret-key-2026-dev-only!!",
+        "Jwt__Issuer": "upds-lms-api",
+        "Jwt__Audience": "upds-lms-client",
+        "Jwt__AccessTokenExpirationMinutes": "10",
+        "Jwt__RefreshTokenExpirationMinutes": "15"
       }
     }
   }
