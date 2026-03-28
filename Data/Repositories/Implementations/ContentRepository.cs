@@ -41,8 +41,8 @@ public class ContentRepository(AppDbContext context) : IContentRepository
         return content;
     }
 
-    public async Task<IEnumerable<Content>> GetByLessonIdAsync(int lessonId)
+    public async Task<IEnumerable<Content>> GetByLessonIdAsync(int LeccionId)
     {
-        return await context.Contents.Where(c => c.LessonId == lessonId).ToListAsync();
+        return await context.Contents.Where(c => c.LeccionId == LeccionId).ToListAsync();
     }
 }

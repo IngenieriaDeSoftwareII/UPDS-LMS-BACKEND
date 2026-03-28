@@ -20,10 +20,10 @@ public class DocumentContentRepository : IDocumentContentRepository
         return documentContent;
     }
 
-    public async Task DeleteAsync(int contentId)
+    public async Task DeleteAsync(int ContenidoId)
     {
         var entity = await _context.DocumentContents
-            .FirstOrDefaultAsync(dc => dc.ContentId == contentId);
+            .FirstOrDefaultAsync(dc => dc.ContenidoId == ContenidoId);
 
         if (entity != null)
         {
@@ -36,13 +36,13 @@ public class DocumentContentRepository : IDocumentContentRepository
     public async Task<IEnumerable<DocumentContent>> GetAllAsync()
     {
         return await _context.DocumentContents
-            .Include(dc => dc.Content)
+            .Include(dc => dc.Contenido)
             .ToListAsync();
     }
 
-    public async Task<DocumentContent?> GetByContentIdAsync(int contentId)
+    public async Task<DocumentContent?> GetByContentIdAsync(int ContenidoId)
     {
-        return await _context.DocumentContents.FirstOrDefaultAsync(dc => dc.ContentId == contentId);
+        return await _context.DocumentContents.FirstOrDefaultAsync(dc => dc.ContenidoId == ContenidoId);
     }
 
     public async Task<DocumentContent> UpdateAsync(DocumentContent documentContent)

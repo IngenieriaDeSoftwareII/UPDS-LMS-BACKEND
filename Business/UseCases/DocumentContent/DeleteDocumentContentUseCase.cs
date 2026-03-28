@@ -30,18 +30,18 @@ namespace Business.UseCases.DocumentContent
                 return Result<bool>.Failure(new[] { "DocumentContent no encontrado" });
 
             // Eliminar archivo físico si existe
-            if (!string.IsNullOrEmpty(existing.FileUrl))
+            if (!string.IsNullOrEmpty(existing.UrlArchivo))
             {
-                await _storage.DeleteAsync(existing.FileUrl, Container);
+                await _storage.DeleteAsync(existing.UrlArchivo, Container);
             }
 
             // Eliminar registro DocumentContent
             await _repository.DeleteAsync(contentId);
 
             // Eliminar Content asociado
-            if (existing.ContentId != 0)
+            if (existing.ContenidoId != 0)
             {
-                await _contentRepository.DeleteAsync(existing.ContentId);
+                await _contentRepository.DeleteAsync(existing.ContenidoId);
             }
 
             return Result<bool>.Success(true);

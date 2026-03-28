@@ -4,19 +4,27 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
+[Table("contenidos_documento")]
 public class DocumentContent
 {
-    [Key, ForeignKey("Content")]
-    public int ContentId { get; set; }
+    [Key, ForeignKey("Contenido")]
+    [Column("contenido_id")]
+    public int ContenidoId { get; set; }
 
-    public string FileUrl { get; set; } = null!;
+    [Required]
+    [Column("url_archivo")]
+    public string UrlArchivo { get; set; } = null!;
 
-    public FormatDocument Format { get; set; }
+    [Required]
+    [Column("formato")]
+    public FormatDocument Formato { get; set; }
 
-    public int? SizeKb { get; set; }
+    [Column("tamano_kb")]
+    public int? TamanoKb { get; set; }
 
-    public int? PageCount { get; set; }
+    [Column("num_paginas")]
+    public int? NumPaginas { get; set; }
 
     // relacion con contenido
-    public Content Content { get; set; } = null!;
+    public Content Contenido { get; set; } = null!;
 }

@@ -23,23 +23,23 @@ public class ListDocumentContentsUseCase
 
         var result = documents.Select(doc => new DocumentContentDto
         {
-            ContentId = doc.ContentId,
-            FileUrl = doc.FileUrl,
-            Format = doc.Format.ToString(),
-            SizeKb = doc.SizeKb,
-            PageCount = doc.PageCount,
+            ContentId = doc.ContenidoId,
+            FileUrl = doc.UrlArchivo,
+            Format = doc.Formato.ToString(),
+            SizeKb = doc.TamanoKb,
+            PageCount = doc.NumPaginas,
 
             Content = new ContentDto
             {
-                Id = doc.Content.Id,
-                LessonId = doc.Content.LessonId,
-                Type = doc.Content.Type.ToString(),
-                Title = doc.Content.Title,
-                Order = doc.Content.Order,
-                EntityStatus = doc.Content.EntityStatus,
-                CreatedAt = doc.Content.CreatedAt,
-                UpdatedAt = doc.Content.UpdatedAt,
-                DeletedAt = doc.Content.DeletedAt
+                Id = doc.Contenido.Id,
+                LessonId = doc.Contenido.LeccionId,
+                Type = doc.Contenido.Tipo.ToString(),
+                Title = doc.Contenido.Titulo,
+                Order = doc.Contenido.Orden,
+                EntityStatus = doc.Contenido.EntityStatus,
+                CreatedAt = doc.Contenido.CreatedAt ?? DateTime.UtcNow,
+                UpdatedAt = doc.Contenido.UpdatedAt ?? DateTime.UtcNow,
+                DeletedAt = doc.Contenido.DeletedAt
             }
         });
 

@@ -22,17 +22,17 @@ public class UpdateDocumentContentUseCase
     {
         // Obtener documento y su content existente
         var document = await _db.DocumentContents
-            .Include(d => d.Content)
-            .FirstOrDefaultAsync(d => d.ContentId == contentId);
+            .Include(d => d.Contenido)
+            .FirstOrDefaultAsync(d => d.ContenidoId == contentId);
 
         if (document == null)
             return false;
 
         // Actualizar metadata
-        document.Content.Title = dto.Title;
-        document.Content.Order = dto.Order;
-        document.Content.UpdatedAt = DateTime.UtcNow;
-        document.PageCount = dto.PageCount;
+        document.Contenido.Titulo = dto.Title;
+        document.Contenido.Orden = dto.Order;
+        document.Contenido.UpdatedAt = DateTime.UtcNow;
+        document.NumPaginas = dto.PageCount;
 
         // Reemplazar archivo si hay uno nuevo
         if (dto.File != null && dto.File.Length > 0)
@@ -44,9 +44,9 @@ public class UpdateDocumentContentUseCase
             // Subir archivo y obtener blobName
             var blobName = await _storage.UploadAsync(dto.File.OpenReadStream(), dto.File.FileName, Container);
 
-            document.FileUrl = blobName;
-            document.Format = Enum.Parse<FormatDocument>(ext.TrimStart('.'), true);
-            document.SizeKb = (int)(dto.File.Length / 1024);
+            document.UrlArchivo = blobName;
+            document.Formato = Enum.Parse<FormatDocument>(ext.TrimStart('.'), true);
+            document.TamanoKb = (int)(dto.File.Length / 1024);
         }
 
         await _db.SaveChangesAsync();

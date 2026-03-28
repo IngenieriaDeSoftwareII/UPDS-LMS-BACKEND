@@ -31,10 +31,10 @@ public class UploadDocumentContentUseCase
         // Crear Content
         var content = new Data.Entities.Content
         {
-            LessonId = dto.LessonId,
-            Type = TypeContent.documento,
-             Title = dto.Title,
-            Order = dto.Order,
+            LeccionId = dto.LessonId,
+            Tipo = TypeContent.documento,
+            Titulo = dto.Title,
+            Orden = dto.Order,
             EntityStatus = 1,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -46,11 +46,11 @@ public class UploadDocumentContentUseCase
         // Guardar SOLO blobName
         var documentContent = new Data.Entities.DocumentContent
         {
-            ContentId = content.Id,
-            FileUrl = blobName,
-            Format = Enum.Parse<FormatDocument>(dto.Format, true),
-            SizeKb = dto.SizeKb,
-            PageCount = dto.PageCount
+            ContenidoId = content.Id,
+            UrlArchivo = blobName,
+            Formato = Enum.Parse<FormatDocument>(dto.Format, true),
+            TamanoKb = dto.SizeKb,
+            NumPaginas = dto.PageCount
         };
 
         _db.DocumentContents.Add(documentContent);
@@ -60,11 +60,11 @@ public class UploadDocumentContentUseCase
         return new UploadDocumentContentResponseDto
         {
             ContentId = content.Id,
-            DocumentId = documentContent.ContentId,
+            DocumentId = documentContent.ContenidoId,
             FileName = dto.FileName,
             FileUrl = blobName,
             LessonId = dto.LessonId,
-            CreatedAt = content.CreatedAt
+            CreatedAt = content.CreatedAt ?? DateTime.UtcNow
         };
     }
 }

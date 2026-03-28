@@ -41,9 +41,9 @@ public class ImageContentRepository : IImageContentRepository
         return await _context.ImageContents.FindAsync(id);
     }
 
-    public async Task<ImageContent?> GetByContentIdAsync(int contentId)
+    public async Task<ImageContent?> GetByContentIdAsync(int ContenidoId)
     {
-        return await _context.ImageContents.FirstOrDefaultAsync(ic => ic.ContentId == contentId);
+        return await _context.ImageContents.FirstOrDefaultAsync(ic => ic.ContenidoId == ContenidoId);
     }
     
     public async Task<ImageContent> UpdateAsync(ImageContent imageContent)

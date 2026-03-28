@@ -20,33 +20,33 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
         // 🔥 DocumentContent se agrego cascade
         builder.Entity<DocumentContent>(entity =>
         {
-            entity.HasKey(e => e.ContentId);
+            entity.HasKey(e => e.ContenidoId);
 
-            entity.HasOne(d => d.Content)
+            entity.HasOne(d => d.Contenido)
                   .WithOne()
-                  .HasForeignKey<DocumentContent>(d => d.ContentId)
+                  .HasForeignKey<DocumentContent>(d => d.ContenidoId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ImageContent 
         builder.Entity<ImageContent>(entity =>
         {
-            entity.HasKey(e => e.ContentId);
+            entity.HasKey(e => e.ContenidoId);
 
-            entity.HasOne(e => e.Content)
+            entity.HasOne(e => e.Contenido)
                   .WithOne()
-                  .HasForeignKey<ImageContent>(e => e.ContentId)
+                  .HasForeignKey<ImageContent>(e => e.ContenidoId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
         //VideoContent 
         builder.Entity<VideoContent>(entity =>
         {
-            entity.HasKey(e => e.ContentId);
+            entity.HasKey(e => e.ContenidoId);
 
-            entity.HasOne(e => e.Content)
+            entity.HasOne(e => e.Contenido)
                   .WithOne()
-                  .HasForeignKey<VideoContent>(e => e.ContentId)
+                  .HasForeignKey<VideoContent>(e => e.ContenidoId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }

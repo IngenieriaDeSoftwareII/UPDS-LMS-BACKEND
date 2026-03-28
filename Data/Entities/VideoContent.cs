@@ -3,15 +3,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
+[Table("contenidos_video")]
 public class VideoContent
 {
-    [Key, ForeignKey("Content")]
-    public int ContentId { get; set; }
+    [Key, ForeignKey("Contenido")]
+    [Column("contenido_id")]
+    public int ContenidoId { get; set; }
 
-    public string VideoUrl { get; set; } = null!;
+    [Required]
+    [Column("url_video")]
+    public string UrlVideo { get; set; } = null!;
 
-    public int DurationSeconds { get; set; }
+    [Required]
+    [Column("duracion_seg")]
+    public int DuracionSeg { get; set; }
 
     // relacion con contenido
-    public Content Content { get; set; } = null!;
+    public Content Contenido { get; set; } = null!;
 }

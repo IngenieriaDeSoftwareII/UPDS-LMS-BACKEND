@@ -41,9 +41,9 @@ public class VideoContentRepository : IVideoContentRepository
         return await _context.VideoContents.FindAsync(id);
     }
 
-    public async Task<VideoContent?> GetByContentIdAsync(int? contentId)
+    public async Task<VideoContent?> GetByContentIdAsync(int? ContenidoId)
     {
-        return await _context.VideoContents.FirstOrDefaultAsync(vc => vc.ContentId == contentId);
+        return await _context.VideoContents.FirstOrDefaultAsync(vc => vc.ContenidoId == ContenidoId);
     }
     public async Task<VideoContent> UpdateAsync(VideoContent videoContent)
     {

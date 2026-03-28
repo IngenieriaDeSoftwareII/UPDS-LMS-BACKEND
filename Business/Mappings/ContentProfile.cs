@@ -15,17 +15,17 @@ public class ContentProfile : Profile
 
         // Document
         CreateMap<CreateDocumentContentDto, DocumentContent>()
-            .ForMember(dest => dest.Content, opt => opt.Ignore());
+            .ForMember(dest => dest.Contenido, opt => opt.Ignore());
         CreateMap<DocumentContent, DocumentContentDto>();
 
         // Image
         CreateMap<CreateImageContentDto, ImageContent>()
-            .ForMember(dest => dest.Content, opt => opt.Ignore()); 
+            .ForMember(dest => dest.Contenido, opt => opt.Ignore()); 
         CreateMap<ImageContent, ImageContentDto>();
 
         // Video
         CreateMap<CreateVideoContentDto, VideoContent>()
-            .ForMember(dest => dest.Content, opt => opt.Ignore()); 
+            .ForMember(dest => dest.Contenido, opt => opt.Ignore()); 
         CreateMap<VideoContent, VideoContentDto>();
     }
 }
