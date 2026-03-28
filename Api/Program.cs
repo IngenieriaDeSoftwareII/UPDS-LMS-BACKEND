@@ -241,9 +241,10 @@ if (app.Environment.IsDevelopment())
 }
 //Aumente esto PARA VER ARCHIVOS
 app.UseStaticFiles(); 
-app.UseHttpsRedirection();
 
 app.UseCors();
+
+// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
