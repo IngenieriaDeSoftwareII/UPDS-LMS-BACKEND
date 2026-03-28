@@ -10,8 +10,8 @@ public class Lesson
     [Column("id")]
     public int Id { get; set; }
 
-    [Column("curso_id")]
-    public int? CursoId { get; set; }
+    [Column("modulo_id")]
+    public int? ModuloId { get; set; }
 
     [Required]
     [Column("titulo")]
@@ -35,6 +35,9 @@ public class Lesson
 
     [Column("deleted_at")]
     public DateTime? DeletedAt { get; set; }
+
+    // relacion con leccion
+    public Module? Modulos { get; set; } = null!;
 
     // Relaciones con contenidos
     public ICollection<Content> Contenidos { get; set; } = [];
