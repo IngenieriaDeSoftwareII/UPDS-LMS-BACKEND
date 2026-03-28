@@ -9,6 +9,12 @@ namespace Data.Context;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User>(options)
 {
     public DbSet<Person> People { get; set; }
+    // LMS Entities
+    public DbSet<Catalogo> Catalogos { get; set; }
+    public DbSet<Docente> Docentes { get; set; }
+    public DbSet<Categoria> Categorias { get; set; }
+    public DbSet<Curso> Cursos { get; set; }
+    public DbSet<Modulo> Modulos { get; set; }
     public DbSet<Inscription> Inscriptions { get; set; }
     public DbSet<LessonProgress> LessonProgresses { get; set; }
     public DbSet<Course> Courses { get; set; }

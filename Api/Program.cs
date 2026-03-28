@@ -19,6 +19,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Database & Azure
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -26,9 +27,8 @@ builder.Services.AddSingleton(new BlobServiceClient(
     builder.Configuration.GetConnectionString("AzuriteBlob")));
 
 
-// Identity
+// Identity Configuration
 // --------------------------------------
-
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequiredLength = 8;
@@ -47,7 +47,6 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 // JWT Authentication
 // --------------------------------------
-
 var jwtSecret = builder.Configuration["Jwt:Secret"]!;
 
 builder.Services.AddAuthentication(options =>
@@ -101,17 +100,19 @@ builder.Services.AddAuthentication(options =>
 
 // Services
 // --------------------------------------
-
 builder.Services.AddScoped<IMediaStorageService, AzureMediaStorageService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 
-// Repositories
+// Repositories (Merged)
 // --------------------------------------
-
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<ICursoRepository, CursoRepository>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<ICatalogoRepository, CatalogoRepository>();
+builder.Services.AddScoped<IDocenteRepository, DocenteRepository>();
 
 builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>();
 builder.Services.AddScoped<IInscriptionRepository, InscriptionRepository>();
@@ -119,15 +120,31 @@ builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IEvaluationRepository, EvaluationRepository>();
 
 
-// UseCases
+// UseCases (Merged)
 // --------------------------------------
 
-// Storage
-builder.Services.AddScoped<UploadImageUseCase>();
+// Auth & Users
+builder.Services.AddScoped<LoginUseCase>();
+builder.Services.AddScoped<RefreshTokenUseCase>();
+builder.Services.AddScoped<CreateUserUseCase>();
+builder.Services.AddScoped<ListUsersUseCase>();
 
-// Persons
+// Storage & Common
+builder.Services.AddScoped<UploadImageUseCase>();
 builder.Services.AddScoped<CreatePersonUseCase>();
 builder.Services.AddScoped<ListPersonsUseCase>();
+
+// Categorias
+builder.Services.AddScoped<Business.UseCases.Categorias.CreateCategoriaUseCase>();
+builder.Services.AddScoped<Business.UseCases.Categorias.ListCategoriasUseCase>();
+builder.Services.AddScoped<Business.UseCases.Categorias.GetCategoriaByIdUseCase>();
+builder.Services.AddScoped<Business.UseCases.Categorias.UpdateCategoriaUseCase>();
+builder.Services.AddScoped<Business.UseCases.Categorias.DeleteCategoriaUseCase>();
+
+// Catalogos
+builder.Services.AddScoped<Business.UseCases.Catalogos.CreateCatalogoUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalogos.ListCatalogosUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalogos.GetCatalogoByIdUseCase>();
 builder.Services.AddScoped<UpdatePersonUseCase>();
 builder.Services.AddScoped<ChangePersonStatusUseCase>();
 
@@ -159,14 +176,23 @@ builder.Services.AddScoped<ChangePasswordUseCase>();
 builder.Services.AddScoped<GetMyProfileUseCase>();
 builder.Services.AddScoped<UpdateMyProfileUseCase>();
 
+// Cursos
+builder.Services.AddScoped<Business.UseCases.Cursos.CreateCursoUseCase>();
+builder.Services.AddScoped<Business.UseCases.Cursos.ListCursosUseCase>();
+builder.Services.AddScoped<Business.UseCases.Cursos.GetCursoByIdUseCase>();
+builder.Services.AddScoped<Business.UseCases.Cursos.UpdateCursoUseCase>();
+builder.Services.AddScoped<Business.UseCases.Cursos.DeleteCursoUseCase>();
 
-// Validators
+// Docentes
+builder.Services.AddScoped<Business.UseCases.Docentes.CreateDocenteUseCase>();
+builder.Services.AddScoped<Business.UseCases.Docentes.ListDocentesUseCase>();
+
+
+// Validators & Mappings
 // --------------------------------------
+
 builder.Services.AddValidatorsFromAssemblyContaining<PersonProfile>();
 
-
-// Mappings
-// --------------------------------------
 builder.Services.AddAutoMapper(
     cfg => { },
     typeof(PersonProfile),
@@ -176,12 +202,16 @@ builder.Services.AddAutoMapper(
     typeof(EvaluationProfile));
 
 
+
+// HTTP Pipeline & Middleware
+// --------------------------------------
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
     policy.WithOrigins("http://localhost:5173")
           .AllowAnyHeader()
           .AllowAnyMethod()));
 
 builder.Services.AddControllers();
+
 
 builder.Services.AddOpenApi(options =>
 {
@@ -209,6 +239,19 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Helpers
+static async Task SeedRolesAsync(IServiceProvider services)
+{
+    using var scope = services.CreateScope();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    foreach (var role in UserRoles.All)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+    }
+}
 
 
 
