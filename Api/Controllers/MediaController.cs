@@ -1,4 +1,4 @@
-using Business.UseCases;
+using Business.UseCases.UpdateDocumentContent;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;

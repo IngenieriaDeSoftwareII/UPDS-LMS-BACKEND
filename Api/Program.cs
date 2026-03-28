@@ -2,6 +2,12 @@ using System.Text.Json;
 using Azure.Storage.Blobs;
 using Business.Mappings;
 using Business.UseCases;
+using Business.UseCases.Content;
+using Business.UseCases.DocumentContent;
+using Business.UseCases.ImageContent;
+using Business.UseCases.Lesson;
+using Business.UseCases.VideoContent;
+using Business.UseCases.UpdateDocumentContent;
 using Data.Context;
 using Data.Entities;
 using Data.Enums;
@@ -105,10 +111,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IMediaStorageService, AzureMediaStorageService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
-
 // Repositories
 // --------------------------------------
-
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -118,10 +122,14 @@ builder.Services.AddScoped<IInscriptionRepository, InscriptionRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IEvaluationRepository, EvaluationRepository>();
 
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<IContentRepository, ContentRepository>();
+builder.Services.AddScoped<IVideoContentRepository, VideoContentRepository>();
+builder.Services.AddScoped<IImageContentRepository, ImageContentRepository>();
+builder.Services.AddScoped<IDocumentContentRepository, DocumentContentRepository>();
 
 // UseCases
 // --------------------------------------
-
 // Storage
 builder.Services.AddScoped<UploadImageUseCase>();
 
@@ -159,6 +167,39 @@ builder.Services.AddScoped<ChangePasswordUseCase>();
 builder.Services.AddScoped<GetMyProfileUseCase>();
 builder.Services.AddScoped<UpdateMyProfileUseCase>();
 
+//Lessons
+builder.Services.AddScoped<CreateLessonUseCase>();
+builder.Services.AddScoped<ListLessonsUseCase>();
+builder.Services.AddScoped<UpdateLessonUseCase>();
+builder.Services.AddScoped<DeleteLessonUseCase>();
+
+//Content
+builder.Services.AddScoped<CreateContentUseCase>();
+builder.Services.AddScoped<ListContentsUseCase>();
+builder.Services.AddScoped<UpdateContentUseCase>();
+builder.Services.AddScoped<DeleteContentUseCase>();
+
+//Video Content
+builder.Services.AddScoped<CreateVideoContentUseCase>();
+builder.Services.AddScoped<ListVideoContentsUseCase>();
+builder.Services.AddScoped<UpdateVideoContentUseCase>();
+builder.Services.AddScoped<DeleteVideoContentUseCase>();
+
+//Image Content
+builder.Services.AddScoped<CreateImageContentUseCase>();
+builder.Services.AddScoped<ListImageContentsUseCase>();
+builder.Services.AddScoped<UpdateImageContentUseCase>();
+builder.Services.AddScoped<DeleteImageContentUseCase>();
+
+//Document Content
+builder.Services.AddScoped<CreateDocumentContentUseCase>();
+builder.Services.AddScoped<ListDocumentContentsUseCase>();
+builder.Services.AddScoped<UpdateDocumentContentUseCase>();
+builder.Services.AddScoped<DeleteDocumentContentUseCase>();
+builder.Services.AddScoped<UploadDocumentContentUseCase>();
+builder.Services.AddScoped<GetDocumentSasUrlUseCase>();
+
+
 
 // Validators
 // --------------------------------------
@@ -177,9 +218,9 @@ builder.Services.AddAutoMapper(
 
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
-    policy.WithOrigins("http://localhost:5173")
-          .AllowAnyHeader()
-          .AllowAnyMethod()));
+    policy.WithOrigins("http://localhost:5137")
+           .AllowAnyMethod()
+           .AllowAnyHeader()));
 
 builder.Services.AddControllers();
 
@@ -198,7 +239,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
-
+//Aumente esto PARA VER ARCHIVOS
+app.UseStaticFiles(); 
 app.UseHttpsRedirection();
 
 app.UseCors();

@@ -9,11 +9,15 @@ namespace Data.Context;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User>(options)
 {
     public DbSet<Person> People { get; set; }
+    public DbSet<Lesson> Lessons { get; set; }
+    public DbSet<Content> Contents { get; set; }
+    public DbSet<ImageContent> ImageContents { get; set; }
+    public DbSet<DocumentContent> DocumentContents { get; set; }
+    public DbSet<VideoContent> VideoContents { get; set; }
     public DbSet<Inscription> Inscriptions { get; set; }
     public DbSet<LessonProgress> LessonProgresses { get; set; }
     public DbSet<Course> Courses { get; set; }
     public DbSet<Module> Modules { get; set; }
-    public DbSet<Lesson> Lessons { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Evaluation> Evaluations { get; set; }
     public DbSet<Question> Questions { get; set; }
@@ -156,5 +160,39 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
         {
             entity.ToTable("progreso_lecciones");
         });
+        // 🔥 DocumentContent se agrego cascade
+        modelBuilder.Entity<DocumentContent>(entity =>
+        {
+            entity.HasKey(e => e.ContenidoId);
+
+            entity.HasOne(d => d.Contenido)
+                  .WithOne()
+                  .HasForeignKey<DocumentContent>(d => d.ContenidoId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ImageContent 
+        modelBuilder.Entity<ImageContent>(entity =>
+        {
+            entity.HasKey(e => e.ContenidoId);
+
+            entity.HasOne(e => e.Contenido)
+                  .WithOne()
+                  .HasForeignKey<ImageContent>(e => e.ContenidoId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        //VideoContent 
+        modelBuilder.Entity<VideoContent>(entity =>
+        {
+            entity.HasKey(e => e.ContenidoId);
+
+            entity.HasOne(e => e.Contenido)
+                  .WithOne()
+                  .HasForeignKey<VideoContent>(e => e.ContenidoId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
     }
+
 }
+

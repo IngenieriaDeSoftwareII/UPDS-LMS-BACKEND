@@ -1,28 +1,31 @@
+using Data.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
-[Table("lecciones")]
-public class Lesson
+[Table("contenidos")]
+public class Content
 {
     [Key]
     [Column("id")]
     public int Id { get; set; }
 
-    [Column("modulo_id")]
-    public int? ModuloId { get; set; }
+    [Column("leccion_id")]
+    public int LeccionId { get; set; }
+
+    [Required]
+    [Column("tipo")]
+    public TypeContent Tipo { get; set; }
 
     [Required]
     [Column("titulo")]
     [MaxLength(150)]
     public string Titulo { get; set; } = null!;
 
-    [Column("descripcion")]
-    public string? Descripcion { get; set; }
-
+    [Required]
     [Column("orden")]
-    public int? Orden { get; set; }
+    public int Orden { get; set; } = 1;
 
     [Column("entity_status")]
     public short EntityStatus { get; set; } = 1;
@@ -37,8 +40,11 @@ public class Lesson
     public DateTime? DeletedAt { get; set; }
 
     // relacion con leccion
-    public Module? Modulos { get; set; } = null!;
+    public Lesson Leccion { get; set; } = null!;
+    // relaciones con tipos de contenido
+    public VideoContent? Video { get; set; }
 
-    // Relaciones con contenidos
-    public ICollection<Content> Contenidos { get; set; } = [];
+    public DocumentContent? Documento { get; set; }
+
+    public ImageContent? Imagen { get; set; }
 }

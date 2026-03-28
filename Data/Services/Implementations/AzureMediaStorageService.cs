@@ -9,6 +9,7 @@ public class AzureMediaStorageService(BlobServiceClient blobServiceClient) : IMe
 {
     private static readonly Dictionary<string, string> ContentTypeMap = new(StringComparer.OrdinalIgnoreCase)
     {
+        { ".pdf",  "application/pdf" }, // 🔥 IMPORTANTE
         { ".mp4",  "video/mp4" },
         { ".webm", "video/webm" },
         { ".mov",  "video/quicktime" },
@@ -34,6 +35,7 @@ public class AzureMediaStorageService(BlobServiceClient blobServiceClient) : IMe
         var blob = container.GetBlobClient(blobName);
 
         var contentType = ContentTypeMap.GetValueOrDefault(extension, "application/octet-stream");
+
         var uploadOptions = new BlobUploadOptions
         {
             HttpHeaders = new BlobHttpHeaders { ContentType = contentType }
