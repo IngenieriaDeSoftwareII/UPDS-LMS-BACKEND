@@ -61,4 +61,55 @@ public class UserRepository(UserManager<User> userManager, AppDbContext context)
     {
         return await userManager.GetRolesAsync(user);
     }
+
+    public async Task<User?> FindByIdAsync(string id)
+    {
+        return await userManager.FindByIdAsync(id);
+    }
+
+    public async Task<(bool Succeeded, IEnumerable<string> Errors)> ResetPasswordAsync(User user, string newPassword)
+    {
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await userManager.ResetPasswordAsync(user, token, newPassword);
+        return (result.Succeeded, result.Errors.Select(e => e.Description));
+    }
+
+    public async Task<User?> FindByIdWithPersonAsync(string id)
+    {
+        return await context.Users
+            .Include(u => u.Person)
+            .FirstOrDefaultAsync(u => u.Id == id);
+    }
+
+    public async Task<(bool Succeeded, IEnumerable<string> Errors)> UpdateAsync(User user)
+    {
+        var result = await userManager.UpdateAsync(user);
+        return (result.Succeeded, result.Errors.Select(e => e.Description));
+    }
+
+    public async Task RemoveRolesAsync(User user, IList<string> roles)
+    {
+        await userManager.RemoveFromRolesAsync(user, roles);
+    }
+
+    public async Task<(bool Succeeded, IEnumerable<string> Errors)> SetLockoutEndDateAsync(User user, DateTimeOffset? lockoutEnd)
+    {
+        if (!await userManager.GetLockoutEnabledAsync(user))
+            await userManager.SetLockoutEnabledAsync(user, true);
+
+        var result = await userManager.SetLockoutEndDateAsync(user, lockoutEnd);
+        return (result.Succeeded, result.Errors.Select(e => e.Description));
+    }
+
+    public async Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePasswordAsync(User user, string currentPassword, string newPassword)
+    {
+        var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        return (result.Succeeded, result.Errors.Select(e => e.Description));
+    }
+
+    public async Task<bool> HasActiveUsersAsync(int personId)
+    {
+        return await context.Users
+            .AnyAsync(u => u.PersonId == personId && (u.LockoutEnd == null || u.LockoutEnd <= DateTimeOffset.UtcNow));
+    }
 }

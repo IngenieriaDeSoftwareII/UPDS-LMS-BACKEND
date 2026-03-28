@@ -8,13 +8,8 @@ public class CreateUserDtoValidator : AbstractValidator<CreateUserDto>
 {
     public CreateUserDtoValidator()
     {
-        RuleFor(x => x.FirstName)
-            .NotEmpty().WithMessage("El nombre es requerido.")
-            .MaximumLength(100).WithMessage("El nombre no puede superar los 100 caracteres.");
-
-        RuleFor(x => x.LastName)
-            .NotEmpty().WithMessage("El apellido es requerido.")
-            .MaximumLength(100).WithMessage("El apellido no puede superar los 100 caracteres.");
+        RuleFor(x => x.PersonId)
+            .GreaterThan(0).WithMessage("El Id de persona es requerido.");
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("El correo institucional es requerido.")

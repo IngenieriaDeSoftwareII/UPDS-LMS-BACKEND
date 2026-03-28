@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Azure.Storage.Blobs;
 using Business.Mappings;
 using Business.UseCases;
@@ -37,6 +38,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = true;
 
     options.User.RequireUniqueEmail = true;
+
+    options.Lockout.AllowedForNewUsers = true;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
@@ -64,6 +67,34 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
         ClockSkew = TimeSpan.Zero
     };
+
+    options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+    {
+        OnChallenge = context =>
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+
+            var isExpired = context.AuthenticateFailure is Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException;
+            var message = isExpired
+                ? "Tu sesión ha expirado por inactividad tras 15 minutos"
+                : "Acceso denegado: no tienes permisos";
+
+            var json = System.Text.Json.JsonSerializer.Serialize(new { errors = new[] { message } });
+            return context.Response.WriteAsync(json);
+        },
+        OnForbidden = context =>
+        {
+            context.Response.StatusCode = 403;
+            context.Response.ContentType = "application/json";
+            var json = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                errors = new[] { "Acceso denegado: no tienes permisos" }
+            });
+            return context.Response.WriteAsync(json);
+        }
+    };
 });
 
 
@@ -82,6 +113,11 @@ builder.Services.AddScoped<ICursoRepository, CursoRepository>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<ICatalogoRepository, CatalogoRepository>();
 builder.Services.AddScoped<IDocenteRepository, DocenteRepository>();
+
+builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>();
+builder.Services.AddScoped<IInscriptionRepository, InscriptionRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IEvaluationRepository, EvaluationRepository>();
 
 
 // UseCases (Merged)
@@ -109,6 +145,36 @@ builder.Services.AddScoped<Business.UseCases.Categorias.DeleteCategoriaUseCase>(
 builder.Services.AddScoped<Business.UseCases.Catalogos.CreateCatalogoUseCase>();
 builder.Services.AddScoped<Business.UseCases.Catalogos.ListCatalogosUseCase>();
 builder.Services.AddScoped<Business.UseCases.Catalogos.GetCatalogoByIdUseCase>();
+builder.Services.AddScoped<UpdatePersonUseCase>();
+builder.Services.AddScoped<ChangePersonStatusUseCase>();
+
+//Inscriptions
+builder.Services.AddScoped<CreateInscriptionUseCase>();
+builder.Services.AddScoped<ListInscriptionsUseCase>();
+builder.Services.AddScoped<CancelInscriptionUseCase>();
+// Evaluations
+builder.Services.AddScoped<CreateEvaluationUseCase>();
+builder.Services.AddScoped<AddEvaluationQuestionUseCase>();
+builder.Services.AddScoped<SubmitEvaluationUseCase>();
+builder.Services.AddScoped<ListMyEvaluationGradesUseCase>();
+builder.Services.AddScoped<ListEvaluationGradesForTeacherUseCase>();
+builder.Services.AddScoped<GetEvaluationToTakeUseCase>();
+// Users
+builder.Services.AddScoped<CreateUserUseCase>();
+builder.Services.AddScoped<ListUsersUseCase>();
+builder.Services.AddScoped<UpdateUserUseCase>();
+builder.Services.AddScoped<ChangeUserStatusUseCase>();
+builder.Services.AddScoped<ResetUserPasswordUseCase>();
+
+// Auth
+builder.Services.AddScoped<LoginUseCase>();
+builder.Services.AddScoped<RefreshTokenUseCase>();
+builder.Services.AddScoped<LogoutUseCase>();
+builder.Services.AddScoped<ChangePasswordUseCase>();
+
+// Profile
+builder.Services.AddScoped<GetMyProfileUseCase>();
+builder.Services.AddScoped<UpdateMyProfileUseCase>();
 
 // Cursos
 builder.Services.AddScoped<Business.UseCases.Cursos.CreateCursoUseCase>();
@@ -124,8 +190,17 @@ builder.Services.AddScoped<Business.UseCases.Docentes.ListDocentesUseCase>();
 
 // Validators & Mappings
 // --------------------------------------
+
 builder.Services.AddValidatorsFromAssemblyContaining<PersonProfile>();
-builder.Services.AddAutoMapper(cfg => { }, typeof(PersonProfile), typeof(UserProfile));
+
+builder.Services.AddAutoMapper(
+    cfg => { },
+    typeof(PersonProfile),
+    typeof(UserProfile),
+    typeof(InscriptionProfile),
+    typeof(CourseProfile),
+    typeof(EvaluationProfile));
+
 
 
 // HTTP Pipeline & Middleware
@@ -136,12 +211,17 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
           .AllowAnyMethod()));
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+
+
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 
 var app = builder.Build();
 
-// Seed de roles al iniciar la aplicación
-await SeedRolesAsync(app.Services);
+// Seed de roles y admin inicial
+await Api.Extensions.DbSeeder.SeedRolesAndAdminAsync(app.Services);
 
 if (app.Environment.IsDevelopment())
 {
@@ -170,5 +250,35 @@ static async Task SeedRolesAsync(IServiceProvider services)
     {
         if (!await roleManager.RoleExistsAsync(role))
             await roleManager.CreateAsync(new IdentityRole(role));
+    }
+}
+
+
+
+// Deleted Local Seed Method
+internal sealed class BearerSecuritySchemeTransformer(
+    Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider authenticationSchemeProvider)
+    : Microsoft.AspNetCore.OpenApi.IOpenApiDocumentTransformer
+{
+    public async Task TransformAsync(
+        Microsoft.OpenApi.OpenApiDocument document,
+        Microsoft.AspNetCore.OpenApi.OpenApiDocumentTransformerContext context,
+        CancellationToken cancellationToken)
+    {
+        var authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync();
+        if (authenticationSchemes.Any(authScheme => authScheme.Name == "Bearer"))
+        {
+            document.Components ??= new Microsoft.OpenApi.OpenApiComponents();
+            document.Components.SecuritySchemes = new Dictionary<string, Microsoft.OpenApi.IOpenApiSecurityScheme>
+            {
+                ["Bearer"] = new Microsoft.OpenApi.OpenApiSecurityScheme
+                {
+                    Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    In = Microsoft.OpenApi.ParameterLocation.Header,
+                    BearerFormat = "Json Web Token"
+                }
+            };
+        }
     }
 }
