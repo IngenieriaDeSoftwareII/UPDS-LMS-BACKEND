@@ -146,7 +146,7 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 
 // Seed de roles al iniciar la aplicación
-await SeedRolesAsync(app.Services);
+await Api.Extensions.DbSeeder.SeedRolesAndAdminAsync(app.Services);
 
 if (app.Environment.IsDevelopment())
 {
@@ -165,16 +165,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-// Helpers
-static async Task SeedRolesAsync(IServiceProvider services)
-{
-    using var scope = services.CreateScope();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-    foreach (var role in UserRoles.All)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-            await roleManager.CreateAsync(new IdentityRole(role));
-    }
-}
