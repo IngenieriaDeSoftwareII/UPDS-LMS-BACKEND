@@ -12,11 +12,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     // LMS Entities
-    public DbSet<Catalogo> Catalogos { get; set; }
-    public DbSet<Docente> Docentes { get; set; }
-    public DbSet<Categoria> Categorias { get; set; }
-    public DbSet<Curso> Cursos { get; set; }
-    public DbSet<Modulo> Modulos { get; set; }
+    public DbSet<Catalog> Catalogs { get; set; }
+    public DbSet<Teacher> Teachers { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Course> Courses { get; set; }
+    public DbSet<Module> Modules { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -78,10 +78,10 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-builder.Services.AddScoped<ICursoRepository, CursoRepository>();
-builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-builder.Services.AddScoped<ICatalogoRepository, CatalogoRepository>();
-builder.Services.AddScoped<IDocenteRepository, DocenteRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICatalogRepository, CatalogRepository>();
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 
 
 // UseCases (Merged)
@@ -98,28 +98,33 @@ builder.Services.AddScoped<UploadImageUseCase>();
 builder.Services.AddScoped<CreatePersonUseCase>();
 builder.Services.AddScoped<ListPersonsUseCase>();
 
-// Categorias
-builder.Services.AddScoped<Business.UseCases.Categorias.CreateCategoriaUseCase>();
-builder.Services.AddScoped<Business.UseCases.Categorias.ListCategoriasUseCase>();
-builder.Services.AddScoped<Business.UseCases.Categorias.GetCategoriaByIdUseCase>();
-builder.Services.AddScoped<Business.UseCases.Categorias.UpdateCategoriaUseCase>();
-builder.Services.AddScoped<Business.UseCases.Categorias.DeleteCategoriaUseCase>();
+// Categories
+builder.Services.AddScoped<Business.UseCases.Category.CreateCategoryUseCase>();
+builder.Services.AddScoped<Business.UseCases.Category.ListCategoriesUseCase>();
+builder.Services.AddScoped<Business.UseCases.Category.GetCategoryByIdUseCase>();
+builder.Services.AddScoped<Business.UseCases.Category.UpdateCategoryUseCase>();
+builder.Services.AddScoped<Business.UseCases.Category.DeleteCategoryUseCase>();
 
-// Catalogos
-builder.Services.AddScoped<Business.UseCases.Catalogos.CreateCatalogoUseCase>();
-builder.Services.AddScoped<Business.UseCases.Catalogos.ListCatalogosUseCase>();
-builder.Services.AddScoped<Business.UseCases.Catalogos.GetCatalogoByIdUseCase>();
+// Catalogs
+builder.Services.AddScoped<Business.UseCases.Catalog.CreateCatalogUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalog.ListCatalogsUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalog.GetCatalogByIdUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalog.UpdateCatalogUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalog.DeleteCatalogUseCase>();
 
-// Cursos
-builder.Services.AddScoped<Business.UseCases.Cursos.CreateCursoUseCase>();
-builder.Services.AddScoped<Business.UseCases.Cursos.ListCursosUseCase>();
-builder.Services.AddScoped<Business.UseCases.Cursos.GetCursoByIdUseCase>();
-builder.Services.AddScoped<Business.UseCases.Cursos.UpdateCursoUseCase>();
-builder.Services.AddScoped<Business.UseCases.Cursos.DeleteCursoUseCase>();
+// Courses
+builder.Services.AddScoped<Business.UseCases.Course.CreateCourseUseCase>();
+builder.Services.AddScoped<Business.UseCases.Course.ListCoursesUseCase>();
+builder.Services.AddScoped<Business.UseCases.Course.GetCourseByIdUseCase>();
+builder.Services.AddScoped<Business.UseCases.Course.UpdateCourseUseCase>();
+builder.Services.AddScoped<Business.UseCases.Course.DeleteCourseUseCase>();
 
-// Docentes
-builder.Services.AddScoped<Business.UseCases.Docentes.CreateDocenteUseCase>();
-builder.Services.AddScoped<Business.UseCases.Docentes.ListDocentesUseCase>();
+// Teachers
+builder.Services.AddScoped<Business.UseCases.Teacher.CreateTeacherUseCase>();
+builder.Services.AddScoped<Business.UseCases.Teacher.ListTeachersUseCase>();
+builder.Services.AddScoped<Business.UseCases.Teacher.GetTeacherByIdUseCase>();
+builder.Services.AddScoped<Business.UseCases.Teacher.UpdateTeacherUseCase>();
+builder.Services.AddScoped<Business.UseCases.Teacher.DeleteTeacherUseCase>();
 
 
 // Validators & Mappings
