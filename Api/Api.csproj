@@ -22,8 +22,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Controllers\" />
 		<Folder Include="Middlewares\" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\Business\Business.csproj" />
 	</ItemGroup>
