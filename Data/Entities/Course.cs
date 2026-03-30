@@ -1,31 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
+[Table("cursos")]
 public class Course
 {
+    [Key]
+    [Column("id")]
     public int Id { get; set; }
-    [Required, MaxLength(150)]
-    public string Title { get; set; } = null!;
-    public string? Description { get; set; }
-    public int? TeacherId { get; set; }
+
+    [Column("titulo")]
+    [MaxLength(150)]
+    public string Titulo { get; set; } = null!;
+
+    [Column("descripcion")]
+    public string? Descripcion { get; set; }
+
+    [Column("docente_id")]
+    public int? DocenteId { get; set; }
+
+    [Column("nivel")]
     [MaxLength(50)]
-    public string? Level { get; set; }
-    public int? CategoryId { get; set; }
-    public string? ImageUrl { get; set; }
-    public bool IsPublished { get; set; } = false;
-    public int TotalDurationMin { get; set; } = 0;
-    public int? MaxStudents { get; set; }
+    public string? Nivel { get; set; }
+
+    [Column("categoria_id")]
+    public int? CategoriaId { get; set; }
+
+    [Column("imagen_url")]
+    public string? ImagenUrl { get; set; }
+
+    [Column("publicado")]
+    public bool Publicado { get; set; }
+
+    [Column("duracion_total_min")]
+    public int DuracionTotalMin { get; set; }
+
+    [Column("max_estudiantes")]
+    public int? MaxEstudiantes { get; set; }
+
+    [Column("entity_status")]
     public short EntityStatus { get; set; } = 1;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    [Column("created_at")]
+    public DateTime CreatedAt { get; set; }
+
+    [Column("updated_at")]
+    public DateTime UpdatedAt { get; set; }
+
+    [Column("deleted_at")]
     public DateTime? DeletedAt { get; set; }
 
-    public Teacher? Teacher { get; set; }
-    public Category? Category { get; set; }
+    [ForeignKey(nameof(DocenteId))]
+    public Teacher? Docente { get; set; }
 
-    // Asumiendo que Modulo aún no lo cambiaste o lo cambiarás a Module pronto.
-    public ICollection<Module> Modules { get; set; } = new List<Module>();
+    [ForeignKey(nameof(CategoriaId))]
+    public Category? Categoria { get; set; }
+
+    public ICollection<Module> Modulos { get; set; } = [];
 }

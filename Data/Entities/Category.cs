@@ -1,20 +1,34 @@
-﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
+[Table("categorias")]
 public class Category
 {
+    [Key]
+    [Column("id")]
     public int Id { get; set; }
-    [Required, MaxLength(100)]
-    public string Name { get; set; } = null!;
-    [Required, MaxLength(100)]
+
+    [Column("nombre")]
+    [MaxLength(100)]
+    public string Nombre { get; set; } = null!;
+
+    [Column("slug")]
+    [MaxLength(100)]
     public string Slug { get; set; } = null!;
-    public string? Description { get; set; }
+
+    [Column("descripcion")]
+    public string? Descripcion { get; set; }
+
+    [Column("entity_status")]
     public short EntityStatus { get; set; } = 1;
 
-    public int? CatalogId { get; set; }
-    public Catalog? Catalog { get; set; }
+    [Column("catalogo_id")]
+    public int? CatalogoId { get; set; }
 
-    public ICollection<Course> Courses { get; set; } = new List<Course>();
+    [ForeignKey(nameof(CatalogoId))]
+    public Catalog? Catalogo { get; set; }
+
+    public ICollection<Course> Cursos { get; set; } = [];
 }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Data.Entities;
@@ -12,8 +12,8 @@ public class TeacherProfile : Profile
         CreateMap<CreateTeacherDto, Teacher>();
         CreateMap<UpdateTeacherDto, Teacher>();
         CreateMap<Teacher, TeacherDto>()
-            .ForMember(dest => dest.UserFullName,
-                       opt => opt.MapFrom(src => src.User != null && src.User.Person != null
-                       ? $"{src.User.Person.FirstName} {src.User.Person.LastName}" : null));
+            .ForMember(dest => dest.NombreCompleto,
+                       opt => opt.MapFrom(src => src.Usuario != null && src.Usuario.Person != null
+                       ? $"{src.Usuario.Person.FirstName} {src.Usuario.Person.LastName}" : null));
     }
 }

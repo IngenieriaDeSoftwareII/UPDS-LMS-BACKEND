@@ -1,19 +1,17 @@
-﻿using System;
-
 namespace Business.DTOs.Responses;
 
 public class CourseDto
 {
     public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string? Description { get; set; }
-    public int? TeacherId { get; set; }
-    public string? Level { get; set; }
-    public int? CategoryId { get; set; }
-    public string CategoryName { get; set; } = string.Empty;
-    public string? ImageUrl { get; set; }
-    public bool IsPublished { get; set; }
-    public int TotalDurationMin { get; set; }
-    public int? MaxStudents { get; set; }
+    public string Titulo { get; set; } = string.Empty;
+    public string? Descripcion { get; set; }
+    public int? DocenteId { get; set; }
+    public string? Nivel { get; set; }
+    public int? CategoriaId { get; set; }
+    public string CategoriaNombre { get; set; } = string.Empty;
+    public string? ImagenUrl { get; set; }
+    public bool Publicado { get; set; }
+    public int DuracionTotalMin { get; set; }
+    public int? MaxEstudiantes { get; set; }
     public DateTime CreatedAt { get; set; }
 }

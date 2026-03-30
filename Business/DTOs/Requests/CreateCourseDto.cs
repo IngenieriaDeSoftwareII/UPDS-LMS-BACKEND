@@ -1,12 +1,12 @@
-﻿namespace Business.DTOs.Requests;
+namespace Business.DTOs.Requests;
 
 public class CreateCourseDto
 {
-    public string Title { get; set; } = string.Empty;
-    public string? Description { get; set; }
-    public int? TeacherId { get; set; }
-    public string? Level { get; set; }
-    public int? CategoryId { get; set; }
-    public string? ImageUrl { get; set; }
-    public int? MaxStudents { get; set; }
+    public string Titulo { get; set; } = string.Empty;
+    public string? Descripcion { get; set; }
+    public int? DocenteId { get; set; }
+    public string? Nivel { get; set; }
+    public int? CategoriaId { get; set; }
+    public string? ImagenUrl { get; set; }
+    public int? MaxEstudiantes { get; set; }
 }

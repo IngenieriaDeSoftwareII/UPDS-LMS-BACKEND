@@ -18,7 +18,7 @@ public class CatalogRepository(AppDbContext context) : ICatalogRepository
     {
         return await context.Catalogs
             .Include(c => c.Categorias.Where(cat => cat.EntityStatus == 1))
-                .ThenInclude(cat => cat.Courses.Where(curso => curso.EntityStatus == 1))
+                .ThenInclude(cat => cat.Cursos.Where(curso => curso.EntityStatus == 1))
             .Where(c => c.EntityStatus == 1)
             .ToListAsync();
     }
@@ -27,7 +27,7 @@ public class CatalogRepository(AppDbContext context) : ICatalogRepository
     {
         return await context.Catalogs
             .Include(c => c.Categorias.Where(cat => cat.EntityStatus == 1))
-                .ThenInclude(cat => cat.Courses.Where(curso => curso.EntityStatus == 1))
+                .ThenInclude(cat => cat.Cursos.Where(curso => curso.EntityStatus == 1))
             .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
     }
 

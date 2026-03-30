@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Data.Entities;
@@ -12,6 +12,6 @@ public class CourseProfile : Profile
         CreateMap<CreateCourseDto, Course>();
         CreateMap<UpdateCourseDto, Course>();
         CreateMap<Course, CourseDto>()
-            .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null));
+            .ForMember(dest => dest.CategoriaNombre, opt => opt.MapFrom(src => src.Categoria != null ? src.Categoria.Nombre : null));
     }
 }

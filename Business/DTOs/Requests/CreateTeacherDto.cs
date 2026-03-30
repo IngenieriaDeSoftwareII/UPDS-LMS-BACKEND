@@ -1,8 +1,8 @@
-﻿namespace Business.DTOs.Requests;
+namespace Business.DTOs.Requests;
 
 public class CreateTeacherDto
 {
-    public string UserId { get; set; } = string.Empty;
-    public string? Specialty { get; set; }
-    public string? Biography { get; set; }
+    public string UsuarioId { get; set; } = string.Empty;
+    public string? Especialidad { get; set; }
+    public string? Biografia { get; set; }
 }

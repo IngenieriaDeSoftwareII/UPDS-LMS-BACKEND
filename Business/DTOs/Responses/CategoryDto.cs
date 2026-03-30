@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-
 namespace Business.DTOs.Responses;
 
 public class CategoryDto
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string Nombre { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
-    public string? Description { get; set; }
-    public int? CatalogId { get; set; }
+    public string? Descripcion { get; set; }
+    public int? CatalogoId { get; set; }
 
-    public IEnumerable<CourseDto> Courses { get; set; } = new List<CourseDto>();
+    public IEnumerable<CourseDto> Cursos { get; set; } = new List<CourseDto>();
 }

@@ -1,4 +1,4 @@
-﻿using Data.Context;
+using Data.Context;
 using Data.Entities;
 using Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -21,14 +21,14 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
     {
         return await context.Categories
             .Where(c => c.EntityStatus == 1)
-            .Include(c => c.Courses.Where(course => course.EntityStatus == 1))
+            .Include(c => c.Cursos.Where(curso => curso.EntityStatus == 1))
             .ToListAsync();
     }
 
     public async Task<Category?> GetByIdAsync(int id)
     {
         return await context.Categories
-            .Include(c => c.Courses.Where(course => course.EntityStatus == 1))
+            .Include(c => c.Cursos.Where(curso => curso.EntityStatus == 1))
             .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
     }
 

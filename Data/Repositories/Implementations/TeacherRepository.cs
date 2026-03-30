@@ -1,4 +1,4 @@
-﻿using Data.Context;
+using Data.Context;
 using Data.Entities;
 using Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -20,16 +20,16 @@ public class TeacherRepository(AppDbContext context) : ITeacherRepository
     public async Task<IEnumerable<Teacher>> GetAllAsync()
     {
         return await context.Teachers
-            .Include(t => t.User).ThenInclude(u => u.Person)
-            .Include(t => t.Courses.Where(c => c.EntityStatus == 1))
+            .Include(t => t.Usuario).ThenInclude(u => u.Person)
+            .Include(t => t.Cursos.Where(c => c.EntityStatus == 1))
             .Where(t => t.EntityStatus == 1).ToListAsync();
     }
 
     public async Task<Teacher?> GetByIdAsync(int id)
     {
         return await context.Teachers
-            .Include(t => t.User).ThenInclude(u => u.Person)
-            .Include(t => t.Courses.Where(c => c.EntityStatus == 1))
+            .Include(t => t.Usuario).ThenInclude(u => u.Person)
+            .Include(t => t.Cursos.Where(c => c.EntityStatus == 1))
             .FirstOrDefaultAsync(t => t.Id == id && t.EntityStatus == 1);
     }
 

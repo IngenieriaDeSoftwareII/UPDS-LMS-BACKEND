@@ -18,6 +18,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<Course> Courses { get; set; }
     public DbSet<Module> Modules { get; set; }
 
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         // Es crucial mantener base.OnModelCreating para que Identity funcione correctamente

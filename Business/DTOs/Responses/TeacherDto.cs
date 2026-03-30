@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-
 namespace Business.DTOs.Responses;
 
 public class TeacherDto
 {
     public int Id { get; set; }
-    public string UserId { get; set; } = string.Empty;
-    public string? Specialty { get; set; }
-    public string? Biography { get; set; }
-    public int TotalCourses { get; set; }
+    public string UsuarioId { get; set; } = string.Empty;
+    public string? Especialidad { get; set; }
+    public string? Biografia { get; set; }
+    public int TotalCursos { get; set; }
     public DateTime CreatedAt { get; set; }
 
-    public string UserFullName { get; set; } = string.Empty; // Mapped from Person
+    public string NombreCompleto { get; set; } = string.Empty; // Mapped from Person
 
-    public IEnumerable<CourseDto> Courses { get; set; } = new List<CourseDto>();
+    public IEnumerable<CourseDto> Cursos { get; set; } = new List<CourseDto>();
 }
