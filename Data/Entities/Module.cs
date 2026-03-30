@@ -35,6 +35,9 @@ public class Module
     [Column("deleted_at")]
     public DateTime? DeletedAt { get; set; }
 
+
     [ForeignKey(nameof(CursoId))]
     public Course? Cursos { get; set; }
+  
+    public ICollection<Lesson> Lecciones { get; set; } = [];
 }

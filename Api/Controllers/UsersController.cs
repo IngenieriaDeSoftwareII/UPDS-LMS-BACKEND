@@ -1,15 +1,22 @@
 using Business.DTOs.Requests;
 using Business.UseCases;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(CreateUserUseCase createUser, ListUsersUseCase listUsers) : ControllerBase
+[Authorize(Roles = "Admin")]
+public class UsersController(
+    CreateUserUseCase createUser,
+    ListUsersUseCase listUsers,
+    UpdateUserUseCase updateUser,
+    ChangeUserStatusUseCase changeStatus,
+    ResetUserPasswordUseCase resetPassword) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create(CreateUserDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateUserDto dto)
     {
         var result = await createUser.ExecuteAsync(dto);
 
@@ -28,5 +35,50 @@ public class UsersController(CreateUserUseCase createUser, ListUsersUseCase list
     {
         var users = await listUsers.ExecuteAsync(search);
         return Ok(users);
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> Update(string id, [FromBody] UpdateUserDto dto)
+    {
+        var result = await updateUser.ExecuteAsync(id, dto);
+
+        if (!result.IsSuccess)
+            return BadRequest(new { errors = result.Errors });
+
+        return Ok(new
+        {
+            message = "Datos actualizados correctamente",
+            data = result.Value
+        });
+    }
+
+    [HttpPost("{id}/reset-password")]
+    public async Task<IActionResult> ResetPassword(string id)
+    {
+        var result = await resetPassword.ExecuteAsync(id);
+
+        if (!result.IsSuccess)
+            return BadRequest(new { errors = result.Errors });
+
+        return Ok(new
+        {
+            message = "Contraseña restablecida exitosamente",
+            data = result.Value
+        });
+    }
+
+    [HttpPatch("{id}/status")]
+    public async Task<IActionResult> ChangeStatus(string id, [FromBody] ChangeUserStatusDto dto)
+    {
+        var result = await changeStatus.ExecuteAsync(id, dto);
+
+        if (!result.IsSuccess)
+            return BadRequest(new { errors = result.Errors });
+
+        return Ok(new
+        {
+            message = dto.IsActive ? "Cuenta de usuario habilitada" : "Cuenta de usuario deshabilitada",
+            data = new { id, dto.IsActive, dto.LockedUntil }
+        });
     }
 }

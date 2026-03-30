@@ -25,6 +25,10 @@ public class Person
     public string? Address { get; set; }
 
     public string? ProfilePictureUrl { get; set; }
-
+  
     public ICollection<User> Users { get; set; } = [];
+
+    public ICollection<Inscription> Inscripciones { get; set; } = [];
+
+    public bool IsActive { get; set; } = true;
 }

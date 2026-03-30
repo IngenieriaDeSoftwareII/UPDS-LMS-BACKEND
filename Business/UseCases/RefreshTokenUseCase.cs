@@ -15,6 +15,17 @@ public class RefreshTokenUseCase(
 {
     public async Task<Result<AuthResponseDto>> ExecuteAsync(RefreshTokenDto dto)
     {
+        // ─── Seguridad: Detección de robo (Reuse Detection) ───
+        // Si alguien presenta un token que YA fue revocado, significa
+        // que el token fue robado. Revocamos TODOS los tokens del usuario.
+        var revokedToken = await refreshTokenRepository.FindRevokedAsync(dto.RefreshToken);
+        if (revokedToken is not null)
+        {
+            await refreshTokenRepository.RevokeAllByUserAsync(revokedToken.UserId);
+            return Result<AuthResponseDto>.Failure(
+                ["Sesión comprometida: se detectó el uso de un token ya utilizado. Todas las sesiones han sido cerradas por seguridad."]);
+        }
+
         var stored = await refreshTokenRepository.FindValidAsync(dto.RefreshToken);
         if (stored is null)
             return Result<AuthResponseDto>.Failure(["El refresh token es inválido o ha expirado"]);
@@ -34,7 +45,7 @@ public class RefreshTokenUseCase(
         {
             Token = newRawRefreshToken,
             UserId = stored.UserId,
-            ExpiresAt = DateTime.UtcNow.AddDays(jwtTokenService.RefreshTokenExpirationDays)
+            ExpiresAt = DateTime.UtcNow.AddMinutes(jwtTokenService.RefreshTokenExpirationMinutes)
         });
 
         var role = roles.FirstOrDefault() ?? string.Empty;
@@ -43,6 +54,7 @@ public class RefreshTokenUseCase(
         {
             AccessToken = newAccessToken,
             RefreshToken = newRawRefreshToken,
+            SessionTTL = jwtTokenService.RefreshTokenExpirationMinutes * 60 * 1000,
             Role = role,
             RedirectTo = GetDashboard(role)
         });

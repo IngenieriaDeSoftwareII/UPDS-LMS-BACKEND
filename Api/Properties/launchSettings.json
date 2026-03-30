@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "http": {
@@ -12,8 +12,8 @@
         "Jwt__Secret": "upds-lms-super-secret-key-2026-dev-only!!",
         "Jwt__Issuer": "upds-lms-api",
         "Jwt__Audience": "upds-lms-client",
-        "Jwt__AccessTokenExpirationMinutes": "60",
-        "Jwt__RefreshTokenExpirationDays": "7"
+        "Jwt__AccessTokenExpirationMinutes": "10",
+        "Jwt__RefreshTokenExpirationMinutes": "15"
       }
     },
     "https": {
@@ -27,8 +27,8 @@
         "Jwt__Secret": "upds-lms-super-secret-key-2026-dev-only!!",
         "Jwt__Issuer": "upds-lms-api",
         "Jwt__Audience": "upds-lms-client",
-        "Jwt__AccessTokenExpirationMinutes": "60",
-        "Jwt__RefreshTokenExpirationDays": "7"
+        "Jwt__AccessTokenExpirationMinutes": "10",
+        "Jwt__RefreshTokenExpirationMinutes": "15"
       }
     }
   }

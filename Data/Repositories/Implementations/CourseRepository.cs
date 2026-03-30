@@ -2,10 +2,6 @@ using Data.Context;
 using Data.Entities;
 using Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Data.Repositories.Implementations;
 
@@ -21,14 +17,17 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
     public async Task<IEnumerable<Course>> GetAllAsync()
     {
         return await context.Courses
+            .AsNoTracking()
             .Include(c => c.Categoria)
             .Include(c => c.Docente)
-            .Where(c => c.EntityStatus == 1).ToListAsync();
+            .Where(c => c.EntityStatus == 1)
+            .ToListAsync();
     }
 
     public async Task<Course?> GetByIdAsync(int id)
     {
         return await context.Courses
+            .AsNoTracking()
             .Include(c => c.Categoria)
             .Include(c => c.Docente)
             .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
@@ -43,7 +42,9 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
 
     public async Task DeleteAsync(int id)
     {
-        var course = await GetByIdAsync(id);
+        var course = await context.Courses
+            .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
+
         if (course != null)
         {
             course.EntityStatus = 0; // Soft delete

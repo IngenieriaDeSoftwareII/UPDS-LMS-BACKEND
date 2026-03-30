@@ -29,4 +29,23 @@ public class RefreshTokenRepository(AppDbContext context) : IRefreshTokenReposit
         refreshToken.IsRevoked = true;
         await context.SaveChangesAsync();
     }
+
+    public async Task<RefreshToken?> FindRevokedAsync(string token)
+    {
+        return await context.RefreshTokens
+            .Include(r => r.User)
+            .FirstOrDefaultAsync(r => r.Token == token && r.IsRevoked);
+    }
+
+    public async Task RevokeAllByUserAsync(string userId)
+    {
+        var tokens = await context.RefreshTokens
+            .Where(r => r.UserId == userId && !r.IsRevoked)
+            .ToListAsync();
+
+        foreach (var token in tokens)
+            token.IsRevoked = true;
+
+        await context.SaveChangesAsync();
+    }
 }

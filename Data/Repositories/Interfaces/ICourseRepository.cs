@@ -1,4 +1,4 @@
-﻿using Data.Entities;
+using Data.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,3 +12,4 @@ public interface ICourseRepository
     Task UpdateAsync(Course course);
     Task DeleteAsync(int id);
 }
+

@@ -1,3 +1,4 @@
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -58,4 +59,7 @@ public class Course
     public Category? Categoria { get; set; }
 
     public ICollection<Module> Modulos { get; set; } = [];
+  
+    public ICollection<Inscription> Inscripciones { get; set; } = [];
+
 }
