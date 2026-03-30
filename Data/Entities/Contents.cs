@@ -23,9 +23,16 @@ public class Content
     [MaxLength(150)]
     public string Titulo { get; set; } = null!;
 
+    [Column("url")]
+    public string? Url { get; set; }
+
     [Required]
     [Column("orden")]
     public int Orden { get; set; } = 1;
+
+    [Required]
+    [Column("duracion")]
+    public int Duracion { get; set; }
 
     [Column("entity_status")]
     public short EntityStatus { get; set; } = 1;

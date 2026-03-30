@@ -41,4 +41,6 @@ public class Lesson
 
     // Relaciones con contenidos
     public ICollection<Content> Contenidos { get; set; } = [];
+
+    public ICollection<Evaluation> Evaluaciones { get; set; } = [];
 }

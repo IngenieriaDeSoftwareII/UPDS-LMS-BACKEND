@@ -29,6 +29,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<Category> Categories { get; set; }
 
+    public DbSet<ActivitySubmission> ActivitySubmissions { get; set; }
+    public DbSet<Submission> Submissions { get; set; }
+    public DbSet<GradableItem> GradableItems { get; set; }
+    public DbSet<ItemGrade> ItemGrades { get; set; }
+    public DbSet<ModuleFinalGrade> ModuleFinalGrades { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
 
@@ -91,6 +97,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             entity.HasOne(e => e.Cursos)
                   .WithMany()
                   .HasForeignKey(e => e.CursoId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Leccion)
+                  .WithMany(l => l.Evaluaciones)
+                  .HasForeignKey(e => e.LeccionId)
                   .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasMany(e => e.Preguntas)
@@ -197,6 +208,42 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
                   .WithOne()
                   .HasForeignKey<VideoContent>(e => e.ContenidoId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // GradableItem
+        modelBuilder.Entity<GradableItem>(entity =>
+        {
+            entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
+            entity.Property(e => e.Orden).HasDefaultValue(1);
+
+            entity.HasOne(e => e.Module)
+                  .WithMany(m => m.ItemsCalificables)
+                  .HasForeignKey(e => e.ModuloId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ItemGrade
+        modelBuilder.Entity<ItemGrade>(entity =>
+        {
+            entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
+
+            entity.HasOne(e => e.Submission)
+                  .WithMany()
+                  .HasForeignKey(e => e.EntregaId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.ActivitySubmission)
+                  .WithMany()
+                  .HasForeignKey(e => e.ActividadEntregaId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ModuleFinalGrade
+        modelBuilder.Entity<ModuleFinalGrade>(entity =>
+        {
+            entity.Property(e => e.ItemsCalificados).HasDefaultValue(0);
+            entity.Property(e => e.ItemsTotales).HasDefaultValue(0);
+            entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
         });
     }
 
