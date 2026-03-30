@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
@@ -51,8 +52,14 @@ public class Course
     [Column("deleted_at")]
     public DateTime? DeletedAt { get; set; }
 
-    public ICollection<Inscription> Inscripciones { get; set; } = [];
+    [ForeignKey(nameof(DocenteId))]
+    public Teacher? Docente { get; set; }
+
+    [ForeignKey(nameof(CategoriaId))]
+    public Category? Categoria { get; set; }
 
     public ICollection<Module> Modulos { get; set; } = [];
-}
+  
+    public ICollection<Inscription> Inscripciones { get; set; } = [];
 
+}

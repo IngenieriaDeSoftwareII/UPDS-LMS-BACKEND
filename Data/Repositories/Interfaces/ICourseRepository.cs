@@ -1,9 +1,15 @@
-﻿using Data.Entities;
+using Data.Entities;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Data.Repositories.Interfaces
+namespace Data.Repositories.Interfaces;
+
+public interface ICourseRepository
 {
-    public interface ICourseRepository
-    {
-        Task<Course?> GetByIdAsync(int id);
-    }
+    Task<Course> CreateAsync(Course course);
+    Task<IEnumerable<Course>> GetAllAsync();
+    Task<Course?> GetByIdAsync(int id);
+    Task UpdateAsync(Course course);
+    Task DeleteAsync(int id);
 }
+

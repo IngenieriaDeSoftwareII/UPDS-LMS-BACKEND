@@ -117,6 +117,12 @@ builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICatalogRepository, CatalogRepository>();
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+
+
 builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>();
 builder.Services.AddScoped<IInscriptionRepository, InscriptionRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
@@ -157,6 +163,36 @@ builder.Services.AddScoped<UpdateUserUseCase>();
 builder.Services.AddScoped<ChangeUserStatusUseCase>();
 builder.Services.AddScoped<ResetUserPasswordUseCase>();
 
+// Categories
+builder.Services.AddScoped<Business.UseCases.Category.CreateCategoryUseCase>();
+builder.Services.AddScoped<Business.UseCases.Category.ListCategoriesUseCase>();
+builder.Services.AddScoped<Business.UseCases.Category.GetCategoryByIdUseCase>();
+builder.Services.AddScoped<Business.UseCases.Category.UpdateCategoryUseCase>();
+builder.Services.AddScoped<Business.UseCases.Category.DeleteCategoryUseCase>();
+
+// Catalogs
+builder.Services.AddScoped<Business.UseCases.Catalog.CreateCatalogUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalog.ListCatalogsUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalog.GetCatalogByIdUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalog.UpdateCatalogUseCase>();
+builder.Services.AddScoped<Business.UseCases.Catalog.DeleteCatalogUseCase>();
+
+// Courses
+builder.Services.AddScoped<Business.UseCases.Course.CreateCourseUseCase>();
+builder.Services.AddScoped<Business.UseCases.Course.ListCoursesUseCase>();
+builder.Services.AddScoped<Business.UseCases.Course.GetCourseByIdUseCase>();
+builder.Services.AddScoped<Business.UseCases.Course.UpdateCourseUseCase>();
+builder.Services.AddScoped<Business.UseCases.Course.DeleteCourseUseCase>();
+
+// Teachers
+builder.Services.AddScoped<Business.UseCases.Teacher.CreateTeacherUseCase>();
+builder.Services.AddScoped<Business.UseCases.Teacher.ListTeachersUseCase>();
+builder.Services.AddScoped<Business.UseCases.Teacher.GetTeacherByIdUseCase>();
+builder.Services.AddScoped<Business.UseCases.Teacher.UpdateTeacherUseCase>();
+builder.Services.AddScoped<Business.UseCases.Teacher.DeleteTeacherUseCase>();
+
+
+// Validators & Mappings
 // Auth
 builder.Services.AddScoped<LoginUseCase>();
 builder.Services.AddScoped<RefreshTokenUseCase>();
@@ -231,7 +267,9 @@ builder.Services.AddOpenApi(options =>
 
 var app = builder.Build();
 
-// Seed de roles y admin inicial
+
+// Seed de roles al iniciar la aplicación
+
 await Api.Extensions.DbSeeder.SeedRolesAndAdminAsync(app.Services);
 
 if (app.Environment.IsDevelopment())
@@ -252,7 +290,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
 
 
 // Deleted Local Seed Method

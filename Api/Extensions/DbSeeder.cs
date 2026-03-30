@@ -2,6 +2,9 @@ using Data.Context;
 using Data.Entities;
 using Data.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
 
 namespace Api.Extensions;
 

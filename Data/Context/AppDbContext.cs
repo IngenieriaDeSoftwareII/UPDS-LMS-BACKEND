@@ -25,7 +25,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<EvaluationAttempt> EvaluationAttempts { get; set; }
     public DbSet<EvaluationAnswer> EvaluationAnswers { get; set; }
 
+    public DbSet<Catalog> Catalogs { get; set; }
+    public DbSet<Teacher> Teachers { get; set; }
+    public DbSet<Category> Categories { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
+
     {
         base.OnModelCreating(modelBuilder);
 
