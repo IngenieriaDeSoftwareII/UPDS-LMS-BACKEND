@@ -40,4 +40,6 @@ public class Module
     public Course? Cursos { get; set; }
   
     public ICollection<Lesson> Lecciones { get; set; } = [];
+
+    public ICollection<GradableItem> ItemsCalificables { get; set; } = [];
 }

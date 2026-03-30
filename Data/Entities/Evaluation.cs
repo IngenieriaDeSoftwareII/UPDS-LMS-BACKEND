@@ -13,6 +13,9 @@ public class Evaluation
     [Column("curso_id")]
     public int CursoId { get; set; }
 
+    [Column("leccion_id")]
+    public int? LeccionId { get; set; }
+
     [Column("titulo")]
     [MaxLength(150)]
     public string Titulo { get; set; } = null!;
@@ -36,10 +39,15 @@ public class Evaluation
     [Column("tiempo_limite_max")]
     public int? TiempoLimiteMax { get; set; }
 
+    [Column("fecha_limite")]
+    public DateTime? FechaLimite { get; set; }
+
     [Column("entity_status")]
     public short EntityStatus { get; set; } = 1;
 
     public Course Cursos { get; set; } = null!;
+
+    public Lesson? Leccion { get; set; }
 
     public ICollection<Question> Preguntas { get; set; } = [];
     public ICollection<EvaluationAttempt> Intentos { get; set; } = [];
