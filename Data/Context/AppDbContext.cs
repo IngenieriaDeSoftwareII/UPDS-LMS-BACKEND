@@ -236,6 +236,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
                   .WithMany()
                   .HasForeignKey(e => e.ActividadEntregaId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Teacher)
+                  .WithMany()
+                  .HasForeignKey(e => e.DocenteId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Student)
+                  .WithMany()
+                  .HasForeignKey(e => e.EstudianteId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Item)
+                  .WithMany()
+                  .HasForeignKey(e => e.ItemId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ModuleFinalGrade
@@ -244,6 +259,34 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             entity.Property(e => e.ItemsCalificados).HasDefaultValue(0);
             entity.Property(e => e.ItemsTotales).HasDefaultValue(0);
             entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
+
+            entity.HasOne(e => e.Student)
+                  .WithMany()
+                  .HasForeignKey(e => e.EstudianteId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Module)
+                  .WithMany()
+                  .HasForeignKey(e => e.ModuloId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Submission
+        modelBuilder.Entity<Submission>(entity =>
+        {
+            entity.HasOne(e => e.Student)
+                  .WithMany()
+                  .HasForeignKey(e => e.EstudianteId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ActivitySubmission
+        modelBuilder.Entity<ActivitySubmission>(entity =>
+        {
+            entity.HasOne(e => e.User)
+                  .WithMany()
+                  .HasForeignKey(e => e.UsuarioId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
     }
 
