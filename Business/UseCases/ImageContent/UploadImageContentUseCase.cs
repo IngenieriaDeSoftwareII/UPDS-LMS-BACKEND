@@ -1,37 +1,69 @@
-using Business.DTOs.Requests;
 using Business.DTOs.Responses;
 using Data.Context;
-using Data.Entities;
 using Data.Enums;
 using Data.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace Business.UseCases.ImageContent;
 
-public class UploadImageContentUseCase(AppDbContext db, IMediaStorageService storage)
+public class UploadImageContentUseCase
 {
+    private readonly AppDbContext db;
+    private readonly IMediaStorageService storage;
     private const string Container = "images";
 
-    public async Task<ImageContentDto> ExecuteAsync(int lessonId, string title, Stream fileStream, string fileName)
+    public UploadImageContentUseCase(AppDbContext db, IMediaStorageService storage)
     {
-        var extension = Path.GetExtension(fileName).ToLower().TrimStart('.');
-        if (!Enum.TryParse<FormatImage>(extension, true, out var format))
+        this.db = db;
+        this.storage = storage;
+    }
+
+    public async Task<ImageContentDto> ExecuteAsync(
+        int lessonId,
+        string title,
+        Stream fileStream,
+        string fileName,
+        int order
+    )
+    {
+        // 🔥 VALIDAR EXTENSIÓN
+        var ext = Path.GetExtension(fileName).ToLower();
+
+        if (!new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" }.Contains(ext))
+            throw new InvalidOperationException($"Tipo de archivo no permitido: {ext}");
+
+        // 🔥 MAPEO CORRECTO (FIX REAL)
+        FormatImage formatEnum;
+
+        switch (ext)
         {
-            // por defecto que use jpg si no se reconoce el formato
-            format = FormatImage.jpg;
+            case ".jpg":
+            case ".jpeg":
+                formatEnum = FormatImage.jpg;
+                break;
+            case ".png":
+                formatEnum = FormatImage.png;
+                break;
+            case ".gif":
+                formatEnum = FormatImage.gif;
+                break;
+            case ".webp":
+                formatEnum = FormatImage.webp;
+                break;
+            default:
+                throw new InvalidOperationException($"Formato no soportado: {ext}");
         }
 
-        // subir a storage
+        // 1. SUBIR ARCHIVO
         var blobName = await storage.UploadAsync(fileStream, fileName, Container);
         var url = await storage.GetReadUrlAsync(blobName, Container, TimeSpan.FromHours(1));
 
-        // crear contenido base
+        // 2. CREAR CONTENT
         var content = new Data.Entities.Content
         {
             LeccionId = lessonId,
             Tipo = TypeContent.imagen,
             Titulo = string.IsNullOrWhiteSpace(title) ? fileName : title,
-            Orden = 1,
+            Orden = order,
             EntityStatus = 1,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -40,26 +72,35 @@ public class UploadImageContentUseCase(AppDbContext db, IMediaStorageService sto
         db.Contents.Add(content);
         await db.SaveChangesAsync();
 
-        // crear contenido de imagen
+        // 3. CREAR IMAGECONTENT
         var imageContent = new Data.Entities.ImageContent
         {
             ContenidoId = content.Id,
-            UrlImagen = blobName, // store the blob name/path
-            Formato = format,
+            UrlImagen = blobName,
             TextoAlternativo = title ?? fileName,
+            Formato = formatEnum, // ✅ FIX AQUÍ
             TamanoKb = (int)(fileStream.Length / 1024)
         };
 
         db.ImageContents.Add(imageContent);
         await db.SaveChangesAsync();
 
+        // 🔥 RESPUESTA
         return new ImageContentDto
         {
             ContentId = content.Id,
             ImageUrl = url.ToString(),
-            Format = format.ToString(),
+            Format = formatEnum.ToString(),
             AltText = imageContent.TextoAlternativo,
-            SizeKb = imageContent.TamanoKb
+            SizeKb = imageContent.TamanoKb,
+
+            Content = new ContentDto
+            {
+                Id = content.Id,
+                LessonId = content.LeccionId,
+                Title = content.Titulo,
+                Order = content.Orden
+            }
         };
     }
 }

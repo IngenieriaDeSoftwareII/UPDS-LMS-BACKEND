@@ -14,13 +14,24 @@ public class ImageContentsController(
     DeleteImageContentUseCase deleteImage) : ControllerBase
 {
     [HttpPost("Upload")]
-    public async Task<IActionResult> Upload([FromForm] int lessonId, [FromForm] string? title, [FromForm] IFormFile file)
+    public async Task<IActionResult> Upload(
+        [FromForm] int lessonId,
+        [FromForm] string? title,
+        [FromForm] int? order,
+        [FromForm] IFormFile file)
     {
         if (file == null || file.Length == 0)
             return BadRequest("Archivo no proporcionado.");
 
         await using var stream = file.OpenReadStream();
-        var result = await uploadImage.ExecuteAsync(lessonId, title ?? file.FileName, stream, file.FileName);
+
+        var result = await uploadImage.ExecuteAsync(
+            lessonId,
+            title ?? file.FileName,
+            stream,
+            file.FileName,
+            order ?? 1 
+        );
 
         return Ok(result);
     }
