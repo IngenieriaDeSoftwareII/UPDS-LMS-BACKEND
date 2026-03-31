@@ -44,14 +44,46 @@ public class ImageContentsController(
     }
 
     [HttpPut("Update/{contentId}")]
-    public async Task<IActionResult> Update(int contentId, CreateImageContentDto dto)
+    public async Task<IActionResult> Update(int contentId,[FromForm] string altText,[FromForm] IFormFile? file)
     {
-        var result = await updateImage.ExecuteAsync(contentId, dto);
+        try
+        {
+            Stream? stream = null;
+            string? fileName = null;
+            long? fileSize = null;
 
-        if (!result.IsSuccess)
-            return BadRequest(result.Errors);
+            if (file != null && file.Length > 0)
+            {
+                stream = file.OpenReadStream();
+                fileName = file.FileName;
+                fileSize = file.Length;
+            }
 
-        return Ok(result.Value);
+            var dto = new UpdateImageContentDto
+            {
+                AltText = altText
+            };
+
+            var result = await updateImage.ExecuteAsync(
+                contentId,
+                dto,
+                stream,
+                fileName,
+                fileSize
+            );
+
+            if (!result.IsSuccess)
+                return BadRequest(new { errors = result.Errors });
+
+            return Ok(result.Value);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new
+            {
+                error = "Error interno del servidor"
+            });
+        }
     }
 
     [HttpDelete("Delete/{contentId}")]

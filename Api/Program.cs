@@ -244,6 +244,14 @@ builder.Services.AddScoped<GetModuleByIdUseCase>();
 builder.Services.AddScoped<UpdateModuleUseCase>();
 builder.Services.AddScoped<DeleteModuleUseCase>();
 
+//Image Content
+builder.Services.AddScoped<UploadImageContentUseCase>();
+builder.Services.AddScoped<CreateImageContentUseCase>();
+builder.Services.AddScoped<ListImageContentsUseCase>();
+builder.Services.AddScoped<UpdateImageContentUseCase>();
+builder.Services.AddScoped<DeleteImageContentUseCase>();
+
+
 
 
 // Validators
