@@ -22,6 +22,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
+using Business.UseCases.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -133,6 +134,7 @@ builder.Services.AddScoped<IContentRepository, ContentRepository>();
 builder.Services.AddScoped<IVideoContentRepository, VideoContentRepository>();
 builder.Services.AddScoped<IImageContentRepository, ImageContentRepository>();
 builder.Services.AddScoped<IDocumentContentRepository, DocumentContentRepository>();
+builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
 
 // UseCases
 // --------------------------------------
@@ -235,6 +237,13 @@ builder.Services.AddScoped<DeleteDocumentContentUseCase>();
 builder.Services.AddScoped<UploadDocumentContentUseCase>();
 builder.Services.AddScoped<GetDocumentSasUrlUseCase>();
 
+//Modules
+builder.Services.AddScoped<CreateModuleUseCase>();
+builder.Services.AddScoped<ListModulesUseCase>();
+builder.Services.AddScoped<GetModuleByIdUseCase>();
+builder.Services.AddScoped<UpdateModuleUseCase>();
+builder.Services.AddScoped<DeleteModuleUseCase>();
+
 
 
 // Validators
@@ -250,7 +259,9 @@ builder.Services.AddAutoMapper(
     typeof(UserProfile),
     typeof(InscriptionProfile),
     typeof(CourseProfile),
-    typeof(EvaluationProfile));
+    typeof(EvaluationProfile),
+    typeof(ModuleProfile)
+    );
 
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
