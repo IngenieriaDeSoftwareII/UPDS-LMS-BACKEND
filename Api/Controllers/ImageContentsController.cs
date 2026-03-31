@@ -10,8 +10,21 @@ public class ImageContentsController(
     CreateImageContentUseCase createImage,
     ListImageContentsUseCase listImages,
     UpdateImageContentUseCase updateImage,
+    UploadImageContentUseCase uploadImage,
     DeleteImageContentUseCase deleteImage) : ControllerBase
 {
+    [HttpPost("Upload")]
+    public async Task<IActionResult> Upload([FromForm] int lessonId, [FromForm] string? title, [FromForm] IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("Archivo no proporcionado.");
+
+        await using var stream = file.OpenReadStream();
+        var result = await uploadImage.ExecuteAsync(lessonId, title ?? file.FileName, stream, file.FileName);
+
+        return Ok(result);
+    }
+
     [HttpPost("Create")]
     public async Task<IActionResult> Create(CreateImageContentDto dto)
     {
