@@ -38,10 +38,24 @@ public class ListImageContentsUseCase
             result.Add(new ImageContentDto
             {
                 ContentId = img.ContenidoId,
-                ImageUrl = url.ToString(), 
+                ImageUrl = url.ToString(),
                 Format = img.Formato.ToString(),
+                WidthPx = img.AnchoPx,
+                HeightPx = img.AltoPx,
                 AltText = img.TextoAlternativo,
-                SizeKb = img.TamanoKb
+                SizeKb = img.TamanoKb,
+                Content = new ContentDto
+                {
+                    Id = img.Contenido.Id,
+                    LessonId = img.Contenido.LeccionId,
+                    Type = img.Contenido.Tipo.ToString(),
+                    Title = img.Contenido.Titulo,
+                    Order = img.Contenido.Orden,
+                    EntityStatus = img.Contenido.EntityStatus,
+                    CreatedAt = img.Contenido.CreatedAt ?? DateTime.UtcNow,
+                    UpdatedAt = img.Contenido.UpdatedAt ?? DateTime.UtcNow,
+                    DeletedAt = img.Contenido.DeletedAt
+                }
             });
         }
 

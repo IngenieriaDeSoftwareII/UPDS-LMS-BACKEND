@@ -20,6 +20,7 @@ public class ImageContentsController(
         [FromForm] int? order,
         [FromForm] IFormFile file)
     {
+        Console.WriteLine($"Received upload request: lessonId={lessonId}, title={title}, order={order}, fileName={file?.FileName}");
         if (file == null || file.Length == 0)
             return BadRequest("Archivo no proporcionado.");
 

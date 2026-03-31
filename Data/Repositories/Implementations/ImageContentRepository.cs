@@ -33,7 +33,9 @@ public class ImageContentRepository : IImageContentRepository
 
     public async Task<IEnumerable<ImageContent>> GetAllAsync()
     {
-        return await _context.ImageContents.ToListAsync();
+        return await _context.ImageContents
+            .Include(ic => ic.Contenido)
+            .ToListAsync();
     }
 
     public async Task<ImageContent?> GetByIdAsync(int? id)
