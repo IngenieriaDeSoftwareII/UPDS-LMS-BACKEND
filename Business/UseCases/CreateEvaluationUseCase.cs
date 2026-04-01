@@ -12,6 +12,7 @@ public class CreateEvaluationUseCase(
     IEvaluationRepository evaluationRepository,
     ICourseRepository courseRepository,
     IUserRepository userRepository,
+    ITeacherRepository teacherRepository,
     IValidator<CreateEvaluationDto> validator,
     IMapper mapper)
 {
@@ -25,11 +26,15 @@ public class CreateEvaluationUseCase(
         if (user is null)
             return Result<EvaluationDto>.Failure(["Usuario no encontrado."]);
 
+        var teacher = await teacherRepository.GetByUserIdAsync(currentUserId);
+        if (teacher is null)
+            return Result<EvaluationDto>.Failure(["Docente no encontrado."]);
+
         var course = await courseRepository.GetByIdAsync(dto.CursoId);
         if (course is null)
             return Result<EvaluationDto>.Failure(["El curso no existe."]);
 
-        if (course.DocenteId != user.PersonId)
+        if (course.DocenteId != teacher.Id)
             return Result<EvaluationDto>.Failure(["No puedes crear evaluaciones para cursos que no son tuyos."]);
 
         var evaluation = mapper.Map<Evaluation>(dto);
