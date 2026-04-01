@@ -1,4 +1,5 @@
 using Business.DTOs.Responses.Reports;
+using Data.Enums;
 
 namespace Business.Services.Reports;
 

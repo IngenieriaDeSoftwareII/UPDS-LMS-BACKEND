@@ -1,7 +1,8 @@
 using AutoMapper;
 using Business.DTOs.Requests.Reports;
 using Business.DTOs.Responses.Reports;
-using Data.Reports.Models;
+using Data.Models.Reports.Queries;
+using Data.Models.Reports.Results;
 
 namespace Business.Mappings;
 

@@ -1,6 +1,6 @@
-namespace Data.Reports.Models;
+namespace Data.Models.Reports.Queries;
 
-public class TeacherCourseDetailReportQuery
+public class TeacherSummaryReportQuery
 {
     public DateTime? From { get; set; }
     public DateTime? To { get; set; }

@@ -1,4 +1,4 @@
-namespace Data.Reports.Models;
+namespace Data.Models.Reports.Queries;
 
 public class AdminCoursesReportQuery
 {

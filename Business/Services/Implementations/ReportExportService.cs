@@ -1,5 +1,6 @@
 using Business.DTOs.Responses.Reports;
 using ClosedXML.Excel;
+using Data.Enums;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;

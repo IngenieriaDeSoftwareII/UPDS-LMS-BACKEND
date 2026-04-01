@@ -1,4 +1,4 @@
-namespace Data.Reports.Models;
+namespace Data.Models.Reports.Results;
 
 public class AdminCoursesReportResult
 {
