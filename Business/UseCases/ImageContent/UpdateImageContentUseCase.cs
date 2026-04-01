@@ -26,25 +26,32 @@ public class UpdateImageContentUseCase(
         if (existing is null)
             return Result<ImageContentDto>.Failure(["Imagen no encontrada"]);
 
-        
+        // ACTUALIZAR TEXTO
         if (!string.IsNullOrWhiteSpace(dto.AltText))
         {
             existing.TextoAlternativo = dto.AltText;
         }
 
-        // REEMPLAZAR IMAGEN
+        // ACTUALIZAR ORDER 
+        if (dto.Order.HasValue && dto.Order.Value > 0)
+        {
+            existing.Contenido.Orden = dto.Order.Value;
+        }
+
+        //  REEMPLAZAR IMAGEN
         if (fileStream != null && fileName != null)
         {
-            // reset stream
             if (fileStream.CanSeek)
                 fileStream.Position = 0;
 
             var blobName = await storage.UploadAsync(fileStream, fileName, Container);
 
             existing.UrlImagen = blobName;
-            existing.TamanoKb = fileSize.HasValue
-                ? (int)(fileSize.Value / 1024)
-                : existing.TamanoKb;
+
+            if (fileSize.HasValue)
+            {
+                existing.TamanoKb = (int)(fileSize.Value / 1024);
+            }
         }
 
         await repository.UpdateAsync(existing);
@@ -61,7 +68,16 @@ public class UpdateImageContentUseCase(
             ImageUrl = url.ToString(),
             Format = existing.Formato.ToString(),
             AltText = existing.TextoAlternativo,
-            SizeKb = existing.TamanoKb
+            SizeKb = existing.TamanoKb,
+
+            // DEVOLVER CONTENT COMPLETO
+            Content = new ContentDto
+            {
+                Id = existing.ContenidoId,
+                LessonId = existing.Contenido.LeccionId,
+                Title = existing.Contenido.Titulo,
+                Order = existing.Contenido.Orden
+            }
         });
     }
 }

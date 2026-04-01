@@ -23,7 +23,10 @@ public class ImageContentRepository : IImageContentRepository
 
     public async Task DeleteAsync(int id)
     {
-        var imageContent = await _context.ImageContents.FindAsync(id);
+        var imageContent = await _context.ImageContents
+            .Include(ic => ic.Contenido) 
+            .FirstOrDefaultAsync(ic => ic.ContenidoId == id);
+
         if (imageContent != null)
         {
             _context.ImageContents.Remove(imageContent);
@@ -34,18 +37,22 @@ public class ImageContentRepository : IImageContentRepository
     public async Task<IEnumerable<ImageContent>> GetAllAsync()
     {
         return await _context.ImageContents
-            .Include(ic => ic.Contenido)
+            .Include(ic => ic.Contenido) 
             .ToListAsync();
     }
 
     public async Task<ImageContent?> GetByIdAsync(int? id)
     {
-        return await _context.ImageContents.FindAsync(id);
+        return await _context.ImageContents
+            .Include(ic => ic.Contenido) 
+            .FirstOrDefaultAsync(ic => ic.ContenidoId == id);
     }
 
-    public async Task<ImageContent?> GetByContentIdAsync(int ContenidoId)
+    public async Task<ImageContent?> GetByContentIdAsync(int contenidoId)
     {
-        return await _context.ImageContents.FirstOrDefaultAsync(ic => ic.ContenidoId == ContenidoId);
+        return await _context.ImageContents
+            .Include(ic => ic.Contenido) 
+            .FirstOrDefaultAsync(ic => ic.ContenidoId == contenidoId);
     }
     
     public async Task<ImageContent> UpdateAsync(ImageContent imageContent)

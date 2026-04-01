@@ -56,7 +56,11 @@ public class ImageContentsController(
     }
 
     [HttpPut("Update/{contentId}")]
-    public async Task<IActionResult> Update(int contentId,[FromForm] string altText,[FromForm] IFormFile? file)
+    public async Task<IActionResult> Update(
+        int contentId,
+        [FromForm] string altText,
+        [FromForm] int? order,
+        [FromForm] IFormFile? file)
     {
         try
         {
@@ -73,7 +77,8 @@ public class ImageContentsController(
 
             var dto = new UpdateImageContentDto
             {
-                AltText = altText
+                AltText = altText,
+                Order = order 
             };
 
             var result = await updateImage.ExecuteAsync(
