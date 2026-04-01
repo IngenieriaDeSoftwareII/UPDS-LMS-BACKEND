@@ -1,11 +1,13 @@
 using System.Text.Json;
 using Azure.Storage.Blobs;
 using Business.Mappings;
+using Business.Services.Reports;
 using Business.UseCases;
 using Business.UseCases.Content;
 using Business.UseCases.DocumentContent;
 using Business.UseCases.ImageContent;
 using Business.UseCases.Lesson;
+using Business.UseCases.Reports;
 using Business.UseCases.VideoContent;
 using Business.UseCases.UpdateDocumentContent;
 using Data.Context;
@@ -110,6 +112,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<IMediaStorageService, AzureMediaStorageService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IReportExportService, ReportExportService>();
 
 // Repositories
 // --------------------------------------
@@ -133,6 +136,7 @@ builder.Services.AddScoped<IContentRepository, ContentRepository>();
 builder.Services.AddScoped<IVideoContentRepository, VideoContentRepository>();
 builder.Services.AddScoped<IImageContentRepository, ImageContentRepository>();
 builder.Services.AddScoped<IDocumentContentRepository, DocumentContentRepository>();
+builder.Services.AddScoped<IReportsRepository, ReportsRepository>();
 
 // UseCases
 // --------------------------------------
@@ -180,6 +184,8 @@ builder.Services.AddScoped<Business.UseCases.Catalog.DeleteCatalogUseCase>();
 // Courses
 builder.Services.AddScoped<Business.UseCases.Course.CreateCourseUseCase>();
 builder.Services.AddScoped<Business.UseCases.Course.ListCoursesUseCase>();
+builder.Services.AddScoped<Business.UseCases.Course.ListCoursesByTeacherUseCase>();
+builder.Services.AddScoped<Business.UseCases.Course.ListCoursesByTeacherWithoutEvaluationUseCase>();
 builder.Services.AddScoped<Business.UseCases.Course.GetCourseByIdUseCase>();
 builder.Services.AddScoped<Business.UseCases.Course.UpdateCourseUseCase>();
 builder.Services.AddScoped<Business.UseCases.Course.DeleteCourseUseCase>();
@@ -201,6 +207,7 @@ builder.Services.AddScoped<ChangePasswordUseCase>();
 
 // Profile
 builder.Services.AddScoped<GetMyProfileUseCase>();
+builder.Services.AddScoped<GetMyTeacherProfileUseCase>();
 builder.Services.AddScoped<UpdateMyProfileUseCase>();
 
 //Lessons
@@ -235,6 +242,22 @@ builder.Services.AddScoped<DeleteDocumentContentUseCase>();
 builder.Services.AddScoped<UploadDocumentContentUseCase>();
 builder.Services.AddScoped<GetDocumentSasUrlUseCase>();
 
+// Reports
+builder.Services.AddScoped<GetAdminCoursesReportUseCase>();
+builder.Services.AddScoped<GetAdminTeachersReportUseCase>();
+builder.Services.AddScoped<GetTeacherSummaryReportUseCase>();
+builder.Services.AddScoped<GetTeacherCoursesReportUseCase>();
+builder.Services.AddScoped<GetTeacherCourseDetailReportUseCase>();
+
+// Evaluations
+builder.Services.AddScoped<CreateEvaluationUseCase>();
+builder.Services.AddScoped<AddEvaluationQuestionUseCase>();
+builder.Services.AddScoped<GetEvaluationToTakeUseCase>();
+builder.Services.AddScoped<SubmitEvaluationUseCase>();
+builder.Services.AddScoped<ListMyEvaluationGradesUseCase>();
+builder.Services.AddScoped<ListEvaluationGradesForTeacherUseCase>();
+builder.Services.AddScoped<ListAvailableEvaluationsForStudentUseCase>();
+
 
 
 // Validators
@@ -250,7 +273,8 @@ builder.Services.AddAutoMapper(
     typeof(UserProfile),
     typeof(InscriptionProfile),
     typeof(CourseProfile),
-    typeof(EvaluationProfile));
+    typeof(EvaluationProfile),
+    typeof(ReportsProfile));
 
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>

@@ -8,6 +8,7 @@ public class ListEvaluationGradesForTeacherUseCase(
     IEvaluationRepository evaluationRepository,
     ICourseRepository courseRepository,
     IUserRepository userRepository,
+    ITeacherRepository teacherRepository,
     IPersonRepository personRepository)
 {
     public async Task<Result<IEnumerable<TeacherEvaluationGradeDto>>> ExecuteAsync(string currentUserId, int cursoId)
@@ -16,11 +17,15 @@ public class ListEvaluationGradesForTeacherUseCase(
         if (user is null)
             return Result<IEnumerable<TeacherEvaluationGradeDto>>.Failure(["Usuario no encontrado."]);
 
+        var teacher = await teacherRepository.GetByUserIdAsync(currentUserId);
+        if (teacher is null)
+            return Result<IEnumerable<TeacherEvaluationGradeDto>>.Failure(["Docente no encontrado."]);
+
         var course = await courseRepository.GetByIdAsync(cursoId);
         if (course is null)
             return Result<IEnumerable<TeacherEvaluationGradeDto>>.Failure(["El curso asociado no existe."]);
 
-        if (course.DocenteId != user.PersonId)
+        if (course.DocenteId != teacher.Id)
             return Result<IEnumerable<TeacherEvaluationGradeDto>>.Failure(["No puedes ver notas de cursos que no son tuyos."]);
 
         var evaluation = await evaluationRepository.GetByCourseIdWithQuestionsAsync(cursoId);
