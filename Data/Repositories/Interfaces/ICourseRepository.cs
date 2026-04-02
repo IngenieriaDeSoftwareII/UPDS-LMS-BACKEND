@@ -9,6 +9,7 @@ public interface ICourseRepository
     Task<Course> CreateAsync(Course course);
     Task<IEnumerable<Course>> GetAllAsync();
     Task<Course?> GetByIdAsync(int id);
+    Task<Course?> GetByIdWithModulesLessonsAndTeacherAsync(int id);
     Task UpdateAsync(Course course);
     Task DeleteAsync(int id);
 }

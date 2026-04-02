@@ -126,6 +126,7 @@ builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>();
 builder.Services.AddScoped<IInscriptionRepository, InscriptionRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IGradableItemRepository, GradableItemRepository>();
 builder.Services.AddScoped<IEvaluationRepository, EvaluationRepository>();
 
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
@@ -149,6 +150,13 @@ builder.Services.AddScoped<ChangePersonStatusUseCase>();
 builder.Services.AddScoped<CreateInscriptionUseCase>();
 builder.Services.AddScoped<ListInscriptionsUseCase>();
 builder.Services.AddScoped<CancelInscriptionUseCase>();
+
+// Student progress
+builder.Services.AddScoped<Business.UseCases.StudentProgress.GetStudentCourseLearningUseCase>();
+builder.Services.AddScoped<Business.UseCases.StudentProgress.CompleteLessonUseCase>();
+builder.Services.AddScoped<Business.UseCases.StudentProgress.GetStudentProgressDashboardUseCase>();
+builder.Services.AddScoped<Business.UseCases.StudentProgress.GetModuleWeightedGradesUseCase>();
+builder.Services.AddScoped<Business.UseCases.StudentProgress.GenerateCourseCertificatePdfUseCase>();
 // Evaluations
 builder.Services.AddScoped<CreateEvaluationUseCase>();
 builder.Services.AddScoped<AddEvaluationQuestionUseCase>();

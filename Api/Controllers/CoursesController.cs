@@ -1,4 +1,4 @@
-﻿using Business.DTOs.Requests;
+using Business.DTOs.Requests;
 using Business.UseCases.Course;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -27,7 +27,7 @@ public class CoursesController(
     {
         var result = await getByIdUseCase.ExecuteAsync(id);
         if (result.IsSuccess) return Ok(result.Value);
-        return NotFound(result.Errors);
+        return NotFound(new { errors = result.Errors });
     }
 
     [HttpPost]

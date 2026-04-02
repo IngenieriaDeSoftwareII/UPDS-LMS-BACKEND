@@ -12,12 +12,12 @@ public class InscriptionsController(
     CancelInscriptionUseCase cancelInscription) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create(CreateInscriptionDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateInscriptionDto dto)
     {
         var result = await createInscription.ExecuteAsync(dto);
 
         if (!result.IsSuccess) 
-            return BadRequest(result.Errors);
+            return BadRequest(new { errors = result.Errors });
 
         return Ok(result.Value);
     }
@@ -30,18 +30,18 @@ public class InscriptionsController(
         var result = await listInscriptions.ExecuteAsync(dto);
 
         if (!result.IsSuccess) 
-            return BadRequest(result.Errors);
+            return BadRequest(new { errors = result.Errors });
 
         return Ok(result.Value);
     }
 
     [HttpPatch("cancel")]
-    public async Task<IActionResult> Cancel(CancelInscriptionDto dto)
+    public async Task<IActionResult> Cancel([FromBody] CancelInscriptionDto dto)
     {
         var result = await cancelInscription.ExecuteAsync(dto);
 
         if (!result.IsSuccess)
-            return BadRequest(result.Errors);
+            return BadRequest(new { errors = result.Errors });
 
         return Ok(result.Value);
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Data.Context;
@@ -13,6 +13,7 @@ namespace Data.Repositories.Implementations
         public async Task<LessonProgress?> GetByUserAndLessonAsync(int usuario_id, int leccion_id)
         {
             return await context.LessonProgresses
+                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.UsuarioId == usuario_id && p.LeccionId == leccion_id);
         }
 
