@@ -11,5 +11,5 @@ public class ImageContentDto
     public int? SizeKb { get; set; }
 
      // RELACIÓN con content
-    public ContentDto Content { get; set; } = null!;
+    public ContentDto? Content { get; set; }
 }

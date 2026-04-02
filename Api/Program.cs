@@ -240,6 +240,7 @@ builder.Services.AddScoped<CreateImageContentUseCase>();
 builder.Services.AddScoped<ListImageContentsUseCase>();
 builder.Services.AddScoped<UpdateImageContentUseCase>();
 builder.Services.AddScoped<DeleteImageContentUseCase>();
+builder.Services.AddScoped<UploadImageContentUseCase>();
 
 //Document Content
 builder.Services.AddScoped<CreateDocumentContentUseCase>();

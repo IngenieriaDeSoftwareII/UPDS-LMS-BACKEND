@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260330023413_CreateAllEntities")]
-    partial class CreateAllEntities
+    [Migration("20260402170334_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -832,9 +832,6 @@ namespace Data.Migrations
                         .HasColumnType("int")
                         .HasColumnName("leccion_id");
 
-                    b.Property<int>("LessonId")
-                        .HasColumnType("int");
-
                     b.Property<decimal?>("PosicionActual")
                         .HasColumnType("decimal(6,2)")
                         .HasColumnName("posicion_actual");
@@ -848,7 +845,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LessonId");
+                    b.HasIndex("LeccionId");
 
                     b.HasIndex("UserId");
 
@@ -1681,7 +1678,7 @@ namespace Data.Migrations
                 {
                     b.HasOne("Data.Entities.Lesson", "Lesson")
                         .WithMany()
-                        .HasForeignKey("LessonId")
+                        .HasForeignKey("LeccionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
