@@ -16,7 +16,8 @@ public class EvaluationsController(
     GetEvaluationToTakeUseCase getEvaluationToTake,
     SubmitEvaluationUseCase submitEvaluation,
     ListMyEvaluationGradesUseCase listMyEvaluationGrades,
-    ListEvaluationGradesForTeacherUseCase listEvaluationGradesForTeacher) : ControllerBase
+    ListEvaluationGradesForTeacherUseCase listEvaluationGradesForTeacher,
+    ListAvailableEvaluationsForStudentUseCase listAvailableEvaluations) : ControllerBase
 {
     private string CurrentUserId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
 
@@ -84,6 +85,20 @@ public class EvaluationsController(
             return Unauthorized();
 
         var result = await listMyEvaluationGrades.ExecuteAsync(CurrentUserId);
+        if (!result.IsSuccess)
+            return BadRequest(new { errors = result.Errors });
+
+        return Ok(result.Value);
+    }
+
+    [Authorize(Roles = UserRoles.Estudiante)]
+    [HttpGet("available")]
+    public async Task<IActionResult> GetAvailableEvaluations()
+    {
+        if (string.IsNullOrEmpty(CurrentUserId))
+            return Unauthorized();
+
+        var result = await listAvailableEvaluations.ExecuteAsync(CurrentUserId);
         if (!result.IsSuccess)
             return BadRequest(new { errors = result.Errors });
 

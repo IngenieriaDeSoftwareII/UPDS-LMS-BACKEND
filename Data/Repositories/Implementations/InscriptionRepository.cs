@@ -45,5 +45,33 @@ namespace Data.Repositories.Implementations
                 .Include(i => i.Cursos)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Course>> GetCoursesWithEvaluationsByUserAsync(int usuarioId)
+        {
+            // Obtener cursos inscritos con evaluaciones, y filtrar donde intentos usados < intentos permitidos
+            var coursesWithAttempts = await dbContext.Inscriptions
+                .Where(i => i.UsuarioId == usuarioId && i.Estado != InscriptionEstate.Cancelado)
+                .Join(dbContext.Evaluations,
+                    i => i.CursoId,
+                    e => e.CursoId,
+                    (i, e) => new { Inscription = i, Evaluation = e })
+                .GroupJoin(dbContext.EvaluationAttempts.Where(ea => ea.UsuarioId == usuarioId),
+                    ie => ie.Evaluation.Id,
+                    ea => ea.EvaluacionId,
+                    (ie, attempts) => new { ie.Inscription, ie.Evaluation, Attempts = attempts })
+                .Select(g => new {
+                    Course = g.Inscription.Cursos,
+                    Evaluation = g.Evaluation,
+                    AttemptsUsed = g.Attempts.Count()
+                })
+                .Where(x => x.AttemptsUsed < x.Evaluation.IntentosPermitidos)
+                .Select(x => x.Course)
+                .Distinct()
+                .Include(c => c.Categoria)
+                .Include(c => c.Docente)
+                .ToListAsync();
+
+            return coursesWithAttempts;
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Business.DTOs.Requests;
+using Business.DTOs.Requests;
 using Business.UseCases.Course;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -10,6 +10,8 @@ namespace Api.Controllers;
 public class CoursesController(
     CreateCourseUseCase createUseCase,
     ListCoursesUseCase listUseCase,
+    ListCoursesByTeacherUseCase listByTeacherUseCase,
+    ListCoursesByTeacherWithoutEvaluationUseCase listByTeacherWithoutEvaluationUseCase,
     GetCourseByIdUseCase getByIdUseCase,
     UpdateCourseUseCase updateUseCase,
     DeleteCourseUseCase deleteUseCase) : ControllerBase
@@ -27,7 +29,7 @@ public class CoursesController(
     {
         var result = await getByIdUseCase.ExecuteAsync(id);
         if (result.IsSuccess) return Ok(result.Value);
-        return NotFound(result.Errors);
+        return NotFound(new { errors = result.Errors });
     }
 
     [HttpPost]
@@ -52,6 +54,22 @@ public class CoursesController(
     {
         var result = await deleteUseCase.ExecuteAsync(id);
         if (result.IsSuccess) return NoContent();
+        return BadRequest(result.Errors);
+    }
+
+    [HttpGet("teacher/{teacherId}")]
+    public async Task<IActionResult> GetByTeacher(int teacherId)
+    {
+        var result = await listByTeacherUseCase.ExecuteAsync(teacherId);
+        if (result.IsSuccess) return Ok(result.Value);
+        return BadRequest(result.Errors);
+    }
+
+    [HttpGet("teacher/{teacherId}/without-evaluation")]
+    public async Task<IActionResult> GetByTeacherWithoutEvaluation(int teacherId)
+    {
+        var result = await listByTeacherWithoutEvaluationUseCase.ExecuteAsync(teacherId);
+        if (result.IsSuccess) return Ok(result.Value);
         return BadRequest(result.Errors);
     }
 }

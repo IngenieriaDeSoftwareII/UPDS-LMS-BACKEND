@@ -33,11 +33,45 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
             .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
     }
 
+    public async Task<Course?> GetByIdWithModulesLessonsAndTeacherAsync(int id)
+    {
+        return await context.Courses
+            .AsNoTracking()
+            .Include(c => c.Categoria)
+            .Include(c => c.Docente!)
+                .ThenInclude(d => d.Usuario)
+                .ThenInclude(u => u.Person)
+            .Include(c => c.Modulos.Where(m => m.EntityStatus == null || m.EntityStatus == 1))
+                .ThenInclude(m => m.Lecciones.Where(l => l.EntityStatus == 1))
+            .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
+    }
+
     public async Task UpdateAsync(Course course)
     {
         course.UpdatedAt = DateTime.UtcNow;
         context.Courses.Update(course);
         await context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Course>> GetByTeacherIdAsync(int teacherId)
+    {
+        return await context.Courses
+            .AsNoTracking()
+            .Include(c => c.Categoria)
+            .Include(c => c.Docente)
+            .Where(c => c.DocenteId == teacherId && c.EntityStatus == 1)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Course>> GetByTeacherIdWithoutEvaluationAsync(int teacherId)
+    {
+        return await context.Courses
+            .AsNoTracking()
+            .Include(c => c.Categoria)
+            .Include(c => c.Docente)
+            .Where(c => c.DocenteId == teacherId && c.EntityStatus == 1)
+            .Where(c => !context.Evaluations.Any(e => e.CursoId == c.Id && e.EntityStatus == 1))
+            .ToListAsync();
     }
 
     public async Task DeleteAsync(int id)
