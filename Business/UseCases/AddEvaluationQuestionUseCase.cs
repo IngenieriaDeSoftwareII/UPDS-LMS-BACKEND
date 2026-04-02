@@ -11,6 +11,7 @@ public class AddEvaluationQuestionUseCase(
     IEvaluationRepository evaluationRepository,
     ICourseRepository courseRepository,
     IUserRepository userRepository,
+    ITeacherRepository teacherRepository,
     IValidator<AddEvaluationQuestionDto> validator,
     IMapper mapper)
 {
@@ -24,6 +25,10 @@ public class AddEvaluationQuestionUseCase(
         if (user is null)
             return Result<EvaluationQuestionDto>.Failure(["Usuario no encontrado."]);
 
+        var teacher = await teacherRepository.GetByUserIdAsync(currentUserId);
+        if (teacher is null)
+            return Result<EvaluationQuestionDto>.Failure(["Docente no encontrado."]);
+
         var evaluation = await evaluationRepository.GetByIdAsync(dto.EvaluacionId);
         if (evaluation is null)
             return Result<EvaluationQuestionDto>.Failure(["La evaluación no existe."]);
@@ -35,7 +40,7 @@ public class AddEvaluationQuestionUseCase(
         if (course is null)
             return Result<EvaluationQuestionDto>.Failure(["El curso asociado no existe."]);
 
-        if (course.DocenteId != user.PersonId)
+        if (course.DocenteId != teacher.Id)
             return Result<EvaluationQuestionDto>.Failure(["No puedes configurar preguntas en cursos que no son tuyos."]);
 
         var question = mapper.Map<Data.Entities.Question>(dto);

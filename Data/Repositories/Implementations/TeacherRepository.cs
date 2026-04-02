@@ -33,6 +33,14 @@ public class TeacherRepository(AppDbContext context) : ITeacherRepository
             .FirstOrDefaultAsync(t => t.Id == id && t.EntityStatus == 1);
     }
 
+    public async Task<Teacher?> GetByUserIdAsync(string userId)
+    {
+        return await context.Teachers
+            .Include(t => t.Usuario).ThenInclude(u => u.Person)
+            .Include(t => t.Cursos.Where(c => c.EntityStatus == 1))
+            .FirstOrDefaultAsync(t => t.UsuarioId == userId && t.EntityStatus == 1);
+    }
+
     public async Task UpdateAsync(Teacher teacher)
     {
         context.Teachers.Update(teacher);

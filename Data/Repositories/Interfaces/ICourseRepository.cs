@@ -10,6 +10,8 @@ public interface ICourseRepository
     Task<IEnumerable<Course>> GetAllAsync();
     Task<Course?> GetByIdAsync(int id);
     Task<Course?> GetByIdWithModulesLessonsAndTeacherAsync(int id);
+    Task<IEnumerable<Course>> GetByTeacherIdAsync(int teacherId);
+    Task<IEnumerable<Course>> GetByTeacherIdWithoutEvaluationAsync(int teacherId);
     Task UpdateAsync(Course course);
     Task DeleteAsync(int id);
 }

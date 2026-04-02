@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
@@ -29,5 +30,6 @@ public class LessonProgress
     public short? EntityStatus { get; set; } = 1;
 
     public User User { get; set; } = null!;
+    [ForeignKey(nameof(LeccionId))]
     public Lesson Lesson { get; set; } = null!;
 }

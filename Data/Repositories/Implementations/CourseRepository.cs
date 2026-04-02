@@ -53,6 +53,27 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
         await context.SaveChangesAsync();
     }
 
+    public async Task<IEnumerable<Course>> GetByTeacherIdAsync(int teacherId)
+    {
+        return await context.Courses
+            .AsNoTracking()
+            .Include(c => c.Categoria)
+            .Include(c => c.Docente)
+            .Where(c => c.DocenteId == teacherId && c.EntityStatus == 1)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Course>> GetByTeacherIdWithoutEvaluationAsync(int teacherId)
+    {
+        return await context.Courses
+            .AsNoTracking()
+            .Include(c => c.Categoria)
+            .Include(c => c.Docente)
+            .Where(c => c.DocenteId == teacherId && c.EntityStatus == 1)
+            .Where(c => !context.Evaluations.Any(e => e.CursoId == c.Id && e.EntityStatus == 1))
+            .ToListAsync();
+    }
+
     public async Task DeleteAsync(int id)
     {
         var course = await context.Courses

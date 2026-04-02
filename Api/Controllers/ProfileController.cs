@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Business.DTOs.Requests;
 using Business.UseCases;
+using Data.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,7 @@ namespace Api.Controllers;
 [Authorize]
 public class ProfileController(
     GetMyProfileUseCase getProfile,
+    GetMyTeacherProfileUseCase getTeacherProfile,
     UpdateMyProfileUseCase updateProfile) : ControllerBase
 {
     private string CurrentUserId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
@@ -22,6 +24,21 @@ public class ProfileController(
             return Unauthorized();
 
         var result = await getProfile.ExecuteAsync(CurrentUserId);
+        
+        if (!result.IsSuccess)
+            return NotFound(new { errors = result.Errors });
+
+        return Ok(result.Value);
+    }
+
+    [Authorize(Roles = UserRoles.Docente)]
+    [HttpGet("teacher")]
+    public async Task<IActionResult> GetMyTeacherProfile()
+    {
+        if (string.IsNullOrEmpty(CurrentUserId))
+            return Unauthorized();
+
+        var result = await getTeacherProfile.ExecuteAsync(CurrentUserId);
         
         if (!result.IsSuccess)
             return NotFound(new { errors = result.Errors });
