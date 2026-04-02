@@ -24,6 +24,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
+using Business.UseCases.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,8 +56,9 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 // JWT Authentication
 // --------------------------------------
-
-var jwtSecret = builder.Configuration["Jwt:Secret"]!;
+var jwtSecret = builder.Configuration["Jwt:Secret"];
+if (string.IsNullOrEmpty(jwtSecret))
+    throw new Exception("JWT Secret no configurado");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -128,7 +130,7 @@ builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 
 builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>();
 builder.Services.AddScoped<IInscriptionRepository, InscriptionRepository>();
-builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+
 builder.Services.AddScoped<IGradableItemRepository, GradableItemRepository>();
 builder.Services.AddScoped<IEvaluationRepository, EvaluationRepository>();
 
@@ -137,7 +139,10 @@ builder.Services.AddScoped<IContentRepository, ContentRepository>();
 builder.Services.AddScoped<IVideoContentRepository, VideoContentRepository>();
 builder.Services.AddScoped<IImageContentRepository, ImageContentRepository>();
 builder.Services.AddScoped<IDocumentContentRepository, DocumentContentRepository>();
+
+builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
 builder.Services.AddScoped<IReportsRepository, ReportsRepository>();
+
 
 // UseCases
 // --------------------------------------
@@ -161,13 +166,7 @@ builder.Services.AddScoped<Business.UseCases.StudentProgress.CompleteLessonUseCa
 builder.Services.AddScoped<Business.UseCases.StudentProgress.GetStudentProgressDashboardUseCase>();
 builder.Services.AddScoped<Business.UseCases.StudentProgress.GetModuleWeightedGradesUseCase>();
 builder.Services.AddScoped<Business.UseCases.StudentProgress.GenerateCourseCertificatePdfUseCase>();
-// Evaluations
-builder.Services.AddScoped<CreateEvaluationUseCase>();
-builder.Services.AddScoped<AddEvaluationQuestionUseCase>();
-builder.Services.AddScoped<SubmitEvaluationUseCase>();
-builder.Services.AddScoped<ListMyEvaluationGradesUseCase>();
-builder.Services.AddScoped<ListEvaluationGradesForTeacherUseCase>();
-builder.Services.AddScoped<GetEvaluationToTakeUseCase>();
+
 // Users
 builder.Services.AddScoped<CreateUserUseCase>();
 builder.Services.AddScoped<ListUsersUseCase>();
@@ -250,12 +249,23 @@ builder.Services.AddScoped<DeleteDocumentContentUseCase>();
 builder.Services.AddScoped<UploadDocumentContentUseCase>();
 builder.Services.AddScoped<GetDocumentSasUrlUseCase>();
 
+//Modules
+builder.Services.AddScoped<CreateModuleUseCase>();
+builder.Services.AddScoped<ListModulesUseCase>();
+builder.Services.AddScoped<GetModuleByIdUseCase>();
+builder.Services.AddScoped<UpdateModuleUseCase>();
+builder.Services.AddScoped<DeleteModuleUseCase>();
+
+
 // Reports
 builder.Services.AddScoped<GetAdminCoursesReportUseCase>();
 builder.Services.AddScoped<GetAdminTeachersReportUseCase>();
 builder.Services.AddScoped<GetTeacherSummaryReportUseCase>();
 builder.Services.AddScoped<GetTeacherCoursesReportUseCase>();
 builder.Services.AddScoped<GetTeacherCourseDetailReportUseCase>();
+
+
+
 
 // Evaluations
 builder.Services.AddScoped<CreateEvaluationUseCase>();
@@ -282,7 +292,9 @@ builder.Services.AddAutoMapper(
     typeof(InscriptionProfile),
     typeof(CourseProfile),
     typeof(EvaluationProfile),
+    typeof(ModuleProfile),
     typeof(ReportsProfile));
+
 
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>

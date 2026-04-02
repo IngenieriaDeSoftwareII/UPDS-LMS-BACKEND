@@ -10,8 +10,33 @@ public class ImageContentsController(
     CreateImageContentUseCase createImage,
     ListImageContentsUseCase listImages,
     UpdateImageContentUseCase updateImage,
+    UploadImageContentUseCase uploadImage,
     DeleteImageContentUseCase deleteImage) : ControllerBase
 {
+    [HttpPost("Upload")]
+    public async Task<IActionResult> Upload(
+        [FromForm] int lessonId,
+        [FromForm] string? title,
+        [FromForm] int? order,
+        [FromForm] IFormFile file)
+    {
+        Console.WriteLine($"Received upload request: lessonId={lessonId}, title={title}, order={order}, fileName={file?.FileName}");
+        if (file == null || file.Length == 0)
+            return BadRequest("Archivo no proporcionado.");
+
+        await using var stream = file.OpenReadStream();
+
+        var result = await uploadImage.ExecuteAsync(
+            lessonId,
+            title ?? file.FileName,
+            stream,
+            file.FileName,
+            order ?? 1 
+        );
+
+        return Ok(result);
+    }
+
     [HttpPost("Create")]
     public async Task<IActionResult> Create(CreateImageContentDto dto)
     {
@@ -31,14 +56,51 @@ public class ImageContentsController(
     }
 
     [HttpPut("Update/{contentId}")]
-    public async Task<IActionResult> Update(int contentId, CreateImageContentDto dto)
+    public async Task<IActionResult> Update(
+        int contentId,
+        [FromForm] string altText,
+        [FromForm] int? order,
+        [FromForm] IFormFile? file)
     {
-        var result = await updateImage.ExecuteAsync(contentId, dto);
+        try
+        {
+            Stream? stream = null;
+            string? fileName = null;
+            long? fileSize = null;
 
-        if (!result.IsSuccess)
-            return BadRequest(result.Errors);
+            if (file != null && file.Length > 0)
+            {
+                stream = file.OpenReadStream();
+                fileName = file.FileName;
+                fileSize = file.Length;
+            }
 
-        return Ok(result.Value);
+            var dto = new UpdateImageContentDto
+            {
+                AltText = altText,
+                Order = order 
+            };
+
+            var result = await updateImage.ExecuteAsync(
+                contentId,
+                dto,
+                stream,
+                fileName,
+                fileSize
+            );
+
+            if (!result.IsSuccess)
+                return BadRequest(new { errors = result.Errors });
+
+            return Ok(result.Value);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new
+            {
+                error = "Error interno del servidor"
+            });
+        }
     }
 
     [HttpDelete("Delete/{contentId}")]

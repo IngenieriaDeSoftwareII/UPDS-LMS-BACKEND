@@ -10,8 +10,15 @@ public class VideoContentsController(
     CreateVideoContentUseCase createVideo,
     ListVideoContentsUseCase listVideos,
     UpdateVideoContentUseCase updateVideo,
+    CreateVideoWithContentUseCase createWithContent,
     DeleteVideoContentUseCase deleteVideo) : ControllerBase
 {
+    [HttpPost("CreateWithContent")]
+    public async Task<IActionResult> CreateWithContent(int lessonId, string title, string videoUrl, int durationSeconds)
+    {
+        var result = await createWithContent.ExecuteAsync(lessonId, title, videoUrl, durationSeconds);
+        return Ok(result);
+    }
     [HttpPost("Create")]
     public async Task<IActionResult> Create(CreateVideoContentDto dto)
     {
