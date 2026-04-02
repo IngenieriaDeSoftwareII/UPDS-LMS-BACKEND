@@ -81,8 +81,9 @@ public class DocumentContentsController : ControllerBase
         {
             Title = dto.Title ?? dto.File?.FileName ?? "Sin título",
             Order = dto.Order,
+            LessonId = dto.LessonId,
             PageCount = dto.PageCount,
-            File = dto.File // ⚡ aquí se pasa el archivo
+            File = dto.File 
         };
 
         try

@@ -60,7 +60,9 @@ public class ImageContentsController(
         int contentId,
         [FromForm] string altText,
         [FromForm] int? order,
-        [FromForm] IFormFile? file)
+        [FromForm] int? lessonId,
+        [FromForm] IFormFile? file
+    )
     {
         try
         {
@@ -78,7 +80,8 @@ public class ImageContentsController(
             var dto = new UpdateImageContentDto
             {
                 AltText = altText,
-                Order = order 
+                Order = order,
+                LessonId = lessonId
             };
 
             var result = await updateImage.ExecuteAsync(

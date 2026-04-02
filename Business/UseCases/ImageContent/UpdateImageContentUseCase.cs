@@ -38,6 +38,12 @@ public class UpdateImageContentUseCase(
             existing.Contenido.Orden = dto.Order.Value;
         }
 
+        // ACTUALIZAR LESSON
+        if (dto.LessonId.HasValue && dto.LessonId.Value > 0)
+        {
+            existing.Contenido.LeccionId = dto.LessonId.Value;
+        }
+
         //  REEMPLAZAR IMAGEN
         if (fileStream != null && fileName != null)
         {
