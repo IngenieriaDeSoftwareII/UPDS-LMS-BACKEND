@@ -34,6 +34,26 @@ public class LessonRepository(AppDbContext context) : ILessonRepository
         return await context.Lessons.FindAsync(id);
     }
 
+    public async Task<Lesson?> GetByIdWithModuleAndCourseAsync(int id)
+    {
+        return await context.Lessons
+            .AsNoTracking()
+            .Include(l => l.Modulos)
+            .FirstOrDefaultAsync(l => l.Id == id && l.EntityStatus == 1);
+    }
+
+    public async Task<int> CountActiveLessonsByCourseAsync(int cursoId)
+    {
+        return await context.Lessons
+            .AsNoTracking()
+            .CountAsync(l => l.EntityStatus == 1
+                && l.ModuloId != null
+                && context.Modules.Any(m =>
+                    m.Id == l.ModuloId
+                    && m.CursoId == cursoId
+                    && (m.EntityStatus == null || m.EntityStatus == 1)));
+    }
+
     public async Task<Lesson> UpdateAsync(Lesson lesson)
     {
         context.Lessons.Update(lesson);

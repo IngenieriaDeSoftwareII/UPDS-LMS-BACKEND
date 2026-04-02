@@ -33,6 +33,19 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
             .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
     }
 
+    public async Task<Course?> GetByIdWithModulesLessonsAndTeacherAsync(int id)
+    {
+        return await context.Courses
+            .AsNoTracking()
+            .Include(c => c.Categoria)
+            .Include(c => c.Docente!)
+                .ThenInclude(d => d.Usuario)
+                .ThenInclude(u => u.Person)
+            .Include(c => c.Modulos.Where(m => m.EntityStatus == null || m.EntityStatus == 1))
+                .ThenInclude(m => m.Lecciones.Where(l => l.EntityStatus == 1))
+            .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
+    }
+
     public async Task UpdateAsync(Course course)
     {
         course.UpdatedAt = DateTime.UtcNow;
