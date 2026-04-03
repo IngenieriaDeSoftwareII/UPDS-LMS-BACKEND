@@ -25,6 +25,8 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
 using Business.UseCases.Modules;
+using Business.UseCases.Homework;
+using Business.UseCases.HomeworkSubmissions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -111,7 +113,7 @@ builder.Services.AddAuthentication(options =>
 
 // Services
 // --------------------------------------
-
+builder.Services.AddScoped<IStorageService, AzureMediaStorageService>();
 builder.Services.AddScoped<IMediaStorageService, AzureMediaStorageService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IReportExportService, ReportExportService>();
@@ -143,6 +145,8 @@ builder.Services.AddScoped<IDocumentContentRepository, DocumentContentRepository
 builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
 builder.Services.AddScoped<IReportsRepository, ReportsRepository>();
 
+builder.Services.AddScoped<IHomeworkRepository, HomeworkRepository>();
+builder.Services.AddScoped<IHomeworkSubmissionRepository, HomeworkSubmissionRepository>();
 
 // UseCases
 // --------------------------------------
@@ -277,7 +281,17 @@ builder.Services.AddScoped<ListMyEvaluationGradesUseCase>();
 builder.Services.AddScoped<ListEvaluationGradesForTeacherUseCase>();
 builder.Services.AddScoped<ListAvailableEvaluationsForStudentUseCase>();
 
+// Homeworks (Tareas)
+builder.Services.AddScoped<CreateHomeworkUseCase>();
+builder.Services.AddScoped<ListHomeworkUseCase>();
+builder.Services.AddScoped<UpdateHomeworkUseCase>();
+builder.Services.AddScoped<DeleteHomeworkUseCase>();
 
+// Homework Submissions (Entregas de Tareas)
+builder.Services.AddScoped<SubmitHomeworkUseCase>();
+builder.Services.AddScoped<DeleteHomeworkSubmissionUseCase>();
+builder.Services.AddScoped<GradeHomeworkSubmissionUseCase>();
+builder.Services.AddScoped<ListHomeworkSubmissionUseCase>();
 
 // Validators
 // --------------------------------------
@@ -294,7 +308,9 @@ builder.Services.AddAutoMapper(
     typeof(CourseProfile),
     typeof(EvaluationProfile),
     typeof(ModuleProfile),
-    typeof(ReportsProfile));
+    typeof(ReportsProfile),
+    typeof(HomeworkProfile)
+    );
 
 
 
