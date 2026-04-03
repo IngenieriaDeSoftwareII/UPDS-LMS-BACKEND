@@ -21,7 +21,7 @@ public class HomeworkSubmissionsController(
     IUserRepository userRepository
 ) : ControllerBase
 {
-    // 🔹 Obtener ID de usuario (GUID) desde el token JWT
+    //Obtener ID de usuario (GUID) desde el token JWT
     private string CurrentUserId =>
         User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0";
 
@@ -39,7 +39,7 @@ public class HomeworkSubmissionsController(
 
     //Crear nueva entrega
     [HttpPost("Create")]
-    [Authorize(Roles = UserRoles.Estudiante)]
+    [Authorize]
     public async Task<IActionResult> Create([FromForm] SubmitHomeworkDto dto)
     {
         var result = await submitHomework.ExecuteAsync(CurrentUsuarioId, dto);
@@ -50,9 +50,8 @@ public class HomeworkSubmissionsController(
         return Ok(result.Value);
     }
 
-    //Listar todas las entregas (solo docentes pueden ver todas)
     [HttpGet("GetAll")]
-    [Authorize(Roles = UserRoles.Docente)]
+    [Authorize]
     public async Task<IActionResult> GetAll()
     {
         var result = await listSubmissions.ExecuteAsync();
@@ -61,7 +60,7 @@ public class HomeworkSubmissionsController(
 
     // Actualizar entrega existente
     [HttpPut("Update/{homeworkId}")]
-    [Authorize(Roles = UserRoles.Estudiante)]
+    [Authorize]
     public async Task<IActionResult> Update(int homeworkId, [FromForm] SubmitHomeworkDto dto)
     {
         dto.HomeworkId = homeworkId;
@@ -76,7 +75,7 @@ public class HomeworkSubmissionsController(
 
     //Eliminar entrega
     [HttpDelete("Delete/{id}")]
-    [Authorize(Roles = UserRoles.Estudiante)]
+    [Authorize]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await deleteSubmission.ExecuteAsync(id, CurrentUsuarioId);
@@ -89,14 +88,13 @@ public class HomeworkSubmissionsController(
 
     // Calificar entrega
     [HttpPatch("Grade")]
-    [Authorize(Roles = UserRoles.Docente)]
+    [Authorize]
     public async Task<IActionResult> Grade([FromBody] GradeHomeworkSubmissionDto dto)
     {
         var result = await gradeSubmission.ExecuteAsync(dto);
 
         if (!result.IsSuccess)
         {
-            Console.WriteLine("❌ Grade API errores: " + string.Join(", ", result.Errors));
             return BadRequest(result.Errors);
         }
 
@@ -107,18 +105,15 @@ public class HomeworkSubmissionsController(
     [HttpGet("GetSubmissionSasUrl/{submissionId}")]
     public async Task<IActionResult> GetSubmissionSasUrl(int submissionId)
     {
-        Console.WriteLine($"🔹 GET SAS URL - Submission ID: {submissionId}");
 
         var submission = await listSubmissions.GetByIdAsync(submissionId);
         if (submission == null)
         {
-            Console.WriteLine("❌ Submission no encontrada");
             return NotFound("No existe la entrega");
         }
 
         if (string.IsNullOrEmpty(submission.UrlArchivo))
         {
-            Console.WriteLine("❌ Submission no tiene archivo");
             return BadRequest("No hay archivo en esta entrega");
         }
 
@@ -129,13 +124,10 @@ public class HomeworkSubmissionsController(
                 "submissions",
                 TimeSpan.FromMinutes(30)
             );
-
-            Console.WriteLine($"🌐 SAS URL generada: {url}");
             return Ok(new { url = url.ToString() });
         }
         catch (Exception ex)
         {
-            Console.WriteLine("❌ Error generando SAS: " + ex.Message);
             return BadRequest("Error generando SAS: " + ex.Message);
         }
     }

@@ -21,21 +21,15 @@ public class HomeworksController(
 ) : ControllerBase
 {
     [HttpPost("Create")]
-    [Authorize(Roles = UserRoles.Docente)]
+    [Authorize]
     public async Task<IActionResult> Create([FromForm] CreateHomeworkDto dto)
     {
         var result = await createHomework.ExecuteAsync(dto);
 
         if (!result.IsSuccess)
         {
-            Console.WriteLine("❌ ERROR:");
-            foreach (var e in result.Errors)
-                Console.WriteLine(e);
-
             return BadRequest(result.Errors);
         }
-
-        Console.WriteLine("✅ OK");
 
         return Ok(result.Value);
     }
@@ -47,7 +41,7 @@ public class HomeworksController(
     }
 
     [HttpPut("Update/{id}")]
-    [Authorize(Roles = UserRoles.Docente)]
+    [Authorize]
     public async Task<IActionResult> Update(int id, [FromForm] UpdateHomeworkDto dto)
     {
         dto.Id = id;
@@ -61,7 +55,7 @@ public class HomeworksController(
     }
 
     [HttpDelete("Delete/{id}")]
-    [Authorize(Roles = UserRoles.Docente)]
+    [Authorize]
     public async Task<IActionResult> Delete(int id)
     {
         var homework = await repository.GetByIdAsync(id);
