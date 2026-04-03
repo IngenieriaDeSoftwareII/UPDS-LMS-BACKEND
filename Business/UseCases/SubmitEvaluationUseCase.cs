@@ -84,7 +84,7 @@ public class SubmitEvaluationUseCase(
             });
         }
 
-        var approvalMin = evaluation.PuntajeMinimoAprobacion ?? (maxScore * 0.6m);
+        var approvalMin = evaluation.PuntajeMinimoAprobacion ?? (maxScore * 0.51m);
         attempt.PuntajeObtenido = score;
         attempt.EsAprobado = score >= approvalMin;
 

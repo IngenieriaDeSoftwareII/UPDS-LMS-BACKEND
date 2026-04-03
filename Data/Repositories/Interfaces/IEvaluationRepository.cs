@@ -13,5 +13,8 @@ public interface IEvaluationRepository
     Task<EvaluationAttempt> CreateAttemptAsync(EvaluationAttempt attempt, IEnumerable<EvaluationAnswer> answers);
     Task<IEnumerable<EvaluationAttempt>> GetAttemptsByStudentAsync(int usuarioId);
     Task<IEnumerable<EvaluationAttempt>> GetAttemptsByEvaluationAsync(int evaluacionId);
+    Task<(Evaluation? Evaluation, EvaluationAttempt? BestAttempt)> GetCourseEvaluationAndBestAttemptAsync(
+        int cursoId,
+        int personId);
 }
 
