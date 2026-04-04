@@ -25,12 +25,11 @@ public class HomeworkSubmissionsController(
     private string CurrentUserId =>
         User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0";
 
-    // Buscar personaId asociado al usuario actual
+    // Método asíncrono para obtener el ID de la persona
     private async Task<int> GetCurrentPersonIdAsync()
     {
-        if (string.IsNullOrEmpty(CurrentUserId) || CurrentUserId == "0")
+        if (string.IsNullOrEmpty(CurrentUserId))
             return 0;
-
         var user = await userRepository.FindByIdAsync(CurrentUserId);
         return user?.PersonId ?? 0;
     }
@@ -42,11 +41,11 @@ public class HomeworkSubmissionsController(
     [Authorize]
     public async Task<IActionResult> Create([FromForm] SubmitHomeworkDto dto)
     {
-        var result = await submitHomework.ExecuteAsync(CurrentUsuarioId, dto);
-
+        int personId = await GetCurrentPersonIdAsync();
+        if (personId == 0) return Unauthorized("No se encontró el perfil del estudiante.");
+        var result = await submitHomework.ExecuteAsync(personId, dto);
         if (!result.IsSuccess)
             return BadRequest(result.Errors);
-
         return Ok(result.Value);
     }
 
@@ -63,13 +62,11 @@ public class HomeworkSubmissionsController(
     [Authorize]
     public async Task<IActionResult> Update(int homeworkId, [FromForm] SubmitHomeworkDto dto)
     {
+        int personId = await GetCurrentPersonIdAsync();
         dto.HomeworkId = homeworkId;
-
-        var result = await submitHomework.ExecuteAsync(CurrentUsuarioId, dto);
-
+        var result = await submitHomework.ExecuteAsync(personId, dto);
         if (!result.IsSuccess)
             return BadRequest(result.Errors);
-
         return Ok(result.Value);
     }
 
