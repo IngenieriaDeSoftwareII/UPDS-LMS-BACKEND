@@ -1,4 +1,5 @@
 using System.Globalization;
+using Business.Helpers;
 using Business.Results;
 using Data.Enums;
 using Data.Repositories.Interfaces;
@@ -13,6 +14,7 @@ public class GenerateCourseCertificatePdfUseCase(
     IUserRepository userRepository,
     IInscriptionRepository inscriptionRepository,
     ICourseRepository courseRepository,
+    IEvaluationRepository evaluationRepository,
     IWebHostEnvironment webHostEnvironment)
 {
     private static readonly CultureInfo Es = new("es-ES");
@@ -43,6 +45,22 @@ public class GenerateCourseCertificatePdfUseCase(
         var course = await courseRepository.GetByIdAsync(cursoId);
         if (course is null)
             return Result<byte[]>.Failure(["Curso no encontrado."]);
+
+        var (evaluation, bestAttempt) =
+            await evaluationRepository.GetCourseEvaluationAndBestAttemptAsync(cursoId, personId);
+        if (evaluation is null)
+            return Result<byte[]>.Failure(
+                ["Este curso no tiene evaluación final configurada; no se puede emitir el certificado."]);
+
+        if (bestAttempt is null)
+            return Result<byte[]>.Failure(
+                ["Debes rendir la evaluación final del curso y obtener al menos 51/100 para descargar el certificado."]);
+
+        var notaSobre100 = CertificateExamRules.ComputeNotaSobre100(evaluation, bestAttempt.PuntajeObtenido);
+        if (notaSobre100 < CertificateExamRules.MinNotaSobre100)
+            return Result<byte[]>.Failure([
+                $"No aprobaste la evaluación final. Tu nota es {notaSobre100:0.##}/100; se requiere nota mínima 51.",
+            ]);
 
         QuestPDF.Settings.License = LicenseType.Community;
 

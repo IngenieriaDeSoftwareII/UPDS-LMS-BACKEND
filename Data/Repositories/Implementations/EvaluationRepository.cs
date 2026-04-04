@@ -86,5 +86,31 @@ public class EvaluationRepository(AppDbContext dbContext) : IEvaluationRepositor
             .OrderByDescending(a => a.CreatedAt)
             .ToListAsync();
     }
+
+    public async Task<(Evaluation? Evaluation, EvaluationAttempt? BestAttempt)> GetCourseEvaluationAndBestAttemptAsync(
+        int cursoId,
+        int personId)
+    {
+        var evaluation = await dbContext.Evaluations
+            .AsNoTracking()
+            .Include(e => e.Preguntas)
+            .Where(e => e.CursoId == cursoId && e.EntityStatus == 1)
+            .OrderBy(e => e.Id)
+            .FirstOrDefaultAsync();
+
+        if (evaluation is null)
+            return (null, null);
+
+        var attempts = await dbContext.EvaluationAttempts
+            .AsNoTracking()
+            .Where(a => a.EvaluacionId == evaluation.Id && a.UsuarioId == personId && a.EntityStatus == 1)
+            .ToListAsync();
+
+        var best = attempts.Count == 0
+            ? null
+            : attempts.MaxBy(a => a.PuntajeObtenido);
+
+        return (evaluation, best);
+    }
 }
 

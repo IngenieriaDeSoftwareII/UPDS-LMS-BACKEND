@@ -1,6 +1,8 @@
 using Business.DTOs.Responses;
+using Business.Helpers;
 using Business.Results;
 using Data.Entities;
+using Data.Enums;
 using Data.Repositories.Interfaces;
 
 namespace Business.UseCases.StudentProgress;
@@ -9,7 +11,8 @@ public class GetStudentCourseLearningUseCase(
     ICourseRepository courseRepository,
     IInscriptionRepository inscriptionRepository,
     ILessonProgressRepository lessonProgressRepository,
-    ILessonRepository lessonRepository)
+    ILessonRepository lessonRepository,
+    IEvaluationRepository evaluationRepository)
 {
     public async Task<Result<StudentCourseLearningDto>> ExecuteAsync(int personId, int cursoId)
     {
@@ -77,6 +80,13 @@ public class GetStudentCourseLearningUseCase(
             Modulos = modulos
         };
 
+        if (inscription is not null)
+        {
+            var (evaluation, bestAttempt) =
+                await evaluationRepository.GetCourseEvaluationAndBestAttemptAsync(cursoId, personId);
+            FillCertificateFields(dto, inscription, evaluation, bestAttempt);
+        }
+
         return Result<StudentCourseLearningDto>.Success(dto);
     }
 
@@ -85,5 +95,56 @@ public class GetStudentCourseLearningUseCase(
         var p = docente?.Usuario?.Person;
         if (p is null) return null;
         return $"{p.FirstName} {p.LastName}".Trim();
+    }
+
+    private static void FillCertificateFields(
+        StudentCourseLearningDto dto,
+        Inscription inscription,
+        Evaluation? evaluation,
+        EvaluationAttempt? bestAttempt)
+    {
+        var completado = inscription.Estado == InscriptionEstate.Terminado;
+        dto.CursoCompletado = completado;
+        dto.TieneEvaluacionFinal = evaluation is not null;
+
+        if (evaluation is null)
+        {
+            dto.PuedeDescargarCertificado = false;
+            dto.AprobadoEvaluacionFinal = false;
+            dto.MensajeCertificado = completado
+                ? "Este curso no tiene evaluación final configurada; no se puede emitir el certificado."
+                : null;
+            return;
+        }
+
+        decimal? nota = null;
+        if (bestAttempt is not null)
+            nota = CertificateExamRules.ComputeNotaSobre100(evaluation, bestAttempt.PuntajeObtenido);
+
+        dto.NotaEvaluacionSobre100 = nota;
+        dto.AprobadoEvaluacionFinal = nota.HasValue && nota.Value >= CertificateExamRules.MinNotaSobre100;
+        dto.PuedeDescargarCertificado = completado && dto.AprobadoEvaluacionFinal;
+
+        if (!completado)
+        {
+            dto.MensajeCertificado = null;
+            return;
+        }
+
+        if (bestAttempt is null)
+        {
+            dto.MensajeCertificado =
+                "Debes rendir la evaluación final del curso (nota mínima 51/100) para descargar el certificado.";
+            return;
+        }
+
+        if (!dto.AprobadoEvaluacionFinal)
+        {
+            dto.MensajeCertificado =
+                $"No aprobaste la evaluación final. Tu nota es {nota:0.##}/100; se requiere mínimo 51.";
+            return;
+        }
+
+        dto.MensajeCertificado = null;
     }
 }

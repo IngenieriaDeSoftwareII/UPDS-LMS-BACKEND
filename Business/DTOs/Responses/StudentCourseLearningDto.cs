@@ -19,6 +19,14 @@ public class StudentCourseLearningDto
     public int LeccionesCompletadas { get; set; }
     public int ProgresoPorcentaje { get; set; }
 
+   public bool CursoCompletado { get; set; }
+
+    public bool TieneEvaluacionFinal { get; set; }
+    public decimal? NotaEvaluacionSobre100 { get; set; }
+    public bool AprobadoEvaluacionFinal { get; set; }
+    public bool PuedeDescargarCertificado { get; set; }
+    public string? MensajeCertificado { get; set; }
+
     public IReadOnlyList<StudentModuleLearningDto> Modulos { get; set; } = [];
 }
 
