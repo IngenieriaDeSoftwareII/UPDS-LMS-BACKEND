@@ -10,6 +10,7 @@ public class LessonsController(
     CreateLessonUseCase createLesson,
     ListLessonsUseCase listLessons,
     UpdateLessonUseCase updateLesson,
+    ListLessonByCourseUseCase listLessonByCourse,
     DeleteLessonUseCase deleteLesson) : ControllerBase
 {
     [HttpPost("Create")]
@@ -50,5 +51,11 @@ public class LessonsController(
             return BadRequest(result.Errors);
 
         return Ok(result.Value);
+    }
+    [HttpGet("GetByModuleAndCourse/{courseId}/{moduleId}")]
+    public async Task<IActionResult> GetByModuleAndCourse(int courseId, int moduleId)
+    {
+        var result = await listLessonByCourse.ExecuteAsync(moduleId,courseId);
+        return Ok(result);
     }
 }

@@ -9,5 +9,6 @@ namespace Data.Repositories.Interfaces
         Task<Module> AddAsync(Module module);
         Task UpdateAsync(Module module);
         Task DeleteAsync(Module module);
+        Task<IEnumerable<Module>> GetModulesByCourseIdAsync(int courseId);
     }
 }

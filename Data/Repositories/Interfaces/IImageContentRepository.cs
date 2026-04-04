@@ -8,6 +8,7 @@ public interface IImageContentRepository
 
     Task<ImageContent?> GetByContentIdAsync(int contentId);
     Task<IEnumerable<ImageContent>> GetAllAsync();
+    Task<IEnumerable<ImageContent>> GetByCourseIdAsync(int courseId);
 
     Task <ImageContent>UpdateAsync(ImageContent imageContent);
 

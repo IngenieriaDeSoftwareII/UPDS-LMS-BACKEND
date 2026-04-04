@@ -42,5 +42,11 @@ namespace Data.Repositories.Implementations
             _context.Modules.Remove(module);
             await _context.SaveChangesAsync();
         }
+        public async Task<IEnumerable<Module>> GetModulesByCourseIdAsync(int courseId)
+        {
+            return await _context.Modules
+                .Where(m => m.CursoId == courseId && (m.EntityStatus == null || m.EntityStatus == 1))
+                .ToListAsync();
+        }
     }
 }

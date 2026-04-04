@@ -41,6 +41,19 @@ public class ImageContentRepository : IImageContentRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<ImageContent>> GetByCourseIdAsync(int courseId)
+    {
+        return await _context.ImageContents
+            .Include(ic => ic.Contenido)
+                .ThenInclude(c => c.Leccion)
+                    .ThenInclude(l => l.Modulos)
+            .Where(ic => ic.Contenido.Leccion.Modulos.CursoId == courseId
+                && ic.Contenido.Leccion.EntityStatus == 1
+                && (ic.Contenido.Leccion.Modulos.EntityStatus == null || ic.Contenido.Leccion.Modulos.EntityStatus == 1)
+                && ic.Contenido.EntityStatus == 1)
+            .ToListAsync();
+    }
+
     public async Task<ImageContent?> GetByIdAsync(int? id)
     {
         return await _context.ImageContents

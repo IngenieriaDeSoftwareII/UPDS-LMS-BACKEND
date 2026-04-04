@@ -100,7 +100,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             entity.Property(e => e.PermiteEntregaTardia).HasDefaultValue(false);
             
             entity.HasOne(h => h.Lesson)
-                  .WithMany()
+                  .WithMany(l => l.Homeworks)
                   .HasForeignKey(h => h.LessonId)
                   .OnDelete(DeleteBehavior.SetNull);
 

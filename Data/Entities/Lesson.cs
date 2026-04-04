@@ -43,4 +43,6 @@ public class Lesson
     public ICollection<Content> Contenidos { get; set; } = [];
 
     public ICollection<Evaluation> Evaluaciones { get; set; } = [];
+
+    public ICollection<Homework> Homeworks { get; set; } = [];
 }

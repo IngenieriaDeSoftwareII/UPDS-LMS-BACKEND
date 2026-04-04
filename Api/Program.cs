@@ -226,6 +226,7 @@ builder.Services.AddScoped<CreateLessonUseCase>();
 builder.Services.AddScoped<ListLessonsUseCase>();
 builder.Services.AddScoped<UpdateLessonUseCase>();
 builder.Services.AddScoped<DeleteLessonUseCase>();
+builder.Services.AddScoped<ListLessonByCourseUseCase>();
 
 //Content
 builder.Services.AddScoped<CreateContentUseCase>();
@@ -242,6 +243,7 @@ builder.Services.AddScoped<DeleteVideoContentUseCase>();
 //Image Content
 builder.Services.AddScoped<CreateImageContentUseCase>();
 builder.Services.AddScoped<ListImageContentsUseCase>();
+builder.Services.AddScoped<ListImageContentsByCourseUseCase>();
 builder.Services.AddScoped<UpdateImageContentUseCase>();
 builder.Services.AddScoped<DeleteImageContentUseCase>();
 builder.Services.AddScoped<UploadImageContentUseCase>();
@@ -260,6 +262,7 @@ builder.Services.AddScoped<ListModulesUseCase>();
 builder.Services.AddScoped<GetModuleByIdUseCase>();
 builder.Services.AddScoped<UpdateModuleUseCase>();
 builder.Services.AddScoped<DeleteModuleUseCase>();
+builder.Services.AddScoped<GetModuleByCourseId>();
 
 
 // Reports
