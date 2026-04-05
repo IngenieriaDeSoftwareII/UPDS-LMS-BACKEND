@@ -27,7 +27,6 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
     public async Task<Course?> GetByIdAsync(int id)
     {
         return await context.Courses
-            .AsNoTracking()
             .Include(c => c.Categoria)
             .Include(c => c.Docente)
             .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
