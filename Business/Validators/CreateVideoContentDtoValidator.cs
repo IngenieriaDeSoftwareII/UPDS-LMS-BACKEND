@@ -7,11 +7,21 @@ public class CreateVideoContentDtoValidator : AbstractValidator<CreateVideoConte
 {
     public CreateVideoContentDtoValidator()
     {
-        RuleFor(x => x.VideoUrl)
-            .NotEmpty().WithMessage("La URL del video es requerida.")
-            .MaximumLength(500);
+        RuleFor(x => x.LessonId)
+            .GreaterThan(0)
+            .WithMessage("Debes seleccionar una lección válida.");
+
+        RuleFor(x => x.Title)
+            .NotEmpty()
+            .WithMessage("El título es obligatorio.")
+            .MaximumLength(200);
+
+        RuleFor(x => x.Order)
+            .GreaterThan(0)
+            .WithMessage("El orden debe ser mayor a 0.");
 
         RuleFor(x => x.DurationSeconds)
-            .GreaterThan(0).WithMessage("La duración debe ser mayor a 0.");
+            .GreaterThan(0)
+            .WithMessage("La duración debe ser mayor a 0.");
     }
 }

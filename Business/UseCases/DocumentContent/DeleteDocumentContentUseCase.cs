@@ -1,50 +1,66 @@
 using Business.Results;
-using Data.Repositories.Interfaces;
+using Data.Context;
 using Data.Services.Interfaces;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
-namespace Business.UseCases.DocumentContent
+namespace Business.UseCases.DocumentContent;
+
+public class DeleteDocumentContentUseCase
 {
-    public class DeleteDocumentContentUseCase
+    private readonly AppDbContext db;
+    private readonly IMediaStorageService storage;
+
+    private const string Container = "documents";
+
+    public DeleteDocumentContentUseCase(
+        AppDbContext db,
+        IMediaStorageService storage
+    )
     {
-        private readonly IDocumentContentRepository _repository;
-        private readonly IContentRepository _contentRepository;
-        private readonly IMediaStorageService _storage; 
-        private const string Container = "documents"; 
+        this.db = db;
+        this.storage = storage;
+    }
 
-        public DeleteDocumentContentUseCase(
-            IDocumentContentRepository repository,
-            IMediaStorageService storage,
-            IContentRepository contentRepository)
+    public async Task<Result<bool>> ExecuteAsync(int contentId)
+    {
+        // 1. Buscar Content
+        var content = await db.Contents
+            .FirstOrDefaultAsync(c => c.Id == contentId);
+
+        if (content is null)
+            return Result<bool>.Failure(["Content no encontrado"]);
+
+        //  2. Buscar DocumentContent
+        var document = await db.DocumentContents
+            .AsNoTracking()
+            .FirstOrDefaultAsync(d => d.ContenidoId == contentId);
+
+        //  3. Eliminar archivo de Azure
+        if (document != null && !string.IsNullOrWhiteSpace(document.UrlArchivo))
         {
-            _repository = repository;
-            _storage = storage;
-            _contentRepository = contentRepository;
+            try
+            {
+                var blobName = document.UrlArchivo;
+
+                if (blobName.StartsWith("http"))
+                {
+                    var uri = new Uri(blobName);
+                    blobName = Path.GetFileName(uri.AbsolutePath);
+                }
+
+                await storage.DeleteAsync(blobName, Container);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error eliminando documento: {ex.Message}");
+            }
         }
 
-        public async Task<Result<bool>> ExecuteAsync(int contentId)
-        {
-            // Obtener DocumentContent existente
-            var existing = await _repository.GetByContentIdAsync(contentId);
-            if (existing is null)
-                return Result<bool>.Failure(new[] { "DocumentContent no encontrado" });
+        //  4. Eliminar Content (cascade elimina DocumentContent)
+        db.Contents.Remove(content);
 
-            // Eliminar archivo físico si existe
-            if (!string.IsNullOrEmpty(existing.UrlArchivo))
-            {
-                await _storage.DeleteAsync(existing.UrlArchivo, Container);
-            }
+        await db.SaveChangesAsync();
 
-            // Eliminar registro DocumentContent
-            await _repository.DeleteAsync(contentId);
-
-            // Eliminar Content asociado
-            if (existing.ContenidoId != 0)
-            {
-                await _contentRepository.DeleteAsync(existing.ContenidoId);
-            }
-
-            return Result<bool>.Success(true);
-        }
+        return Result<bool>.Success(true);
     }
 }

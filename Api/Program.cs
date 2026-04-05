@@ -235,7 +235,7 @@ builder.Services.AddScoped<UpdateContentUseCase>();
 builder.Services.AddScoped<DeleteContentUseCase>();
 
 //Video Content
-builder.Services.AddScoped<CreateVideoContentUseCase>();
+builder.Services.AddScoped<UploadVideoContentUseCase>();
 builder.Services.AddScoped<ListVideoContentsUseCase>();
 builder.Services.AddScoped<UpdateVideoContentUseCase>();
 builder.Services.AddScoped<DeleteVideoContentUseCase>();
