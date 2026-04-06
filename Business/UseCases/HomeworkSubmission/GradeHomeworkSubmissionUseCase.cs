@@ -23,6 +23,7 @@ public class GradeHomeworkSubmissionUseCase(
 
         submission.Feedback = string.IsNullOrWhiteSpace(dto.Feedback) ? null : dto.Feedback;
         submission.Estado = dto.Revisado ? "revisado" : "sin revisar";
+        submission.Revisado = dto.Revisado;
         submission.UpdatedAt = DateTime.Now;
 
         await submissionRepository.UpdateAsync(submission);
