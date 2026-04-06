@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260405143418_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20260330023413_CreateAllEntities")]
+    partial class CreateAllEntities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -596,168 +596,6 @@ namespace Data.Migrations
                     b.ToTable("items_calificables");
                 });
 
-            modelBuilder.Entity("Data.Entities.Homework", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Descripcion")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("descripcion");
-
-                    b.Property<int>("DocenteId")
-                        .HasColumnType("int")
-                        .HasColumnName("docente_id");
-
-                    b.Property<short>("EntityStatus")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasDefaultValue((short)1)
-                        .HasColumnName("entity_status");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("activo")
-                        .HasColumnName("estado");
-
-                    b.Property<DateTime>("FechaApertura")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("fecha_apertura");
-
-                    b.Property<DateTime>("FechaEntrega")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("fecha_entrega");
-
-                    b.Property<DateTime?>("FechaLimite")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("fecha_limite");
-
-                    b.Property<int?>("Formato")
-                        .HasColumnType("int")
-                        .HasColumnName("formato");
-
-                    b.Property<int?>("LessonId")
-                        .HasColumnType("int")
-                        .HasColumnName("leccion_id");
-
-                    b.Property<bool>("PermiteEntregaTardia")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("permite_entrega_tardia");
-
-                    b.Property<int?>("TamanoKb")
-                        .HasColumnType("int")
-                        .HasColumnName("tamano_kb");
-
-                    b.Property<string>("Titulo")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)")
-                        .HasColumnName("titulo");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UrlArchivo")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("url_archivo");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LessonId");
-
-                    b.ToTable("tareas");
-                });
-
-            modelBuilder.Entity("Data.Entities.HomeworkSubmission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comentario")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("comentario");
-
-                    b.Property<short>("EntityStatus")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasDefaultValue((short)1)
-                        .HasColumnName("entity_status");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("pendiente")
-                        .HasColumnName("estado");
-
-                    b.Property<DateTime>("FechaEntrega")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("fecha_entrega");
-
-                    b.Property<string>("Feedback")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("feedback");
-
-                    b.Property<int?>("Formato")
-                        .HasColumnType("int")
-                        .HasColumnName("formato");
-
-                    b.Property<int>("HomeworkId")
-                        .HasColumnType("int")
-                        .HasColumnName("tarea_id");
-
-                    b.Property<bool>("Revisado")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("Revisado");
-
-                    b.Property<int?>("TamanoKb")
-                        .HasColumnType("int")
-                        .HasColumnName("tamano_kb");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UrlArchivo")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("url_archivo");
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int")
-                        .HasColumnName("usuario_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HomeworkId");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("entregas_tareas");
-                });
-
             modelBuilder.Entity("Data.Entities.ImageContent", b =>
                 {
                     b.Property<int>("ContenidoId")
@@ -994,6 +832,9 @@ namespace Data.Migrations
                         .HasColumnType("int")
                         .HasColumnName("leccion_id");
 
+                    b.Property<int>("LessonId")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("PosicionActual")
                         .HasColumnType("decimal(6,2)")
                         .HasColumnName("posicion_actual");
@@ -1007,7 +848,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LeccionId");
+                    b.HasIndex("LessonId");
 
                     b.HasIndex("UserId");
 
@@ -1755,35 +1596,6 @@ namespace Data.Migrations
                     b.Navigation("Module");
                 });
 
-            modelBuilder.Entity("Data.Entities.Homework", b =>
-                {
-                    b.HasOne("Data.Entities.Lesson", "Lesson")
-                        .WithMany("Homeworks")
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Lesson");
-                });
-
-            modelBuilder.Entity("Data.Entities.HomeworkSubmission", b =>
-                {
-                    b.HasOne("Data.Entities.Homework", "Homework")
-                        .WithMany("Submissions")
-                        .HasForeignKey("HomeworkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.Person", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Homework");
-
-                    b.Navigation("Usuario");
-                });
-
             modelBuilder.Entity("Data.Entities.ImageContent", b =>
                 {
                     b.HasOne("Data.Entities.Content", "Contenido")
@@ -1869,7 +1681,7 @@ namespace Data.Migrations
                 {
                     b.HasOne("Data.Entities.Lesson", "Lesson")
                         .WithMany()
-                        .HasForeignKey("LeccionId")
+                        .HasForeignKey("LessonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -2068,18 +1880,11 @@ namespace Data.Migrations
                     b.Navigation("Respuestas");
                 });
 
-            modelBuilder.Entity("Data.Entities.Homework", b =>
-                {
-                    b.Navigation("Submissions");
-                });
-
             modelBuilder.Entity("Data.Entities.Lesson", b =>
                 {
                     b.Navigation("Contenidos");
 
                     b.Navigation("Evaluaciones");
-
-                    b.Navigation("Homeworks");
                 });
 
             modelBuilder.Entity("Data.Entities.Module", b =>
