@@ -44,7 +44,7 @@ public class ListImageContentsUseCase
                 HeightPx = img.AltoPx,
                 AltText = img.TextoAlternativo,
                 SizeKb = img.TamanoKb,
-                Content = new ContentDto
+                Content = img.Contenido == null ? null : new ContentDto
                 {
                     Id = img.Contenido.Id,
                     LessonId = img.Contenido.LeccionId,

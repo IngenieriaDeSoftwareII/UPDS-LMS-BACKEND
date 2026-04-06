@@ -5,7 +5,7 @@ using Data.Services.Interfaces;
 
 namespace Data.Services.Implementations;
 
-public class AzureMediaStorageService(BlobServiceClient blobServiceClient) : IMediaStorageService
+public class AzureMediaStorageService(BlobServiceClient blobServiceClient) : IMediaStorageService, IStorageService
 {
     private static readonly Dictionary<string, string> ContentTypeMap = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -76,5 +76,28 @@ public class AzureMediaStorageService(BlobServiceClient blobServiceClient) : IMe
         var container = blobServiceClient.GetBlobContainerClient(containerName);
         await container.CreateIfNotExistsAsync();
         return container;
+    }
+
+    // Implementación de IStorageService
+    async Task<string> IStorageService.UploadFileAsync(Stream stream, string fileName, string containerName)
+    {
+        return await UploadAsync(stream, fileName, containerName);
+    }
+
+    async Task IStorageService.DeleteFileAsync(string fileUrl, string containerName)
+    {
+        await DeleteAsync(fileUrl, containerName);
+    }
+
+    async Task<Uri> IStorageService.GetReadUrlAsync(string blobName, string containerName, TimeSpan expiry)
+    {
+        return await GetReadUrlAsync(blobName, containerName, expiry);
+    }
+
+    Uri IStorageService.GetPublicUrl(string blobName, string containerName)
+    {
+        var container = blobServiceClient.GetBlobContainerClient(containerName);
+        var blob = container.GetBlobClient(blobName);
+        return blob.Uri;
     }
 }

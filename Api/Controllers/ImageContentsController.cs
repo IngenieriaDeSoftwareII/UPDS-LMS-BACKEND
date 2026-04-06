@@ -9,10 +9,12 @@ namespace Api.Controllers;
 public class ImageContentsController(
     CreateImageContentUseCase createImage,
     ListImageContentsUseCase listImages,
+    ListImageContentsByCourseUseCase listImagesByCourse,
     UpdateImageContentUseCase updateImage,
     UploadImageContentUseCase uploadImage,
     DeleteImageContentUseCase deleteImage) : ControllerBase
 {
+    private readonly ListImageContentsByCourseUseCase _listImagesByCourse = listImagesByCourse;
     [HttpPost("Upload")]
     public async Task<IActionResult> Upload(
         [FromForm] int lessonId,
@@ -20,7 +22,6 @@ public class ImageContentsController(
         [FromForm] int? order,
         [FromForm] IFormFile file)
     {
-        Console.WriteLine($"Received upload request: lessonId={lessonId}, title={title}, order={order}, fileName={file?.FileName}");
         if (file == null || file.Length == 0)
             return BadRequest("Archivo no proporcionado.");
 
@@ -55,12 +56,21 @@ public class ImageContentsController(
         return Ok(result);
     }
 
+    [HttpGet("GetByCourse/{courseId}")]
+    public async Task<IActionResult> GetByCourse(int courseId)
+    {
+        var result = await _listImagesByCourse.ExecuteAsync(courseId);
+        return Ok(result);
+    }
+
     [HttpPut("Update/{contentId}")]
     public async Task<IActionResult> Update(
         int contentId,
         [FromForm] string altText,
         [FromForm] int? order,
-        [FromForm] IFormFile? file)
+        [FromForm] int? lessonId,
+        [FromForm] IFormFile? file
+    )
     {
         try
         {
@@ -78,7 +88,8 @@ public class ImageContentsController(
             var dto = new UpdateImageContentDto
             {
                 AltText = altText,
-                Order = order 
+                Order = order,
+                LessonId = lessonId
             };
 
             var result = await updateImage.ExecuteAsync(

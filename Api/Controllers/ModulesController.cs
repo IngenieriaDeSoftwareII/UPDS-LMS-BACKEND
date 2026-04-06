@@ -11,7 +11,8 @@ public class ModulesController(
     ListModulesUseCase listModules,
     GetModuleByIdUseCase getModuleById,
     UpdateModuleUseCase updateModule,
-    DeleteModuleUseCase deleteModule
+    DeleteModuleUseCase deleteModule,
+    GetModuleByCourseId getModuleByCourseId
 ) : ControllerBase
 {
     // 🔹 CREATE
@@ -66,5 +67,11 @@ public class ModulesController(
             return NotFound();
 
         return Ok();
+    }
+    [HttpGet("GetByCourseId/{courseId}")]
+    public async Task<IActionResult> GetByCourseId(int courseId)
+    {
+        var result = await getModuleByCourseId.ExecuteAsync(courseId);
+        return Ok(result);
     }
 }

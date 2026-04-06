@@ -1,4 +1,3 @@
-using Business.DTOs.Requests;
 using Business.UseCases.VideoContent;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,40 +6,59 @@ namespace Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class VideoContentsController(
-    CreateVideoContentUseCase createVideo,
-    ListVideoContentsUseCase listVideos,
-    UpdateVideoContentUseCase updateVideo,
-    CreateVideoWithContentUseCase createWithContent,
-    DeleteVideoContentUseCase deleteVideo) : ControllerBase
+    UploadVideoContentUseCase upload,
+    ListVideoContentsUseCase list,
+    UpdateVideoContentUseCase update,
+    DeleteVideoContentUseCase delete
+) : ControllerBase
 {
-    [HttpPost("CreateWithContent")]
-    public async Task<IActionResult> CreateWithContent(int lessonId, string title, string videoUrl, int durationSeconds)
+    [HttpPost("Upload")]
+    public async Task<IActionResult> Upload(
+        [FromForm] int lessonId,
+        [FromForm] string title,
+        [FromForm] int order,
+        [FromForm] int duracionSeg,
+        [FromForm] IFormFile file)
     {
-        var result = await createWithContent.ExecuteAsync(lessonId, title, videoUrl, durationSeconds);
+        var stream = file.OpenReadStream();
+
+        var result = await upload.ExecuteAsync(
+            lessonId,
+            title,
+            stream,
+            file.FileName,
+            order,
+            duracionSeg
+        );
+
         return Ok(result);
-    }
-    [HttpPost("Create")]
-    public async Task<IActionResult> Create(CreateVideoContentDto dto)
-    {
-        var result = await createVideo.ExecuteAsync(dto);
-
-        if (!result.IsSuccess)
-            return BadRequest(result.Errors);
-
-        return Ok(result.Value);
     }
 
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll()
     {
-        var result = await listVideos.ExecuteAsync();
+        var result = await list.ExecuteAsync();
         return Ok(result);
     }
 
-    [HttpPut("Update/{contentId}")]
-    public async Task<IActionResult> Update(int contentId, CreateVideoContentDto dto)
+    [HttpPut("Update/{id}")]
+    public async Task<IActionResult> Update(
+        int id,
+        [FromForm] int? duracionSeg,
+        [FromForm] int? lessonId,
+        [FromForm] int? order,
+        [FromForm] IFormFile? file)
     {
-        var result = await updateVideo.ExecuteAsync(contentId, dto);
+        Stream? stream = file?.OpenReadStream();
+
+        var dto = new Business.DTOs.Requests.UpdateVideoContentDto
+        {
+            DuracionSeg = duracionSeg,
+            LessonId = lessonId,
+            Order = order
+        };
+
+        var result = await update.ExecuteAsync(id, dto, stream, file?.FileName);
 
         if (!result.IsSuccess)
             return BadRequest(result.Errors);
@@ -48,10 +66,10 @@ public class VideoContentsController(
         return Ok(result.Value);
     }
 
-    [HttpDelete("Delete/{contentId}")]
-    public async Task<IActionResult> Delete(int contentId)
+    [HttpDelete("Delete/{id}")]
+    public async Task<IActionResult> Delete(int id)
     {
-        var result = await deleteVideo.ExecuteAsync(contentId);
+        var result = await delete.ExecuteAsync(id);
 
         if (!result.IsSuccess)
             return BadRequest(result.Errors);

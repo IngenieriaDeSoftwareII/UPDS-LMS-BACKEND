@@ -9,6 +9,7 @@ public interface ILessonRepository
     Task DeleteAsync(int id);   
     Task<IEnumerable<Lesson>> GetAllAsync();
     Task<Lesson?> GetByIdAsync(int? id);
-    Task<Lesson?> GetByIdWithModuleAndCourseAsync(int id);
+    Task<Lesson?> GetByIdWithModuleAndCourseAsync(int courseId);
     Task<int> CountActiveLessonsByCourseAsync(int cursoId);
+    Task<IEnumerable<Lesson>> GetLessonsByCourseAndModuleAsync(int courseId, int moduleId);
 }

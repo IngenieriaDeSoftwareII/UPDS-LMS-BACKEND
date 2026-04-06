@@ -31,6 +31,7 @@ public class UpdateDocumentContentUseCase
         // Actualizar metadata
         document.Contenido.Titulo = dto.Title;
         document.Contenido.Orden = dto.Order;
+        document.Contenido.LeccionId = dto.LessonId;
         document.Contenido.UpdatedAt = DateTime.UtcNow;
         document.NumPaginas = dto.PageCount;
 
