@@ -84,7 +84,7 @@ public class HomeworkSubmissionsController(
     }
 
     // Calificar entrega
-    [HttpPatch("Grade")]
+    [HttpPut("Grade")]
     [Authorize]
     public async Task<IActionResult> Grade([FromBody] GradeHomeworkSubmissionDto dto)
     {

@@ -16,6 +16,7 @@ public class HomeworksController(
     UpdateHomeworkUseCase updateHomework,
     DeleteHomeworkUseCase deleteHomework,
     ListHomeworkUseCase listHomework,
+    GetHomeworkSubmissionsUseCase getHomeworkSubmissions,
     IHomeworkRepository repository,
     IStorageService storageService
 ) : ControllerBase
@@ -91,5 +92,11 @@ public class HomeworksController(
         );
 
         return Ok(new { url = url.ToString() });
+    }
+
+    [HttpGet("GetSubmissions/{homeworkId}")]
+    public async Task<IActionResult> GetSubmissions(int homeworkId){
+        var submissionDtos = await getHomeworkSubmissions.ExecuteAsync(homeworkId);
+        return Ok(submissionDtos);
     }
 }

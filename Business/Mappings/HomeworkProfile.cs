@@ -16,7 +16,7 @@ public class HomeworkProfile : Profile
         CreateMap<HomeworkSubmission, HomeworkSubmissionDto>()
             .ForMember(dest => dest.EstudianteNombre, 
                 opt => opt.MapFrom(src => src.Usuario != null 
-                    ? $"{src.Usuario.FirstName} {src.Usuario.LastName}" 
+                    ? $"{src.Usuario.FirstName} {src.Usuario.LastName} {src.Usuario.MotherLastName}" 
                     : "Desconocido"));
     }
 }

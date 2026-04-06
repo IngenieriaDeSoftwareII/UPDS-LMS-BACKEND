@@ -51,4 +51,12 @@ public class HomeworkRepository(AppDbContext context) : IHomeworkRepository
             await context.SaveChangesAsync();
         }
     }
+
+    public async Task<IEnumerable<Homework>> GetHomeworkWithSubmissionsAsync(int homeworkId)
+    {
+        return await context.Homeworks
+            .Include(h => h.Submissions.Where(s => s.EntityStatus == 1))
+            .Where(h => h.Id == homeworkId && h.EntityStatus == 1)
+            .ToListAsync();
+    }
 }

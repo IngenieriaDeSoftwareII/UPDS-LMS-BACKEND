@@ -289,6 +289,7 @@ builder.Services.AddScoped<CreateHomeworkUseCase>();
 builder.Services.AddScoped<ListHomeworkUseCase>();
 builder.Services.AddScoped<UpdateHomeworkUseCase>();
 builder.Services.AddScoped<DeleteHomeworkUseCase>();
+builder.Services.AddScoped<GetHomeworkSubmissionsUseCase>();
 
 // Homework Submissions (Entregas de Tareas)
 builder.Services.AddScoped<SubmitHomeworkUseCase>();

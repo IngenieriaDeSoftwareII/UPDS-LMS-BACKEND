@@ -35,6 +35,7 @@ public class HomeworkSubmissionRepository(AppDbContext context) : IHomeworkSubmi
     {
         return await context.HomeworkSubmissions
             .Include(s => s.Usuario)
+            .Include(s => s.Homework)
             .Where(s => s.HomeworkId == homeworkId && s.EntityStatus == 1)
             .ToListAsync();
     }
