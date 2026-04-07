@@ -13,8 +13,12 @@ public class UpdateCourseUseCase(ICourseRepository repository, IMapper mapper)
     {
         var entity = await repository.GetByIdAsync(dto.Id);
         if (entity == null) return Result<CourseDto>.Failure(new[] { "Course not found" });
+
         mapper.Map(dto, entity);
         await repository.UpdateAsync(entity);
-        return Result<CourseDto>.Success(mapper.Map<CourseDto>(entity));
+
+        // Recargar la entidad con sus relaciones para devolver datos completos
+        var updatedEntity = await repository.GetByIdAsync(dto.Id);
+        return Result<CourseDto>.Success(mapper.Map<CourseDto>(updatedEntity!));
     }
 }
