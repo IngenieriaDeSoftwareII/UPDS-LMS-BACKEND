@@ -25,4 +25,7 @@ public class CourseDto
     public int? MaxEstudiantes { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    // Información del docente
+    public string? DocenteNombre { get; set; }
 }
