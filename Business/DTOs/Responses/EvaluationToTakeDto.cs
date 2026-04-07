@@ -4,6 +4,7 @@ public class EvaluationToTakeDto
 {
     public int Id { get; set; }
     public int CursoId { get; set; }
+    public string? NombreCurso { get; set; }
     public string Titulo { get; set; } = string.Empty;
     public string? Descripcion { get; set; }
     public string Tipo { get; set; } = string.Empty;
@@ -30,5 +31,6 @@ public class EvaluationAnswerOptionToTakeDto
     public int Id { get; set; }
     public string Texto { get; set; } = string.Empty;
     public int Orden { get; set; }
+    public bool? EsCorrecta { get; set; }
 }
 
