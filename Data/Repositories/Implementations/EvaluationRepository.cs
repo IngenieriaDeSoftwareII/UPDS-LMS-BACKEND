@@ -14,6 +14,13 @@ public class EvaluationRepository(AppDbContext dbContext) : IEvaluationRepositor
         return evaluation;
     }
 
+    public async Task<Evaluation> UpdateAsync(Evaluation evaluation)
+    {
+        dbContext.Evaluations.Update(evaluation);
+        await dbContext.SaveChangesAsync();
+        return evaluation;
+    }
+
     public async Task<Question> AddQuestionAsync(Question question, IEnumerable<AnswerOption> options)
     {
         dbContext.Questions.Add(question);
@@ -28,6 +35,16 @@ public class EvaluationRepository(AppDbContext dbContext) : IEvaluationRepositor
         return question;
     }
 
+    public async Task DeleteQuestionsByEvaluationIdAsync(int evaluacionId)
+    {
+        var questions = await dbContext.Questions
+            .Where(q => q.EvaluacionId == evaluacionId)
+            .ToListAsync();
+
+        dbContext.Questions.RemoveRange(questions);
+        await dbContext.SaveChangesAsync();
+    }
+
     public Task<Evaluation?> GetByIdAsync(int id) =>
         dbContext.Evaluations.FirstOrDefaultAsync(e => e.Id == id);
 
@@ -39,6 +56,7 @@ public class EvaluationRepository(AppDbContext dbContext) : IEvaluationRepositor
 
     public Task<Evaluation?> GetByCourseIdWithQuestionsAsync(int cursoId) =>
         dbContext.Evaluations
+            .Include(e => e.Cursos)
             .Include(e => e.Preguntas.OrderBy(p => p.Orden))
             .ThenInclude(p => p.OpcionesRespuesta.OrderBy(o => o.Orden))
             .FirstOrDefaultAsync(e => e.CursoId == cursoId);

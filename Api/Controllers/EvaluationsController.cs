@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Business.DTOs.Requests;
 using Business.UseCases;
 using Data.Enums;
+using Data.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,12 +13,16 @@ namespace Api.Controllers;
 [Authorize]
 public class EvaluationsController(
     CreateEvaluationUseCase createEvaluation,
+    UpdateEvaluationUseCase updateEvaluation,
     AddEvaluationQuestionUseCase addEvaluationQuestion,
     GetEvaluationToTakeUseCase getEvaluationToTake,
     SubmitEvaluationUseCase submitEvaluation,
     ListMyEvaluationGradesUseCase listMyEvaluationGrades,
     ListEvaluationGradesForTeacherUseCase listEvaluationGradesForTeacher,
-    ListAvailableEvaluationsForStudentUseCase listAvailableEvaluations) : ControllerBase
+    ListAvailableEvaluationsForStudentUseCase listAvailableEvaluations,
+    IEvaluationRepository evaluationRepository,
+    ITeacherRepository teacherRepository,
+    IUserRepository userRepository) : ControllerBase
 {
     private string CurrentUserId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
 
@@ -33,6 +38,39 @@ public class EvaluationsController(
             return BadRequest(new { errors = result.Errors });
 
         return Ok(result.Value);
+    }
+
+    [Authorize(Roles = UserRoles.Docente)]
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] CreateEvaluationDto dto)
+    {
+        if (string.IsNullOrEmpty(CurrentUserId))
+            return Unauthorized();
+
+        var result = await updateEvaluation.ExecuteAsync(CurrentUserId, id, dto);
+        if (!result.IsSuccess)
+            return BadRequest(new { errors = result.Errors });
+
+        return Ok(result.Value);
+    }
+
+    [Authorize(Roles = UserRoles.Docente)]
+    [HttpDelete("{id:int}/questions")]
+    public async Task<IActionResult> DeleteQuestions(int id)
+    {
+        if (string.IsNullOrEmpty(CurrentUserId))
+            return Unauthorized();
+
+        var evaluation = await evaluationRepository.GetByIdAsync(id);
+        if (evaluation is null)
+            return NotFound(new { errors = new[] { "Evaluación no encontrada." } });
+
+        var teacher = await teacherRepository.GetByUserIdAsync(CurrentUserId);
+        if (teacher is null || evaluation.Cursos?.DocenteId != teacher.Id)
+            return Forbid();
+
+        await evaluationRepository.DeleteQuestionsByEvaluationIdAsync(id);
+        return Ok(new { message = "Preguntas eliminadas" });
     }
 
     [Authorize(Roles = UserRoles.Docente)]
@@ -99,6 +137,20 @@ public class EvaluationsController(
             return Unauthorized();
 
         var result = await listAvailableEvaluations.ExecuteAsync(CurrentUserId);
+        if (!result.IsSuccess)
+            return BadRequest(new { errors = result.Errors });
+
+        return Ok(result.Value);
+    }
+
+    [Authorize(Roles = UserRoles.Docente)]
+    [HttpGet("teacher/{cursoId:int}")]
+    public async Task<IActionResult> GetForTeacher(int cursoId)
+    {
+        if (string.IsNullOrEmpty(CurrentUserId))
+            return Unauthorized();
+
+        var result = await getEvaluationToTake.ExecuteAsync(CurrentUserId, cursoId, UserRoles.Docente);
         if (!result.IsSuccess)
             return BadRequest(new { errors = result.Errors });
 

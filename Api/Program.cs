@@ -251,6 +251,7 @@ builder.Services.AddScoped<GetTeacherCourseDetailReportUseCase>();
 
 // Evaluations
 builder.Services.AddScoped<CreateEvaluationUseCase>();
+builder.Services.AddScoped<UpdateEvaluationUseCase>();
 builder.Services.AddScoped<AddEvaluationQuestionUseCase>();
 builder.Services.AddScoped<GetEvaluationToTakeUseCase>();
 builder.Services.AddScoped<SubmitEvaluationUseCase>();

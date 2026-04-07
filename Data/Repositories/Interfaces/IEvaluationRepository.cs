@@ -5,7 +5,9 @@ namespace Data.Repositories.Interfaces;
 public interface IEvaluationRepository
 {
     Task<Evaluation> CreateAsync(Evaluation evaluation);
+    Task<Evaluation> UpdateAsync(Evaluation evaluation);
     Task<Question> AddQuestionAsync(Question question, IEnumerable<AnswerOption> options);
+    Task DeleteQuestionsByEvaluationIdAsync(int evaluacionId);
     Task<Evaluation?> GetByIdAsync(int id);
     Task<Evaluation?> GetByIdWithQuestionsAsync(int id);
     Task<Evaluation?> GetByCourseIdWithQuestionsAsync(int cursoId);

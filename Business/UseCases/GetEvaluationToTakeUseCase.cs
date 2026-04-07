@@ -8,9 +8,10 @@ namespace Business.UseCases;
 public class GetEvaluationToTakeUseCase(
     IEvaluationRepository evaluationRepository,
     IInscriptionRepository inscriptionRepository,
-    IUserRepository userRepository)
+    IUserRepository userRepository,
+    ITeacherRepository teacherRepository)
 {
-    public async Task<Result<EvaluationToTakeDto>> ExecuteAsync(string currentUserId, int cursoId)
+    public async Task<Result<EvaluationToTakeDto>> ExecuteAsync(string currentUserId, int cursoId, string? userRole = null)
     {
         var user = await userRepository.FindByIdWithPersonAsync(currentUserId);
         if (user is null)
@@ -20,21 +21,34 @@ public class GetEvaluationToTakeUseCase(
         if (evaluation is null)
             return Result<EvaluationToTakeDto>.Failure(["No existe una evaluación para este curso."]);
 
-        var inscription = await inscriptionRepository.GetByUserAndCourseAsync(user.PersonId, evaluation.CursoId);
-        if (inscription is null || inscription.Estado == InscriptionEstate.Cancelado)
-            return Result<EvaluationToTakeDto>.Failure(["No estás inscrito en este curso."]);
+        if (userRole == UserRoles.Docente)
+        {
+            var teacher = await teacherRepository.GetByUserIdAsync(currentUserId);
+            if (teacher is null)
+                return Result<EvaluationToTakeDto>.Failure(["Docente no encontrado."]);
 
-        var courseCompleted =
-            inscription.Estado == InscriptionEstate.Terminado ||
-            inscription.FechaCompletado.HasValue;
+            if (evaluation.Cursos == null || evaluation.Cursos.DocenteId != teacher.Id)
+                return Result<EvaluationToTakeDto>.Failure(["No tienes permisos para ver esta evaluación."]);
+        }
+        else
+        {
+            var inscription = await inscriptionRepository.GetByUserAndCourseAsync(user.PersonId, evaluation.CursoId);
+            if (inscription is null || inscription.Estado == InscriptionEstate.Cancelado)
+                return Result<EvaluationToTakeDto>.Failure(["No estás inscrito en este curso."]);
 
-        if (!courseCompleted)
-            return Result<EvaluationToTakeDto>.Failure(["Solo puedes responder la evaluación cuando hayas completado el curso."]);
+            var courseCompleted =
+                inscription.Estado == InscriptionEstate.Terminado ||
+                inscription.FechaCompletado.HasValue;
+
+            if (!courseCompleted)
+                return Result<EvaluationToTakeDto>.Failure(["Solo puedes responder la evaluación cuando hayas completado el curso."]);
+        }
 
         var dto = new EvaluationToTakeDto
         {
             Id = evaluation.Id,
             CursoId = evaluation.CursoId,
+            NombreCurso = evaluation.Cursos?.Titulo,
             Titulo = evaluation.Titulo,
             Descripcion = evaluation.Descripcion,
             Tipo = evaluation.Tipo,
@@ -58,7 +72,8 @@ public class GetEvaluationToTakeUseCase(
                         {
                             Id = o.Id,
                             Texto = o.Texto,
-                            Orden = o.Orden
+                            Orden = o.Orden,
+                            EsCorrecta = userRole == UserRoles.Docente ? o.EsCorrecta : null
                         })
                         .ToList()
                 })
