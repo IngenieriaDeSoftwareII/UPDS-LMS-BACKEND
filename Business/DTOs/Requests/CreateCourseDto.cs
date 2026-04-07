@@ -9,4 +9,6 @@ public class CreateCourseDto
     public int? CategoriaId { get; set; }
     public string? ImagenUrl { get; set; }
     public int? MaxEstudiantes { get; set; }
+    public int DuracionTotalMin { get; set; }
+    public bool Publicado { get; set; }
 }

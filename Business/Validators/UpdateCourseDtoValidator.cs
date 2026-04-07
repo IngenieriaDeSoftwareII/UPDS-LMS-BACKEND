@@ -3,10 +3,13 @@ using FluentValidation;
 
 namespace Business.Validators;
 
-public class CreateCourseDtoValidator : AbstractValidator<CreateCourseDto>
+public class UpdateCourseDtoValidator : AbstractValidator<UpdateCourseDto>
 {
-    public CreateCourseDtoValidator()
+    public UpdateCourseDtoValidator()
     {
+        RuleFor(x => x.Id)
+            .GreaterThan(0).WithMessage("El ID del curso es requerido y debe ser mayor a 0");
+
         RuleFor(x => x.Titulo)
             .NotEmpty().WithMessage("El título es requerido")
             .MaximumLength(150).WithMessage("El título no puede exceder 150 caracteres");

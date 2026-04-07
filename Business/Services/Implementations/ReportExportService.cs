@@ -1,11 +1,9 @@
-using System.Globalization;
 using Business.DTOs.Responses.Reports;
 using ClosedXML.Excel;
 using Data.Enums;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using SkiaSharp;
 
 namespace Business.Services.Reports;
 
@@ -14,175 +12,6 @@ public class ReportExportService : IReportExportService
     static ReportExportService()
     {
         QuestPDF.Settings.License = LicenseType.Community;
-    }
-
-    private static byte[] RenderChartPng(int width, int height, Action<SKCanvas, SKRect> draw)
-    {
-        using var surface = SKSurface.Create(new SKImageInfo(width, height));
-        var canvas = surface.Canvas;
-        canvas.Clear(SKColors.White);
-
-        draw(canvas, new SKRect(0, 0, width, height));
-
-        using var image = surface.Snapshot();
-        using var data = image.Encode(SKEncodedImageFormat.Png, 90);
-        return data.ToArray();
-    }
-
-    private static byte[] GenerateLineChartImage(IReadOnlyList<double> values, IReadOnlyList<string> labels, string title)
-    {
-        const int width = 800;
-        const int height = 360;
-        return RenderChartPng(width, height, (canvas, area) =>
-        {
-            var backgroundPaint = new SKPaint { Color = SKColors.White, IsAntialias = true };
-            canvas.DrawRect(area, backgroundPaint);
-
-            var titlePaint = new SKPaint { Color = SKColors.Black, TextSize = 20, IsAntialias = true, Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold) };
-            canvas.DrawText(title, area.Left + 16, area.Top + 28, titlePaint);
-
-            var chartLeft = area.Left + 60;
-            var chartTop = area.Top + 48;
-            var chartRight = area.Right - 20;
-            var chartBottom = area.Bottom - 40;
-            var chartHeight = chartBottom - chartTop;
-            var chartWidth = chartRight - chartLeft;
-
-            var axisPaint = new SKPaint { Color = SKColors.Black, StrokeWidth = 2, IsAntialias = true };
-            canvas.DrawLine(chartLeft, chartBottom, chartRight, chartBottom, axisPaint);
-            canvas.DrawLine(chartLeft, chartBottom, chartLeft, chartTop, axisPaint);
-
-            var maxValue = values.Count == 0 ? 1 : Math.Max(1, (int)Math.Ceiling(values.Max()));
-            var stepCount = Math.Min(values.Count, 6);
-            var yStep = chartHeight / 5f;
-            var textPaint = new SKPaint { Color = SKColors.Black, TextSize = 12, IsAntialias = true };
-            for (var i = 0; i <= 5; i++)
-            {
-                var y = chartBottom - i * yStep;
-                canvas.DrawLine(chartLeft - 4, y, chartLeft, y, axisPaint);
-                var label = Math.Round(maxValue * i / 5f).ToString(CultureInfo.InvariantCulture);
-                canvas.DrawText(label, chartLeft - 10 - textPaint.MeasureText(label), y + 4, textPaint);
-            }
-
-            if (values.Count > 0)
-            {
-                var pointGap = chartWidth / Math.Max(1, values.Count - 1);
-                var linePaint = new SKPaint { Color = SKColor.Parse("#3B82F6"), StrokeWidth = 4, IsAntialias = true, Style = SKPaintStyle.Stroke };
-                var fillPaint = new SKPaint { Color = SKColor.Parse("#93C5FD").WithAlpha(120), IsAntialias = true, Style = SKPaintStyle.Fill };
-                using var path = new SKPath();
-                for (var index = 0; index < values.Count; index++)
-                {
-                    var x = chartLeft + index * pointGap;
-                    var value = values[index];
-                    var y = chartBottom - (float)(value / maxValue) * chartHeight;
-                    if (index == 0)
-                        path.MoveTo(x, y);
-                    else
-                        path.LineTo(x, y);
-                }
-
-                using var fillPath = new SKPath(path);
-                fillPath.LineTo(chartLeft + (values.Count - 1) * pointGap, chartBottom);
-                fillPath.LineTo(chartLeft, chartBottom);
-                fillPath.Close();
-                canvas.DrawPath(fillPath, fillPaint);
-                canvas.DrawPath(path, linePaint);
-
-                var dotPaint = new SKPaint { Color = SKColor.Parse("#1D4ED8"), IsAntialias = true };
-                for (var index = 0; index < values.Count; index++)
-                {
-                    var x = chartLeft + index * pointGap;
-                    var y = chartBottom - (float)(values[index] / maxValue) * chartHeight;
-                    canvas.DrawCircle(x, y, 5, dotPaint);
-                    var labelX = x - 18;
-                    canvas.DrawText(labels[index], labelX, chartBottom + 18, textPaint);
-                }
-            }
-        });
-    }
-
-    private static byte[] GenerateBarChartImage(IReadOnlyList<double> values, IReadOnlyList<string> labels, string title)
-    {
-        const int width = 800;
-        const int height = 360;
-        return RenderChartPng(width, height, (canvas, area) =>
-        {
-            var backgroundPaint = new SKPaint { Color = SKColors.White, IsAntialias = true };
-            canvas.DrawRect(area, backgroundPaint);
-
-            var titlePaint = new SKPaint { Color = SKColors.Black, TextSize = 20, IsAntialias = true, Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold) };
-            canvas.DrawText(title, area.Left + 16, area.Top + 28, titlePaint);
-
-            var chartLeft = area.Left + 60;
-            var chartTop = area.Top + 48;
-            var chartRight = area.Right - 20;
-            var chartBottom = area.Bottom - 40;
-            var chartHeight = chartBottom - chartTop;
-            var chartWidth = chartRight - chartLeft;
-
-            var axisPaint = new SKPaint { Color = SKColors.Black, StrokeWidth = 2, IsAntialias = true };
-            canvas.DrawLine(chartLeft, chartBottom, chartRight, chartBottom, axisPaint);
-            canvas.DrawLine(chartLeft, chartBottom, chartLeft, chartTop, axisPaint);
-
-            var maxValue = values.Count == 0 ? 1 : Math.Max(1, (int)Math.Ceiling(values.Max()));
-            var barCount = values.Count;
-            var barSpacing = 12f;
-            var barWidth = Math.Max(16, (chartWidth - barSpacing * (barCount + 1)) / barCount);
-            var textPaint = new SKPaint { Color = SKColors.Black, TextSize = 12, IsAntialias = true };
-            var barPaint = new SKPaint { Color = SKColor.Parse("#F97316"), IsAntialias = true, Style = SKPaintStyle.Fill };
-            var labelPaint = new SKPaint { Color = SKColors.Black, TextSize = 10, IsAntialias = true };
-
-            for (var index = 0; index < barCount; index++)
-            {
-                var x = chartLeft + barSpacing + index * (barWidth + barSpacing);
-                var barHeight = (float)(values[index] / maxValue) * chartHeight;
-                var rect = new SKRect(x, chartBottom - barHeight, x + barWidth, chartBottom);
-                canvas.DrawRect(rect, barPaint);
-                var label = labels[index];
-                var labelWidth = labelPaint.MeasureText(label);
-                var labelX = x + (barWidth - labelWidth) / 2f;
-                canvas.DrawText(label, labelX, chartBottom + 16, labelPaint);
-            }
-        });
-    }
-
-    private static byte[] GeneratePieChartImage(IReadOnlyList<(string Name, double Value)> slices, string title)
-    {
-        const int width = 800;
-        const int height = 360;
-        return RenderChartPng(width, height, (canvas, area) =>
-        {
-            var backgroundPaint = new SKPaint { Color = SKColors.White, IsAntialias = true };
-            canvas.DrawRect(area, backgroundPaint);
-
-            var titlePaint = new SKPaint { Color = SKColors.Black, TextSize = 20, IsAntialias = true, Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold) };
-            canvas.DrawText(title, area.Left + 16, area.Top + 28, titlePaint);
-
-            var centerX = area.Left + 260;
-            var centerY = area.Top + 190;
-            var radius = Math.Min(180, Math.Min(area.Width, area.Height) / 4f);
-            var total = Math.Max(1, slices.Sum(s => s.Value));
-            var startAngle = -90f;
-            var sliceColors = new[] { SKColor.Parse("#22C55E"), SKColor.Parse("#3B82F6"), SKColor.Parse("#F97316"), SKColor.Parse("#A855F7") };
-            for (var index = 0; index < slices.Count; index++)
-            {
-                var slice = slices[index];
-                var sweepAngle = (float)(360 * slice.Value / total);
-                using var paint = new SKPaint { Color = sliceColors[index % sliceColors.Length], IsAntialias = true, Style = SKPaintStyle.Fill };
-                canvas.DrawArc(new SKRect(centerX - radius, centerY - radius, centerX + radius, centerY + radius), startAngle, sweepAngle, true, paint);
-                startAngle += sweepAngle;
-            }
-
-            var legendPaint = new SKPaint { Color = SKColors.Black, TextSize = 12, IsAntialias = true };
-            for (var index = 0; index < slices.Count; index++)
-            {
-                var slice = slices[index];
-                var top = area.Top + 60 + index * 24;
-                using var colorPaint = new SKPaint { Color = sliceColors[index % sliceColors.Length], IsAntialias = true, Style = SKPaintStyle.Fill };
-                canvas.DrawRect(new SKRect(area.Right - 240, top - 12, area.Right - 220, top + 4), colorPaint);
-                canvas.DrawText($"{slice.Name}: {slice.Value:0.##}", area.Right - 210, top, legendPaint);
-            }
-        });
     }
 
     public ReportExportResult ExportAdminCourses(AdminCoursesReportDto report, ReportExportFormat format)
@@ -290,6 +119,7 @@ public class ReportExportService : IReportExportService
 
     private static void WriteAdminCoursesSheet(IXLWorksheet ws, AdminCoursesReportDto report)
     {
+        // Header
         ws.Cell(1, 1).Value = "Universidad Privada Domingo Savio";
         ws.Cell(1, 1).Style.Font.Bold = true;
         ws.Cell(1, 1).Style.Font.FontSize = 16;
@@ -346,6 +176,7 @@ public class ReportExportService : IReportExportService
 
     private static void WriteAdminTeachersSheet(IXLWorksheet ws, AdminTeachersReportDto report)
     {
+        // Header
         ws.Cell(1, 1).Value = "Universidad Privada Domingo Savio";
         ws.Cell(1, 1).Style.Font.Bold = true;
         ws.Cell(1, 1).Style.Font.FontSize = 16;
@@ -483,18 +314,6 @@ public class ReportExportService : IReportExportService
 
     private static void BuildAdminCoursesPdf(IDocumentContainer container, AdminCoursesReportDto report)
     {
-        var totalEnrollments = report.Courses.Sum(c => c.TotalEnrollments);
-        var totalCancellations = report.Courses.Sum(c => c.TotalCancellations);
-        var totalCompletions = report.Courses.Sum(c => c.TotalCompletions);
-        var active = totalEnrollments - totalCancellations - totalCompletions;
-
-        var pieData = new[]
-        {
-            new { Name = "Activos", Value = (double)active },
-            new { Name = "Cancelados", Value = (double)totalCancellations },
-            new { Name = "Completados", Value = (double)totalCompletions }
-        }.Where(d => d.Value > 0).ToArray();
-
         container.Page(page =>
         {
             page.Margin(24);
@@ -504,7 +323,7 @@ public class ReportExportService : IReportExportService
             page.Footer().Element(c => AddFooter(c));
             page.Content().Column(col =>
             {
-                col.Item().PaddingTop(20).Text("Detalle de Cursos").Bold().FontSize(14).FontColor(QuestPDF.Helpers.Colors.Blue.Darken4);
+                col.Item().PaddingTop(20).Text("Detalle de Cursos").Bold().FontSize(14);
 
                 col.Item().Table(table =>
                 {
@@ -520,47 +339,24 @@ public class ReportExportService : IReportExportService
 
                     table.Header(header =>
                     {
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Blue.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Blue.Darken1).Padding(5).Text("ID").SemiBold().FontColor(QuestPDF.Helpers.Colors.Blue.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Blue.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Blue.Darken1).Padding(5).Text("Curso").SemiBold().FontColor(QuestPDF.Helpers.Colors.Blue.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Blue.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Blue.Darken1).Padding(5).Text("Docente").SemiBold().FontColor(QuestPDF.Helpers.Colors.Blue.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Blue.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Blue.Darken1).Padding(5).AlignRight().Text("Inscr.").SemiBold().FontColor(QuestPDF.Helpers.Colors.Blue.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Blue.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Blue.Darken1).Padding(5).AlignRight().Text("Canc.").SemiBold().FontColor(QuestPDF.Helpers.Colors.Blue.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Blue.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Blue.Darken1).Padding(5).AlignRight().Text("Term.").SemiBold().FontColor(QuestPDF.Helpers.Colors.Blue.Darken3);
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).Text("ID").SemiBold();
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).Text("Curso").SemiBold();
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).Text("Docente").SemiBold();
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).AlignRight().Text("Inscr.").SemiBold();
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).AlignRight().Text("Canc.").SemiBold();
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).AlignRight().Text("Term.").SemiBold();
                     });
 
                     foreach (var c in report.Courses.Take(200))
                     {
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text(c.CourseId.ToString());
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text(c.Title);
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text(c.TeacherName ?? "-");
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(c.TotalEnrollments.ToString());
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(c.TotalCancellations.ToString());
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(c.TotalCompletions.ToString());
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).Text(c.CourseId.ToString());
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).Text(c.Title);
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).Text(c.TeacherName ?? "-");
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(c.TotalEnrollments.ToString());
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(c.TotalCancellations.ToString());
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(c.TotalCompletions.ToString());
                     }
                 });
-
-                col.Item().PaddingTop(20).Text("Datos de Gráficas").Bold().FontSize(14).FontColor(QuestPDF.Helpers.Colors.Blue.Darken4).Underline();
-
-                if (report.EnrollmentsByMonth.Any())
-                {
-                    col.Item().PaddingTop(10).Text("Inscripciones por Mes").SemiBold().FontSize(12).FontColor(QuestPDF.Helpers.Colors.Blue.Darken2);
-                    var lineImage = GenerateLineChartImage(
-                        report.EnrollmentsByMonth.Select(m => (double)m.Count).ToList(),
-                        report.EnrollmentsByMonth.Select(m => $"{m.Year}-{m.Month:D2}").ToList(),
-                        "Inscripciones por Mes"
-                    );
-                    col.Item().Image(lineImage).FitWidth();
-                }
-
-                if (pieData.Any())
-                {
-                    col.Item().PaddingTop(10).Text("Estado de Inscripciones").SemiBold().FontSize(12).FontColor(QuestPDF.Helpers.Colors.Blue.Darken2);
-                    var pieImage = GeneratePieChartImage(
-                        pieData.Select(d => (d.Name, d.Value)).ToList(),
-                        "Estado de Inscripciones"
-                    );
-                    col.Item().Image(pieImage).FitWidth();
-                }
             });
         });
     }
@@ -576,7 +372,7 @@ public class ReportExportService : IReportExportService
             page.Footer().Element(c => AddFooter(c));
             page.Content().Column(col =>
             {
-                col.Item().PaddingTop(20).Text("Detalle de Docentes").Bold().FontSize(14).FontColor(QuestPDF.Helpers.Colors.Blue.Darken4);
+                col.Item().PaddingTop(20).Text("Detalle de Docentes").Bold().FontSize(14);
 
                 col.Item().Table(table =>
                 {
@@ -592,45 +388,30 @@ public class ReportExportService : IReportExportService
 
                     table.Header(header =>
                     {
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Orange.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Orange.Darken1).Padding(5).Text("ID").SemiBold().FontColor(QuestPDF.Helpers.Colors.Orange.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Orange.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Orange.Darken1).Padding(5).Text("Docente").SemiBold().FontColor(QuestPDF.Helpers.Colors.Orange.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Orange.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Orange.Darken1).Padding(5).AlignRight().Text("Cursos").SemiBold().FontColor(QuestPDF.Helpers.Colors.Orange.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Orange.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Orange.Darken1).Padding(5).AlignRight().Text("Inscr.").SemiBold().FontColor(QuestPDF.Helpers.Colors.Orange.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Orange.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Orange.Darken1).Padding(5).AlignRight().Text("Canc.").SemiBold().FontColor(QuestPDF.Helpers.Colors.Orange.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Orange.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Orange.Darken1).Padding(5).AlignRight().Text("Term.").SemiBold().FontColor(QuestPDF.Helpers.Colors.Orange.Darken3);
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).Text("ID").SemiBold();
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).Text("Docente").SemiBold();
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).AlignRight().Text("Cursos").SemiBold();
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).AlignRight().Text("Inscr.").SemiBold();
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).AlignRight().Text("Canc.").SemiBold();
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).AlignRight().Text("Term.").SemiBold();
                     });
 
                     foreach (var t in report.Teachers.Take(200))
                     {
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text(t.TeacherId.ToString());
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text(t.TeacherName);
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(t.TotalCourses.ToString());
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(t.TotalEnrollments.ToString());
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(t.TotalCancellations.ToString());
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(t.TotalCompletions.ToString());
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).Text(t.TeacherId.ToString());
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).Text(t.TeacherName);
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(t.TotalCourses.ToString());
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(t.TotalEnrollments.ToString());
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(t.TotalCancellations.ToString());
+                        table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(t.TotalCompletions.ToString());
                     }
                 });
-
-                col.Item().PaddingTop(20).Text("Datos de Gráficas").Bold().FontSize(14).FontColor(QuestPDF.Helpers.Colors.Blue.Darken4).Underline();
-
-                if (report.Teachers.Any())
-                {
-                    col.Item().PaddingTop(10).Text("Inscripciones por Docente").SemiBold().FontSize(12).FontColor(QuestPDF.Helpers.Colors.Blue.Darken2);
-                    var barImage = GenerateBarChartImage(
-                        report.Teachers.Select(t => (double)t.TotalEnrollments).ToList(),
-                        report.Teachers.Select(t => t.TeacherName.Length > 20 ? t.TeacherName.Substring(0, 20) + "..." : t.TeacherName).ToList(),
-                        "Inscripciones por Docente"
-                    );
-                    col.Item().Image(barImage).FitWidth();
-                }
             });
         });
     }
 
     private static void BuildTeacherSummaryPdf(IDocumentContainer container, TeacherSummaryReportDto report)
     {
-        var active = report.TotalEnrollments - report.TotalCancellations - report.TotalCompletions;
-
         container.Page(page =>
         {
             page.Margin(24);
@@ -640,7 +421,7 @@ public class ReportExportService : IReportExportService
             page.Footer().Element(c => AddFooter(c));
             page.Content().Column(col =>
             {
-                col.Item().PaddingTop(20).Text("Resumen de Actividad").Bold().FontSize(14).FontColor(QuestPDF.Helpers.Colors.Blue.Darken4);
+                col.Item().PaddingTop(20).Text("Resumen de Actividad").Bold().FontSize(14);
 
                 col.Item().PaddingTop(10).Table(table =>
                 {
@@ -652,68 +433,21 @@ public class ReportExportService : IReportExportService
 
                     table.Header(header =>
                     {
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Green.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Green.Darken1).Padding(5).Text("Métrica").SemiBold().FontColor(QuestPDF.Helpers.Colors.Green.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Green.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Green.Darken1).Padding(5).AlignRight().Text("Valor").SemiBold().FontColor(QuestPDF.Helpers.Colors.Green.Darken3);
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).Text("Métrica").SemiBold();
+                        header.Cell().Background(Colors.Blue.Lighten4).Border(1).BorderColor(Colors.Blue.Darken1).AlignRight().Text("Valor").SemiBold();
                     });
 
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text("Cursos");
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(report.TotalCourses.ToString());
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text("Inscritos");
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(report.TotalEnrollments.ToString());
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text("Cancelados");
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(report.TotalCancellations.ToString());
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text("Terminados");
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(report.TotalCompletions.ToString());
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text("Tasa Terminación");
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(report.CompletionRate.ToString("0.####"));
+                    table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).Text("Cursos");
+                    table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(report.TotalCourses.ToString());
+                    table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).Text("Inscritos");
+                    table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(report.TotalEnrollments.ToString());
+                    table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).Text("Cancelados");
+                    table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(report.TotalCancellations.ToString());
+                    table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).Text("Terminados");
+                    table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(report.TotalCompletions.ToString());
+                    table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).Text("Tasa Terminación");
+                    table.Cell().Border(0.5f).BorderColor(Colors.Grey.Lighten1).AlignRight().Text(report.CompletionRate.ToString("0.####"));
                 });
-
-                if (report.TotalEnrollments > 0)
-                {
-                    var pieImage = GeneratePieChartImage(
-                        new List<(string Name, double Value)>
-                        {
-                            ("Activos", report.TotalEnrollments - report.TotalCancellations - report.TotalCompletions),
-                            ("Cancelados", report.TotalCancellations),
-                            ("Completados", report.TotalCompletions),
-                        }.Where(s => s.Value > 0).ToList(),
-                        "Estado de Inscripciones"
-                    );
-                    col.Item().PaddingTop(16).Text("Gráfico de Estado").SemiBold().FontSize(12).FontColor(QuestPDF.Helpers.Colors.Blue.Darken2);
-                    col.Item().Image(pieImage).FitWidth();
-                }
-
-                col.Item().PaddingTop(20).Text("Gráficas").Bold().FontSize(14);
-
-                var pieData = new[]
-                {
-                    new { Name = "Activos", Value = (double)active },
-                    new { Name = "Cancelados", Value = (double)report.TotalCancellations },
-                    new { Name = "Completados", Value = (double)report.TotalCompletions }
-                }.Where(d => d.Value > 0).ToArray();
-
-                if (pieData.Any())
-                {
-                    col.Item().PaddingTop(10).Text("Estado de Inscripciones").SemiBold().FontSize(12).FontColor(QuestPDF.Helpers.Colors.Blue.Darken2);
-                    col.Item().Table(table =>
-                    {
-                        table.ColumnsDefinition(columns =>
-                        {
-                            columns.RelativeColumn(2);
-                            columns.RelativeColumn(1);
-                        });
-                        table.Header(header =>
-                        {
-                            header.Cell().Background(QuestPDF.Helpers.Colors.Green.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Green.Darken1).Padding(5).Text("Estado").SemiBold().FontColor(QuestPDF.Helpers.Colors.Green.Darken3);
-                            header.Cell().Background(QuestPDF.Helpers.Colors.Green.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Green.Darken1).Padding(5).AlignRight().Text("Cantidad").SemiBold().FontColor(QuestPDF.Helpers.Colors.Green.Darken3);
-                        });
-                        foreach (var d in pieData)
-                        {
-                            table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text(d.Name);
-                            table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(d.Value.ToString());
-                        }
-                    });
-                }
             });
         });
     }
@@ -727,9 +461,9 @@ public class ReportExportService : IReportExportService
             page.DefaultTextStyle(x => x.FontSize(10));
             page.Content().Column(col =>
             {
-                col.Item().Text("Reporte: Cursos del Docente").Bold().FontSize(16).FontColor(QuestPDF.Helpers.Colors.Blue.Darken4);
-                col.Item().Text($"Docente: {report.TeacherName}").FontColor(QuestPDF.Helpers.Colors.Grey.Darken2);
-                col.Item().Text($"Rango: {report.From:yyyy-MM-dd} a {report.To:yyyy-MM-dd}").FontColor(QuestPDF.Helpers.Colors.Grey.Darken2);
+                col.Item().Text("Reporte: Cursos del Docente").Bold().FontSize(16);
+                col.Item().Text($"Docente: {report.TeacherName}");
+                col.Item().Text($"Rango: {report.From:yyyy-MM-dd} a {report.To:yyyy-MM-dd}").FontColor(Colors.Grey.Darken2);
 
                 col.Item().Table(table =>
                 {
@@ -745,37 +479,24 @@ public class ReportExportService : IReportExportService
 
                     table.Header(header =>
                     {
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Purple.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Purple.Darken1).Padding(5).Text("ID").SemiBold().FontColor(QuestPDF.Helpers.Colors.Purple.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Purple.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Purple.Darken1).Padding(5).Text("Curso").SemiBold().FontColor(QuestPDF.Helpers.Colors.Purple.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Purple.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Purple.Darken1).Padding(5).AlignRight().Text("Inscr.").SemiBold().FontColor(QuestPDF.Helpers.Colors.Purple.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Purple.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Purple.Darken1).Padding(5).AlignRight().Text("Canc.").SemiBold().FontColor(QuestPDF.Helpers.Colors.Purple.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Purple.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Purple.Darken1).Padding(5).AlignRight().Text("Term.").SemiBold().FontColor(QuestPDF.Helpers.Colors.Purple.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Purple.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Purple.Darken1).Padding(5).AlignRight().Text("Tasa").SemiBold().FontColor(QuestPDF.Helpers.Colors.Purple.Darken3);
+                        header.Cell().Text("ID").SemiBold();
+                        header.Cell().Text("Curso").SemiBold();
+                        header.Cell().AlignRight().Text("Inscr.").SemiBold();
+                        header.Cell().AlignRight().Text("Canc.").SemiBold();
+                        header.Cell().AlignRight().Text("Term.").SemiBold();
+                        header.Cell().AlignRight().Text("Tasa").SemiBold();
                     });
 
                     foreach (var c in report.Courses.Take(200))
                     {
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text(c.CourseId.ToString());
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text(c.Title);
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(c.TotalEnrollments.ToString());
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(c.TotalCancellations.ToString());
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(c.TotalCompletions.ToString());
-                        table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(c.CompletionRate.ToString("0.####"));
+                        table.Cell().Text(c.CourseId.ToString());
+                        table.Cell().Text(c.Title);
+                        table.Cell().AlignRight().Text(c.TotalEnrollments.ToString());
+                        table.Cell().AlignRight().Text(c.TotalCancellations.ToString());
+                        table.Cell().AlignRight().Text(c.TotalCompletions.ToString());
+                        table.Cell().AlignRight().Text(c.CompletionRate.ToString("0.####"));
                     }
                 });
-
-                col.Item().PaddingTop(20).Text("Datos de Gráficas").Bold().FontSize(14).FontColor(QuestPDF.Helpers.Colors.Blue.Darken4).Underline();
-
-                if (report.Courses.Any())
-                {
-                    col.Item().PaddingTop(10).Text("Inscripciones por Curso").SemiBold().FontSize(12).FontColor(QuestPDF.Helpers.Colors.Blue.Darken2);
-                    var barImage = GenerateBarChartImage(
-                        report.Courses.Select(c => (double)c.TotalEnrollments).ToList(),
-                        report.Courses.Select(c => c.Title.Length > 30 ? c.Title.Substring(0, 30) + "..." : c.Title).ToList(),
-                        "Inscripciones por Curso"
-                    );
-                    col.Item().Image(barImage).FitWidth();
-                }
             });
         });
     }
@@ -789,10 +510,10 @@ public class ReportExportService : IReportExportService
             page.DefaultTextStyle(x => x.FontSize(10));
             page.Content().Column(col =>
             {
-                col.Item().Text("Reporte: Curso (Detalle Docente)").Bold().FontSize(16).FontColor(QuestPDF.Helpers.Colors.Blue.Darken4);
-                col.Item().Text($"Docente: {report.TeacherName}").FontColor(QuestPDF.Helpers.Colors.Grey.Darken2);
-                col.Item().Text($"Curso: {report.CourseTitle}").FontColor(QuestPDF.Helpers.Colors.Grey.Darken2);
-                col.Item().Text($"Rango: {report.From:yyyy-MM-dd} a {report.To:yyyy-MM-dd}").FontColor(QuestPDF.Helpers.Colors.Grey.Darken2);
+                col.Item().Text("Reporte: Curso (Detalle Docente)").Bold().FontSize(16);
+                col.Item().Text($"Docente: {report.TeacherName}");
+                col.Item().Text($"Curso: {report.CourseTitle}");
+                col.Item().Text($"Rango: {report.From:yyyy-MM-dd} a {report.To:yyyy-MM-dd}").FontColor(Colors.Grey.Darken2);
 
                 col.Item().PaddingTop(10).Table(table =>
                 {
@@ -802,26 +523,20 @@ public class ReportExportService : IReportExportService
                         columns.RelativeColumn(2);
                     });
 
-                    table.Header(header =>
-                    {
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Red.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Red.Darken1).Padding(5).Text("Métrica").SemiBold().FontColor(QuestPDF.Helpers.Colors.Red.Darken3);
-                        header.Cell().Background(QuestPDF.Helpers.Colors.Red.Lighten4).Border(1).BorderColor(QuestPDF.Helpers.Colors.Red.Darken1).Padding(5).AlignRight().Text("Valor").SemiBold().FontColor(QuestPDF.Helpers.Colors.Red.Darken3);
-                    });
-
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text("Inscritos");
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(report.TotalEnrollments.ToString());
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text("Cancelados");
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(report.TotalCancellations.ToString());
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text("Terminados");
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(report.TotalCompletions.ToString());
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).Text("Tasa_terminación");
-                    table.Cell().Border(0.5f).BorderColor(QuestPDF.Helpers.Colors.Grey.Lighten1).Padding(5).AlignRight().Text(report.CompletionRate.ToString("0.####"));
+                    table.Cell().Text("Inscritos").SemiBold();
+                    table.Cell().AlignRight().Text(report.TotalEnrollments.ToString());
+                    table.Cell().Text("Cancelados").SemiBold();
+                    table.Cell().AlignRight().Text(report.TotalCancellations.ToString());
+                    table.Cell().Text("Terminados").SemiBold();
+                    table.Cell().AlignRight().Text(report.TotalCompletions.ToString());
+                    table.Cell().Text("Tasa_terminación").SemiBold();
+                    table.Cell().AlignRight().Text(report.CompletionRate.ToString("0.####"));
                 });
             });
         });
     }
 
-    private static void AddHeader(IContainer container, string title, string? subtitle = null)
+    private static void AddHeader(IContainer container, string title, string subtitle = null)
     {
         container.Row(row =>
         {

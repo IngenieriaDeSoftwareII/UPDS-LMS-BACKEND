@@ -14,10 +14,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<ImageContent> ImageContents { get; set; }
     public DbSet<DocumentContent> DocumentContents { get; set; }
     public DbSet<VideoContent> VideoContents { get; set; }
-    public DbSet<Homework> Homeworks { get; set; }
-    public DbSet<HomeworkSubmission> HomeworkSubmissions { get; set; }
-
-
     public DbSet<Inscription> Inscriptions { get; set; }
     public DbSet<LessonProgress> LessonProgresses { get; set; }
     public DbSet<Course> Courses { get; set; }
@@ -91,34 +87,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
         modelBuilder.Entity<Lesson>(entity =>
         {
             entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
-        });
-
-        modelBuilder.Entity<Homework>(entity =>
-        {
-            entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
-            entity.Property(e => e.Estado).HasDefaultValue("activo");
-            entity.Property(e => e.PermiteEntregaTardia).HasDefaultValue(false);
-            
-            entity.HasOne(h => h.Lesson)
-                  .WithMany(l => l.Homeworks)
-                  .HasForeignKey(h => h.LessonId)
-                  .OnDelete(DeleteBehavior.SetNull);
-
-            entity.HasMany(h => h.Submissions)
-                  .WithOne(s => s.Homework)
-                  .HasForeignKey(s => s.HomeworkId)
-                  .OnDelete(DeleteBehavior.Cascade);
-        });
-        modelBuilder.Entity<HomeworkSubmission>(entity =>
-        {
-            entity.Property(e => e.EntityStatus).HasDefaultValue((short)1);
-            entity.Property(e => e.Estado).HasDefaultValue("pendiente");
-            entity.Property(e => e.Revisado).HasDefaultValue(false);
-
-            entity.HasOne(s => s.Usuario)
-                  .WithMany()
-                  .HasForeignKey(s => s.UsuarioId)
-                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Evaluation>(entity =>

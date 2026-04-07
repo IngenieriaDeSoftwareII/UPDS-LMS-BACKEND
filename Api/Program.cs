@@ -24,9 +24,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
-using Business.UseCases.Modules;
-using Business.UseCases.Homework;
-using Business.UseCases.HomeworkSubmissions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,9 +55,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 // JWT Authentication
 // --------------------------------------
-var jwtSecret = builder.Configuration["Jwt:Secret"];
-if (string.IsNullOrEmpty(jwtSecret))
-    throw new Exception("JWT Secret no configurado");
+
+var jwtSecret = builder.Configuration["Jwt:Secret"]!;
 
 builder.Services.AddAuthentication(options =>
 {
@@ -113,7 +109,7 @@ builder.Services.AddAuthentication(options =>
 
 // Services
 // --------------------------------------
-builder.Services.AddScoped<IStorageService, AzureMediaStorageService>();
+
 builder.Services.AddScoped<IMediaStorageService, AzureMediaStorageService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IReportExportService, ReportExportService>();
@@ -132,8 +128,7 @@ builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 
 builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>();
 builder.Services.AddScoped<IInscriptionRepository, InscriptionRepository>();
-
-builder.Services.AddScoped<IGradableItemRepository, GradableItemRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IEvaluationRepository, EvaluationRepository>();
 
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
@@ -141,12 +136,7 @@ builder.Services.AddScoped<IContentRepository, ContentRepository>();
 builder.Services.AddScoped<IVideoContentRepository, VideoContentRepository>();
 builder.Services.AddScoped<IImageContentRepository, ImageContentRepository>();
 builder.Services.AddScoped<IDocumentContentRepository, DocumentContentRepository>();
-
-builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
 builder.Services.AddScoped<IReportsRepository, ReportsRepository>();
-
-builder.Services.AddScoped<IHomeworkRepository, HomeworkRepository>();
-builder.Services.AddScoped<IHomeworkSubmissionRepository, HomeworkSubmissionRepository>();
 
 // UseCases
 // --------------------------------------
@@ -163,14 +153,13 @@ builder.Services.AddScoped<ChangePersonStatusUseCase>();
 builder.Services.AddScoped<CreateInscriptionUseCase>();
 builder.Services.AddScoped<ListInscriptionsUseCase>();
 builder.Services.AddScoped<CancelInscriptionUseCase>();
-
-// Student progress
-builder.Services.AddScoped<Business.UseCases.StudentProgress.GetStudentCourseLearningUseCase>();
-builder.Services.AddScoped<Business.UseCases.StudentProgress.CompleteLessonUseCase>();
-builder.Services.AddScoped<Business.UseCases.StudentProgress.GetStudentProgressDashboardUseCase>();
-builder.Services.AddScoped<Business.UseCases.StudentProgress.GetModuleWeightedGradesUseCase>();
-builder.Services.AddScoped<Business.UseCases.StudentProgress.GenerateCourseCertificatePdfUseCase>();
-
+// Evaluations
+builder.Services.AddScoped<CreateEvaluationUseCase>();
+builder.Services.AddScoped<AddEvaluationQuestionUseCase>();
+builder.Services.AddScoped<SubmitEvaluationUseCase>();
+builder.Services.AddScoped<ListMyEvaluationGradesUseCase>();
+builder.Services.AddScoped<ListEvaluationGradesForTeacherUseCase>();
+builder.Services.AddScoped<GetEvaluationToTakeUseCase>();
 // Users
 builder.Services.AddScoped<CreateUserUseCase>();
 builder.Services.AddScoped<ListUsersUseCase>();
@@ -226,7 +215,6 @@ builder.Services.AddScoped<CreateLessonUseCase>();
 builder.Services.AddScoped<ListLessonsUseCase>();
 builder.Services.AddScoped<UpdateLessonUseCase>();
 builder.Services.AddScoped<DeleteLessonUseCase>();
-builder.Services.AddScoped<ListLessonByCourseUseCase>();
 
 //Content
 builder.Services.AddScoped<CreateContentUseCase>();
@@ -235,7 +223,7 @@ builder.Services.AddScoped<UpdateContentUseCase>();
 builder.Services.AddScoped<DeleteContentUseCase>();
 
 //Video Content
-builder.Services.AddScoped<UploadVideoContentUseCase>();
+builder.Services.AddScoped<CreateVideoContentUseCase>();
 builder.Services.AddScoped<ListVideoContentsUseCase>();
 builder.Services.AddScoped<UpdateVideoContentUseCase>();
 builder.Services.AddScoped<DeleteVideoContentUseCase>();
@@ -243,10 +231,8 @@ builder.Services.AddScoped<DeleteVideoContentUseCase>();
 //Image Content
 builder.Services.AddScoped<CreateImageContentUseCase>();
 builder.Services.AddScoped<ListImageContentsUseCase>();
-builder.Services.AddScoped<ListImageContentsByCourseUseCase>();
 builder.Services.AddScoped<UpdateImageContentUseCase>();
 builder.Services.AddScoped<DeleteImageContentUseCase>();
-builder.Services.AddScoped<UploadImageContentUseCase>();
 
 //Document Content
 builder.Services.AddScoped<CreateDocumentContentUseCase>();
@@ -256,24 +242,12 @@ builder.Services.AddScoped<DeleteDocumentContentUseCase>();
 builder.Services.AddScoped<UploadDocumentContentUseCase>();
 builder.Services.AddScoped<GetDocumentSasUrlUseCase>();
 
-//Modules
-builder.Services.AddScoped<CreateModuleUseCase>();
-builder.Services.AddScoped<ListModulesUseCase>();
-builder.Services.AddScoped<GetModuleByIdUseCase>();
-builder.Services.AddScoped<UpdateModuleUseCase>();
-builder.Services.AddScoped<DeleteModuleUseCase>();
-builder.Services.AddScoped<GetModuleByCourseId>();
-
-
 // Reports
 builder.Services.AddScoped<GetAdminCoursesReportUseCase>();
 builder.Services.AddScoped<GetAdminTeachersReportUseCase>();
 builder.Services.AddScoped<GetTeacherSummaryReportUseCase>();
 builder.Services.AddScoped<GetTeacherCoursesReportUseCase>();
 builder.Services.AddScoped<GetTeacherCourseDetailReportUseCase>();
-
-
-
 
 // Evaluations
 builder.Services.AddScoped<CreateEvaluationUseCase>();
@@ -284,18 +258,7 @@ builder.Services.AddScoped<ListMyEvaluationGradesUseCase>();
 builder.Services.AddScoped<ListEvaluationGradesForTeacherUseCase>();
 builder.Services.AddScoped<ListAvailableEvaluationsForStudentUseCase>();
 
-// Homeworks (Tareas)
-builder.Services.AddScoped<CreateHomeworkUseCase>();
-builder.Services.AddScoped<ListHomeworkUseCase>();
-builder.Services.AddScoped<UpdateHomeworkUseCase>();
-builder.Services.AddScoped<DeleteHomeworkUseCase>();
-builder.Services.AddScoped<GetHomeworkSubmissionsUseCase>();
 
-// Homework Submissions (Entregas de Tareas)
-builder.Services.AddScoped<SubmitHomeworkUseCase>();
-builder.Services.AddScoped<DeleteHomeworkSubmissionUseCase>();
-builder.Services.AddScoped<GradeHomeworkSubmissionUseCase>();
-builder.Services.AddScoped<ListHomeworkSubmissionUseCase>();
 
 // Validators
 // --------------------------------------
@@ -311,11 +274,7 @@ builder.Services.AddAutoMapper(
     typeof(InscriptionProfile),
     typeof(CourseProfile),
     typeof(EvaluationProfile),
-    typeof(ModuleProfile),
-    typeof(ReportsProfile),
-    typeof(HomeworkProfile)
-    );
-
+    typeof(ReportsProfile));
 
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>

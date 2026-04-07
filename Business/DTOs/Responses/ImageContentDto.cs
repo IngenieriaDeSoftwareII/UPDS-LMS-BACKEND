@@ -9,7 +9,4 @@ public class ImageContentDto
     public int? HeightPx { get; set; }
     public string AltText { get; set; } = null!;
     public int? SizeKb { get; set; }
-
-     // RELACIÓN con content
-    public ContentDto? Content { get; set; }
 }

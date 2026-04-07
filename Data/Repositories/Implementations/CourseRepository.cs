@@ -11,7 +11,8 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
     {
         context.Courses.Add(course);
         await context.SaveChangesAsync();
-        return course;
+        // Recargar la entidad con sus relaciones para devolver datos completos
+        return await GetByIdAsync(course.Id) ?? course;
     }
 
     public async Task<IEnumerable<Course>> GetAllAsync()
@@ -20,6 +21,8 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
             .AsNoTracking()
             .Include(c => c.Categoria)
             .Include(c => c.Docente)
+                .ThenInclude(d => d.Usuario)
+                    .ThenInclude(u => u.Person)
             .Where(c => c.EntityStatus == 1)
             .ToListAsync();
     }
@@ -29,19 +32,8 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
         return await context.Courses
             .Include(c => c.Categoria)
             .Include(c => c.Docente)
-            .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
-    }
-
-    public async Task<Course?> GetByIdWithModulesLessonsAndTeacherAsync(int id)
-    {
-        return await context.Courses
-            .AsNoTracking()
-            .Include(c => c.Categoria)
-            .Include(c => c.Docente!)
                 .ThenInclude(d => d.Usuario)
-                .ThenInclude(u => u.Person)
-            .Include(c => c.Modulos.Where(m => m.EntityStatus == null || m.EntityStatus == 1))
-                .ThenInclude(m => m.Lecciones.Where(l => l.EntityStatus == 1))
+                    .ThenInclude(u => u.Person)
             .FirstOrDefaultAsync(c => c.Id == id && c.EntityStatus == 1);
     }
 
@@ -58,6 +50,8 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
             .AsNoTracking()
             .Include(c => c.Categoria)
             .Include(c => c.Docente)
+                .ThenInclude(d => d.Usuario)
+                    .ThenInclude(u => u.Person)
             .Where(c => c.DocenteId == teacherId && c.EntityStatus == 1)
             .ToListAsync();
     }
@@ -68,6 +62,8 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
             .AsNoTracking()
             .Include(c => c.Categoria)
             .Include(c => c.Docente)
+                .ThenInclude(d => d.Usuario)
+                    .ThenInclude(u => u.Person)
             .Where(c => c.DocenteId == teacherId && c.EntityStatus == 1)
             .Where(c => !context.Evaluations.Any(e => e.CursoId == c.Id && e.EntityStatus == 1))
             .ToListAsync();

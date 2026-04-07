@@ -14,48 +14,41 @@ public class VideoContentRepository : IVideoContentRepository
         _context = context;
     }
 
-    public async Task<VideoContent> CreateAsync(VideoContent video)
+    public async Task<VideoContent> CreateAsync(VideoContent videoContent)
     {
-        _context.VideoContents.Add(video);
+        _context.VideoContents.Add(videoContent);
         await _context.SaveChangesAsync();
-        return video;
+        return videoContent;
     }
 
-    public async Task<IEnumerable<VideoContent>> GetAllAsync()
+    public async Task DeleteAsync(int id)
     {
-        return await _context.VideoContents
-            .Include(v => v.Contenido)
-            .ToListAsync();
-    }
-
-    public async Task<VideoContent?> GetByContentIdAsync(int contentId)
-    {
-        return await _context.VideoContents
-            .Include(v => v.Contenido)
-            .FirstOrDefaultAsync(v => v.ContenidoId == contentId);
-    }
-
-    public async Task<VideoContent> UpdateAsync(VideoContent video)
-    {
-        _context.VideoContents.Update(video);
-        await _context.SaveChangesAsync();
-        return video;
-    }
-
-    public async Task DeleteAsync(int contentId)
-    {
-        var video = await GetByContentIdAsync(contentId);
-
-        if (video != null)
+        var videoContent = await _context.VideoContents.FindAsync(id);
+        if (videoContent != null)
         {
-            _context.VideoContents.Remove(video);
+            _context.VideoContents.Remove(videoContent);
             await _context.SaveChangesAsync();
         }
     }
-    public async Task<IEnumerable<VideoContent>> GetAllWithContentAsync()
+
+    public async Task<List<VideoContent>> GetAllAsync()
     {
-        return await _context.VideoContents
-            .Include(v => v.Contenido) 
-            .ToListAsync();
+        return await _context.VideoContents.ToListAsync();
+    }
+
+    public async Task<VideoContent?> GetByIdAsync(int? id)
+    {
+        return await _context.VideoContents.FindAsync(id);
+    }
+
+    public async Task<VideoContent?> GetByContentIdAsync(int? ContenidoId)
+    {
+        return await _context.VideoContents.FirstOrDefaultAsync(vc => vc.ContenidoId == ContenidoId);
+    }
+    public async Task<VideoContent> UpdateAsync(VideoContent videoContent)
+    {
+        _context.VideoContents.Update(videoContent);
+        await _context.SaveChangesAsync();
+        return videoContent;
     }
 }

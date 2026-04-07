@@ -23,10 +23,7 @@ public class ImageContentRepository : IImageContentRepository
 
     public async Task DeleteAsync(int id)
     {
-        var imageContent = await _context.ImageContents
-            .Include(ic => ic.Contenido) 
-            .FirstOrDefaultAsync(ic => ic.ContenidoId == id);
-
+        var imageContent = await _context.ImageContents.FindAsync(id);
         if (imageContent != null)
         {
             _context.ImageContents.Remove(imageContent);
@@ -36,36 +33,17 @@ public class ImageContentRepository : IImageContentRepository
 
     public async Task<IEnumerable<ImageContent>> GetAllAsync()
     {
-        return await _context.ImageContents
-            .Include(ic => ic.Contenido) 
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<ImageContent>> GetByCourseIdAsync(int courseId)
-    {
-        return await _context.ImageContents
-            .Include(ic => ic.Contenido)
-                .ThenInclude(c => c.Leccion)
-                    .ThenInclude(l => l.Modulos)
-            .Where(ic => ic.Contenido.Leccion.Modulos.CursoId == courseId
-                && ic.Contenido.Leccion.EntityStatus == 1
-                && (ic.Contenido.Leccion.Modulos.EntityStatus == null || ic.Contenido.Leccion.Modulos.EntityStatus == 1)
-                && ic.Contenido.EntityStatus == 1)
-            .ToListAsync();
+        return await _context.ImageContents.ToListAsync();
     }
 
     public async Task<ImageContent?> GetByIdAsync(int? id)
     {
-        return await _context.ImageContents
-            .Include(ic => ic.Contenido) 
-            .FirstOrDefaultAsync(ic => ic.ContenidoId == id);
+        return await _context.ImageContents.FindAsync(id);
     }
 
-    public async Task<ImageContent?> GetByContentIdAsync(int contenidoId)
+    public async Task<ImageContent?> GetByContentIdAsync(int ContenidoId)
     {
-        return await _context.ImageContents
-            .Include(ic => ic.Contenido) 
-            .FirstOrDefaultAsync(ic => ic.ContenidoId == contenidoId);
+        return await _context.ImageContents.FirstOrDefaultAsync(ic => ic.ContenidoId == ContenidoId);
     }
     
     public async Task<ImageContent> UpdateAsync(ImageContent imageContent)

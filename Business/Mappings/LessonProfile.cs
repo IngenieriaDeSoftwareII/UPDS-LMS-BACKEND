@@ -20,13 +20,5 @@ public class LessonProfile : Profile
             .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Descripcion))
             .ForMember(dest => dest.ModuleId, opt => opt.MapFrom(src => src.ModuloId))
             .ForMember(dest => dest.Order, opt => opt.MapFrom(src => src.Orden));
-
-        CreateMap<Lesson, LessonWithContentsDto>()
-            .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Titulo))
-            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Descripcion))
-            .ForMember(dest => dest.ModuleId, opt => opt.MapFrom(src => src.ModuloId))
-            .ForMember(dest => dest.Order, opt => opt.MapFrom(src => src.Orden))
-            .ForMember(dest => dest.Contents, opt => opt.MapFrom(src => src.Contenidos))
-            .ForMember(dest => dest.Homeworks, opt => opt.MapFrom(src => src.Homeworks));
     }
 }

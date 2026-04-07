@@ -48,8 +48,8 @@ public class ContentProfile : Profile
 
         // Video
         CreateMap<CreateVideoContentDto, VideoContent>()
-            .ForMember(dest => dest.ContenidoId, opt => opt.Ignore()) //  se asigna después
-            .ForMember(dest => dest.UrlVideo, opt => opt.Ignore())    //  lo genera el storage
+            .ForMember(dest => dest.ContenidoId, opt => opt.MapFrom(src => src.ContentId))
+            .ForMember(dest => dest.UrlVideo, opt => opt.MapFrom(src => src.VideoUrl))
             .ForMember(dest => dest.DuracionSeg, opt => opt.MapFrom(src => src.DurationSeconds))
             .ForMember(dest => dest.Contenido, opt => opt.Ignore());
 

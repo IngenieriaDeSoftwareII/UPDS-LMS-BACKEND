@@ -26,37 +26,12 @@ public class LessonRepository(AppDbContext context) : ILessonRepository
 
     public async Task<IEnumerable<Lesson>> GetAllAsync()
     {
-        return await context.Lessons
-            .AsNoTracking()
-            .Include(l => l.Modulos)
-            .Include(l => l.Contenidos)
-            .Include(l => l.Homeworks)
-            .ToListAsync();
+        return await context.Lessons.ToListAsync();
     }
 
-    public async Task<Lesson?> GetByIdAsync(int? courseId)
+    public async Task<Lesson?> GetByIdAsync(int? id)
     {
-        return await context.Lessons.FindAsync(courseId);
-    }
-
-    public async Task<Lesson?> GetByIdWithModuleAndCourseAsync(int courseId)
-    {
-        return await context.Lessons
-            .AsNoTracking()
-            .Include(l => l.Modulos)
-            .FirstOrDefaultAsync(l => l.Id == courseId && l.EntityStatus == 1);
-    }
-
-    public async Task<int> CountActiveLessonsByCourseAsync(int cursoId)
-    {
-        return await context.Lessons
-            .AsNoTracking()
-            .CountAsync(l => l.EntityStatus == 1
-                && l.ModuloId != null
-                && context.Modules.Any(m =>
-                    m.Id == l.ModuloId
-                    && m.CursoId == cursoId
-                    && (m.EntityStatus == null || m.EntityStatus == 1)));
+        return await context.Lessons.FindAsync(id);
     }
 
     public async Task<Lesson> UpdateAsync(Lesson lesson)
@@ -64,20 +39,5 @@ public class LessonRepository(AppDbContext context) : ILessonRepository
         context.Lessons.Update(lesson);
         await context.SaveChangesAsync();
         return lesson;
-    }
-    public async Task<IEnumerable<Lesson>> GetLessonsByCourseAndModuleAsync(int courseId, int moduleId)
-    {
-        return await context.Lessons
-            .AsNoTracking()
-            .Include(l => l.Modulos)
-            .Include(l => l.Contenidos)
-            .Include(l => l.Homeworks)
-            .Where(l => l.EntityStatus == 1
-                && l.ModuloId == moduleId
-                && context.Modules.Any(m =>
-                    m.Id == moduleId
-                    && m.CursoId == courseId
-                    && (m.EntityStatus == null || m.EntityStatus == 1)))
-            .ToListAsync();
     }
 }
